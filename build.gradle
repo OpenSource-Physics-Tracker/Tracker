@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+}
+
+jar {
+    manifest { // Здесь указывается Main class для запуска приложений(иначе jar не запуститься)
+        attributes 'Main-Class': 'java.org.opensourcephysics.cabrillo.tracker.Tracker'
+    }
+}
+
+group 'org.osptracker'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    // Добавлен JitPack для работы с зависимостями через GitHub
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compile group: 'com.nativelibs4java', name: 'bridj', version: '0.7.0'
+    implementation 'com.github.OpenSource-Physics-Tracker:AppleJavaExstensions:70fb48e5fe'
+    implementation 'com.github.OpenSource-Physics-Tracker:FFMpeg:ef6949741c'
+}
