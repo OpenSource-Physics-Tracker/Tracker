@@ -142,10 +142,7 @@ public class OSPLog extends JFrame {
     logdir = dir;
   }
 
-  /**
-   * Gets the directory where the log file will be saved if logging is enabled.
-   * @param dir String
-   */
+
   public String getLogDir() {
     return logdir;
   }
@@ -164,11 +161,7 @@ public class OSPLog extends JFrame {
     return false;
   }
 
-  /**
-   * Sets the visibility of this log.
-   *
-   * @param true to set visible
-   */
+
   public void setVisible(boolean visible) {
     if(OSPRuntime.appletMode||(OSPRuntime.applet!=null)) {
       org.opensourcephysics.controls.MessageFrame.showLog(visible);
@@ -350,11 +343,6 @@ public class OSPLog extends JFrame {
     }
   }
 
-  /**
-   * Clears the Log.
-   *
-   * @param msg the message
-   */
   public static void clearLog() {
     messageIndex = 0;
     if(OSPRuntime.appletMode||(OSPRuntime.applet!=null)) {
