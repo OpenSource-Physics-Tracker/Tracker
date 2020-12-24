@@ -207,7 +207,7 @@ public class ExportZipDialog extends JDialog {
    * Creates the visible components of this dialog.
    */
   private void createGUI() {
-    String path = "/org/opensourcephysics/cabrillo/tracker/resources/images/open.gif"; //$NON-NLS-1$
+    String path = "/images/open.gif"; //$NON-NLS-1$
     openIcon = new ResizableIcon(new ImageIcon(this.getClass().getResource(path)));
     Color color = UIManager.getColor("Label.disabledForeground"); //$NON-NLS-1$
     if (color!=null) UIManager.put("ComboBox.disabledForeground", color); //$NON-NLS-1$

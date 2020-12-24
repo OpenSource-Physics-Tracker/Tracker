@@ -85,10 +85,10 @@ public class PencilControl extends JDialog {
   private static Color lightgrey = new Color(230, 230, 230);
 
   static {
-  	undoIcon =  new ResizableIcon(Tracker.class.getResource("resources/images/undo.gif")); //$NON-NLS-1$
-  	redoIcon =  new ResizableIcon(Tracker.class.getResource("resources/images/redo.gif")); //$NON-NLS-1$
-  	undoDisabledIcon =  new ResizableIcon(Tracker.class.getResource("resources/images/undo_disabled.gif")); //$NON-NLS-1$
-  	redoDisabledIcon =  new ResizableIcon(Tracker.class.getResource("resources/images/redo_disabled.gif")); //$NON-NLS-1$
+  	undoIcon =  new ResizableIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\undo.gif"); //$NON-NLS-1$
+  	redoIcon =  new ResizableIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\redo.gif"); //$NON-NLS-1$
+  	undoDisabledIcon =  new ResizableIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\undo_disabled.gif"); //$NON-NLS-1$
+  	redoDisabledIcon =  new ResizableIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\redo_disabled.gif"); //$NON-NLS-1$
   }
   	
 	private PencilDrawer drawer;

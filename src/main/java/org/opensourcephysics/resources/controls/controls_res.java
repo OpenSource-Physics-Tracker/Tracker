@@ -1,4 +1,5 @@
 package org.opensourcephysics.resources.controls;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.PropertyResourceBundle;
@@ -13,14 +14,14 @@ import java.util.PropertyResourceBundle;
 */
 public class controls_res extends PropertyResourceBundle {
   // relative path to strings
-  static String res = "controls_res.properties"; //$NON-NLS-1$
+  static File res = new File("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\java\\org\\opensourcephysics\\resources\\controls\\controls_res.properties");
 
   /**
    * Constructor tools
    * @throws IOException
    */
   public controls_res() throws IOException {
-    this(controls_res.class.getResourceAsStream(res));
+    this(controls_res.class.getResourceAsStream("org.opensourcephysics.resources.controls.controls_res.properties"));
   }
 
   /**

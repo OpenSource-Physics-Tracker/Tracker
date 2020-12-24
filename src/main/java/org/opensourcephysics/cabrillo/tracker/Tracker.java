@@ -69,11 +69,9 @@ public class Tracker {
   public static final String VERSION = "5.2.0.0"; //$NON-NLS-1$
   public static final String COPYRIGHT = "Copyright (c) 2018 Douglas Brown, Nikolai Avdeev"; //$NON-NLS-1$
   /** the tracker icon */
-  public static final ImageIcon TRACKER_ICON = new ImageIcon(
-      Tracker.class.getResource("resources/images/tracker_icon_32.png")); //$NON-NLS-1$
-  /** a larger tracker icon */
-  public static final ImageIcon TRACKER_ICON_256 = new ImageIcon(
-      Tracker.class.getResource("resources/images/tracker_icon_256.png")); //$NON-NLS-1$
+  public static final ImageIcon TRACKER_ICON = new ImageIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\tracker_icon_32.png"); //$NON-NLS-1$
+    /** a larger tracker icon */
+  public static final ImageIcon TRACKER_ICON_256 = new ImageIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\tracker_icon_256.png"); //$NON-NLS-1$
 
 	static final String THETA = TeXParser.parseTeX("$\\theta"); //$NON-NLS-1$
 	static final String OMEGA = TeXParser.parseTeX("$\\omega"); //$NON-NLS-1$
@@ -202,13 +200,13 @@ public class Tracker {
 //    System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Tracker");
   	
   	// get logo icons with ResourceLoader so launch jar file is identified
-    String imageFile = "/org/opensourcephysics/cabrillo/tracker/resources/images/tracker_logo.png"; //$NON-NLS-1$
+    String imageFile = "/images/tracker_logo.png"; //$NON-NLS-1$
     trackerLogoIcon = ResourceLoader.getIcon(imageFile);
-    imageFile = "/org/opensourcephysics/cabrillo/tracker/resources/images/osp_logo_url.png"; //$NON-NLS-1$
+    imageFile = "/images/osp_logo_url.png"; //$NON-NLS-1$
     ospLogoIcon = ResourceLoader.getIcon(imageFile);
     
     // create grab cursor
-	  imageFile = "/org/opensourcephysics/cabrillo/tracker/resources/images/grab.gif";  //$NON-NLS-1$
+	  imageFile = "/images/grab.gif";  //$NON-NLS-1$
 	  Image grab = ResourceLoader.getImage(imageFile); 
 	  grabCursor = GUIUtils.createCustomCursor(grab, new Point(14, 10), "Grab", Cursor.HAND_CURSOR); //$NON-NLS-1$
     
@@ -1485,7 +1483,7 @@ public class Tracker {
    */
   protected static Cursor getZoomInCursor() {
   	if (zoomInCursor==null) {
-  	  String imageFile = "/org/opensourcephysics/cabrillo/tracker/resources/images/zoom_in.gif";  //$NON-NLS-1$
+  	  String imageFile = "/images/zoom_in.gif";  //$NON-NLS-1$
   	  Image zoom = ResourceLoader.getImage(imageFile);    
   	  zoomInCursor = GUIUtils.createCustomCursor(zoom, new Point(12, 12), "Zoom In", Cursor.DEFAULT_CURSOR); //$NON-NLS-1$
   	}
@@ -1508,7 +1506,7 @@ public class Tracker {
    */
   protected static Cursor getZoomOutCursor() {
   	if (zoomOutCursor==null) {
-  		String imageFile = "/org/opensourcephysics/cabrillo/tracker/resources/images/zoom_out.gif";  //$NON-NLS-1$
+  		String imageFile = "/images/zoom_out.gif";  //$NON-NLS-1$
   		Image zoom = ResourceLoader.getImage(imageFile);    
   	  zoomOutCursor = GUIUtils.createCustomCursor(zoom, new Point(12, 12), "Zoom Out", Cursor.DEFAULT_CURSOR); //$NON-NLS-1$
   	}

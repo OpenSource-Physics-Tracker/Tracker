@@ -32,7 +32,7 @@ public class ResizableIcon implements Icon {
    *
    * @param location the URL for the image
    */
-  public ResizableIcon(URL location) {
+  public ResizableIcon(String location) {
     this(new ImageIcon(location));
   }
 

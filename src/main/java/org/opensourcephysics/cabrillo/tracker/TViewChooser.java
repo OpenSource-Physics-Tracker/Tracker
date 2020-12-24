@@ -48,10 +48,8 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
 	protected static Icon maxIcon, restoreIcon;
 	
 	static {
-    maxIcon = new ResizableIcon(
-        Tracker.class.getResource("resources/images/maximize.gif")); //$NON-NLS-1$
-    restoreIcon = new ResizableIcon(
-        Tracker.class.getResource("resources/images/restore.gif")); //$NON-NLS-1$
+    maxIcon = new ResizableIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\maximize.gif"); //$NON-NLS-1$
+    restoreIcon = new ResizableIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\restore.gif"); //$NON-NLS-1$
 		
 	}
 
