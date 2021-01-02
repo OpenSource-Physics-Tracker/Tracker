@@ -90,8 +90,8 @@ public class ResizableIcon implements Icon {
    */
   public void resize(int factor) {
   	int n = Math.max(factor, 1);
-  	w = n*baseWidth;
-  	h = n*baseHeight;
+  	w = n * baseWidth;
+  	h = n * baseHeight;
   }
   
 }

@@ -61,16 +61,13 @@ public class TMouseHandler implements InteractiveMouseHandler {
   Dimension dim = new Dimension();
   
   static {
-    ImageIcon icon = new ImageIcon(
-        Tracker.class.getResource("resources/images/creatept.gif")); //$NON-NLS-1$
+    ImageIcon icon = new ImageIcon("/home/arthur/IdeaProjects/Tracker/src/main/resources/images/creatept.gif"); //$NON-NLS-1$
     markPointCursor = GUIUtils.createCustomCursor(icon.getImage(), new Point(8, 8), 
     		TrackerRes.getString("Tracker.Cursor.Crosshair.Description"), Cursor.MOVE_CURSOR); //$NON-NLS-1$  	
-    icon = new ImageIcon(
-        Tracker.class.getResource("resources/images/autotrack.gif")); //$NON-NLS-1$
+    icon = new ImageIcon("/home/arthur/IdeaProjects/Tracker/src/main/resources/images/autotrack.gif"); //$NON-NLS-1$
     autoTrackCursor = GUIUtils.createCustomCursor(icon.getImage(), new Point(9, 9), 
     		TrackerRes.getString("PointMass.Cursor.Autotrack.Description"), Cursor.MOVE_CURSOR); //$NON-NLS-1$ 
-    icon = new ImageIcon(
-        Tracker.class.getResource("resources/images/autotrack_mark.gif")); //$NON-NLS-1$
+    icon = new ImageIcon("/home/arthur/IdeaProjects/Tracker/src/main/resources/images/autotrack_mark.gif"); //$NON-NLS-1$
     autoTrackMarkCursor = GUIUtils.createCustomCursor(icon.getImage(), new Point(9, 9), 
     		TrackerRes.getString("Tracker.Cursor.Autotrack.Keyframe.Description"), Cursor.MOVE_CURSOR); //$NON-NLS-1$  	
   }

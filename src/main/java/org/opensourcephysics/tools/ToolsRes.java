@@ -28,7 +28,7 @@ import org.opensourcephysics.display.dialogs.DialogsRes;
  */
 public class ToolsRes {
   // static fields
-  static final String BUNDLE_NAME = "org.opensourcephysics.resources.tools.tools"; //$NON-NLS-1$
+  static final String BUNDLE_NAME = "tools"; //$NON-NLS-1$
   static Locale resourceLocale = Locale.getDefault();
   static ResourceBundle res = ResourceBundle.getBundle(BUNDLE_NAME, resourceLocale);
   static Object resObj = new ToolsRes();
@@ -76,7 +76,7 @@ public class ToolsRes {
     Locale prev = resourceLocale;
     resourceLocale = loc;
     // get the new resource bundle for the tool and other OSP resource objects
-    res = ResourceBundle.getBundle("org.opensourcephysics.resources.tools.tools", resourceLocale); //$NON-NLS-1$
+    res = ResourceBundle.getBundle("tools", resourceLocale); //$NON-NLS-1$
     ControlsRes.setLocale(resourceLocale);
     DisplayRes.setLocale(resourceLocale);
     DialogsRes.setLocale(resourceLocale);

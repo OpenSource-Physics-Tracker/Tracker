@@ -98,8 +98,7 @@ public class PageTView extends JPanel implements TView {
    */
   protected PageTView(TrackerPanel panel) {
     trackerPanel = panel;
-    icon = new ImageIcon(
-        Tracker.class.getResource("resources/images/html.gif")); //$NON-NLS-1$
+    icon = new ImageIcon("/home/arthur/IdeaProjects/Tracker/src/main/resources/images/html.gif"); //$NON-NLS-1$
     setBackground(panel.getBackground());
     createGUI();
     refresh();

@@ -41,7 +41,7 @@ public class TrackerRes {
 	// static fields
 	static Locale locale = Locale.getDefault();
 	static ResourceBundle res = ResourceBundle.getBundle(
-					"org.opensourcephysics.cabrillo.tracker.resources.tracker",  //$NON-NLS-1$
+					"tracker",  //$NON-NLS-1$
 					locale);
 	static Object resObj = new TrackerRes();
   static PropertyChangeSupport support = new SwingPropertyChangeSupport(resObj);
@@ -78,7 +78,7 @@ public class TrackerRes {
 		locale = loc;
 		// get the new resource bundle
 		res = ResourceBundle.getBundle(
-						"org.opensourcephysics.cabrillo.tracker.resources.tracker",  //$NON-NLS-1$
+						"tracker",  //$NON-NLS-1$
 						locale);
 		org.opensourcephysics.media.core.MediaRes.setLocale(loc);
 		org.opensourcephysics.controls.ControlsRes.setLocale(loc);

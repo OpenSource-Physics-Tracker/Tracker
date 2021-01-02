@@ -46,8 +46,7 @@ public class PlotTView extends TrackChooserTView {
    */
   public PlotTView(TrackerPanel panel) {
     super(panel);
-    icon = new ImageIcon(
-        Tracker.class.getResource("resources/images/plot.gif")); //$NON-NLS-1$
+    icon = new ImageIcon("/home/arthur/IdeaProjects/Tracker/src/main/resources/images/plot.gif"); //$NON-NLS-1$
   }
 
   /**

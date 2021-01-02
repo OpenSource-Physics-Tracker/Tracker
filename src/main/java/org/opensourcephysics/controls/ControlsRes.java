@@ -6,9 +6,12 @@
  */
 
 package org.opensourcephysics.controls;
+import java.awt.*;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
+import com.android.dx.gen.Local;
 import org.opensourcephysics.display.OSPRuntime;
 
 /**
@@ -37,9 +40,9 @@ public class ControlsRes {
   public static String CALCULATION_RESET_TIP;
   public static String XML_NAME;
   public static String XML_VALUE;
-  static final String BUNDLE_NAME = "org.opensourcephysics.resources.controls.controls_res"; //$NON-NLS-1$
-  static ResourceBundle res;
+  static final String BUNDLE_NAME = "controls_res"; //$NON-NLS-1$
 
+  static ResourceBundle res;
   // private constructor because all methods are static
   private ControlsRes() {}
 
@@ -85,8 +88,8 @@ public class ControlsRes {
   }
 
   /**
-  * Gets the local strings.  Static strings are used for speed to avoid having to call the resource object.
-  */
+   * Gets the local strings.  Static strings are used for speed to avoid having to call the resource object.
+   */
   private static void setLocalStrings() {
     ANIMATION_NEW = getString(res, "ANIMATION_NEW");                 //$NON-NLS-1$
     ANIMATION_INIT = getString(res, "ANIMATION_INIT");               //$NON-NLS-1$

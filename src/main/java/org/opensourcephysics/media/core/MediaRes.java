@@ -42,7 +42,7 @@ import java.util.ResourceBundle;
  */
 public class MediaRes {
   // static fields
-  private static String BUNDLE_NAME = "org.opensourcephysics.resources.media.video"; //$NON-NLS-1$
+  private static String BUNDLE_NAME = "video"; //$NON-NLS-1$
   static Locale resourceLocale = Locale.getDefault();
   static ResourceBundle res = ResourceBundle.getBundle(BUNDLE_NAME, resourceLocale);
 

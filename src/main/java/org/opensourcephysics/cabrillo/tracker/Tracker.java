@@ -69,9 +69,9 @@ public class Tracker {
   public static final String VERSION = "5.2.0.0"; //$NON-NLS-1$
   public static final String COPYRIGHT = "Copyright (c) 2018 Douglas Brown, Nikolai Avdeev"; //$NON-NLS-1$
   /** the tracker icon */
-  public static final ImageIcon TRACKER_ICON = new ImageIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\tracker_icon_32.png"); //$NON-NLS-1$
+  public static final ImageIcon TRACKER_ICON = new ImageIcon("/home/arthur/IdeaProjects/Tracker/src/main/resources/images/tracker_icon_32.png"); //$NON-NLS-1$
     /** a larger tracker icon */
-  public static final ImageIcon TRACKER_ICON_256 = new ImageIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\tracker_icon_256.png"); //$NON-NLS-1$
+  public static final ImageIcon TRACKER_ICON_256 = new ImageIcon("/home/arthur/IdeaProjects/Tracker/src/main/resources/images/tracker_icon_256.png"); //$NON-NLS-1$
 
 	static final String THETA = TeXParser.parseTeX("$\\theta"); //$NON-NLS-1$
 	static final String OMEGA = TeXParser.parseTeX("$\\omega"); //$NON-NLS-1$

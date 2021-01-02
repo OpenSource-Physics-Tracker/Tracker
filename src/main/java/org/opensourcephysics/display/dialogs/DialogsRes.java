@@ -36,7 +36,7 @@ public class DialogsRes {
   public static String LOG_OK;
   public static String LOG_WARNING;
   // static fields
-  static final String BUNDLE_NAME = "org.opensourcephysics.resources.display.dialogs_res"; //$NON-NLS-1$
+  static final String BUNDLE_NAME = "dialogs_res"; //$NON-NLS-1$
   static Locale resourceLocale = Locale.ENGLISH;
   static ResourceBundle res;
 
