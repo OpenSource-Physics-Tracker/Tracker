@@ -4,7 +4,7 @@ plugins {
 
 jar {
     manifest { // Здесь указывается Main class для запуска приложений(иначе jar не запуститься)
-        attributes 'Main-Class': 'java.org.opensourcephysics.cabrillo.tracker.Tracker'
+        attributes 'Main-Class': 'org.opensourcephysics.cabrillo.tracker.Tracker'
     }
 }
 
