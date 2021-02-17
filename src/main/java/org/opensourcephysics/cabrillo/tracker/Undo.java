@@ -218,7 +218,7 @@ public class Undo {
    * @param step the changed step
    * @param control an XMLControl with the previous state of the track
    */
-  protected static void postStepEdit(Step step, XMLControl control) {
+  public static void postStepEdit(Step step, XMLControl control) {
   	TrackerPanel panel = step.getTrack().trackerPanel;
   	if (panel == null) return;
   	UndoableEdit edit = getUndo(panel).new StepEdit(step, control); 

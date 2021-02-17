@@ -25,6 +25,7 @@
 package org.opensourcephysics.cabrillo.tracker;
 
 import org.opensourcephysics.cabrillo.tracker.PageTView.TabView;
+import org.opensourcephysics.cabrillo.tracker.vector.Vector;
 import org.opensourcephysics.controls.OSPLog;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
@@ -93,7 +94,7 @@ public class TToolBar extends JToolBar implements PropertyChangeListener {
     protected DrawingButton drawingButton;
     protected JButton axesButton, zoomButton, autotrackerButton;
     protected JButton traceVisButton, pVisButton, vVisButton, aVisButton;
-    protected JButton xMassButton, trailButton, labelsButton, stretchButton;
+    public JButton xMassButton, trailButton, labelsButton, stretchButton;
     protected JButton fontSmallerButton, fontBiggerButton;
     protected int trailLength = trailLengths[Tracker.trailLengthIndex];
     protected JPopupMenu newPopup = new JPopupMenu();
@@ -808,8 +809,8 @@ public class TToolBar extends JToolBar implements PropertyChangeListener {
                                 }
                             }
                             p.repaint();
-                        } else if (track instanceof Vector) {
-                            Vector v = (Vector) track;
+                        } else if (track instanceof org.opensourcephysics.cabrillo.tracker.vector.Vector) {
+                            org.opensourcephysics.cabrillo.tracker.vector.Vector v = (Vector) track;
                             v.setLabelsVisible(labelsButton.isSelected());
                             Footprint[] footprints = v.getFootprints();
                             for (int i = 0; i < footprints.length; i++) {

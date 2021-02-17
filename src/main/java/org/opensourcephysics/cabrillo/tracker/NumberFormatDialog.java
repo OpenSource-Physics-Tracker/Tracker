@@ -67,6 +67,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.opensourcephysics.cabrillo.tracker.TableTrackView.TrackDataTable;
+import org.opensourcephysics.cabrillo.tracker.vector.Vector;
 import org.opensourcephysics.display.DataFunction;
 import org.opensourcephysics.display.DataTable;
 import org.opensourcephysics.display.Dataset;

@@ -22,7 +22,7 @@
  * For additional Tracker information and documentation, please see
  * <http://physlets.org/tracker/>.
  */
-package org.opensourcephysics.cabrillo.tracker;
+package org.opensourcephysics.cabrillo.tracker.vector;
 
 import java.beans.*;
 import java.util.*;
@@ -31,6 +31,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import org.opensourcephysics.cabrillo.tracker.*;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.controls.*;

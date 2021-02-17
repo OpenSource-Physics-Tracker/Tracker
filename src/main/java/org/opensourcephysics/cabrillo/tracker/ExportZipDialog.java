@@ -45,6 +45,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.JTextComponent;
 
+import org.opensourcephysics.cabrillo.tracker.vector.Vector;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.controls.XMLControlElement;
@@ -1090,9 +1091,9 @@ public class ExportZipDialog extends JDialog {
     	        trackControl.setValue("framedata", newKeys);        			 //$NON-NLS-1$
         		}
         		
-        		else if (Vector.class.isAssignableFrom(trackType)) {
+        		else if (org.opensourcephysics.cabrillo.tracker.vector.Vector.class.isAssignableFrom(trackType)) {
     	        array = trackControl.getObject("framedata"); //$NON-NLS-1$
-    	        Vector.FrameData[] vectorKeyFrames = (Vector.FrameData[])array;
+    	        org.opensourcephysics.cabrillo.tracker.vector.Vector.FrameData[] vectorKeyFrames = (org.opensourcephysics.cabrillo.tracker.vector.Vector.FrameData[])array;
     	        newFrameNumbers.clear();
     	        newFrameNum = 0;
     	        for (int i = 0; i<vectorKeyFrames.length; i++) {
@@ -1100,7 +1101,7 @@ public class ExportZipDialog extends JDialog {
     	        	newFrameNum = realClip.frameToStep(i);
     	        	newFrameNumbers.put(newFrameNum, i);    	        	
     	        }
-    	        Vector.FrameData[] newKeys = new Vector.FrameData[newFrameNum+1];
+    	        org.opensourcephysics.cabrillo.tracker.vector.Vector.FrameData[] newKeys = new Vector.FrameData[newFrameNum+1];
     	        for (Integer k: newFrameNumbers.keySet()) {
     	        	newKeys[k] = vectorKeyFrames[newFrameNumbers.get(k)];
     	        	newKeys[k].independent = newKeys[k].xc!=0 || newKeys[k].yc!=0;

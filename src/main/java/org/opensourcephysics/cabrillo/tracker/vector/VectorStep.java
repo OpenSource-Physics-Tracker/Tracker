@@ -22,7 +22,7 @@
  * For additional Tracker information and documentation, please see
  * <http://physlets.org/tracker/>.
  */
-package org.opensourcephysics.cabrillo.tracker;
+package org.opensourcephysics.cabrillo.tracker.vector;
 
 import java.beans.*;
 import java.util.*;
@@ -30,6 +30,7 @@ import java.awt.*;
 import java.awt.font.*;
 import java.awt.geom.*;
 
+import org.opensourcephysics.cabrillo.tracker.*;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.display.*;
@@ -48,7 +49,7 @@ public class VectorStep extends Step
   protected static boolean pointSnapEnabled = true;
   protected static boolean vectorSnapEnabled = true;
   protected static double snapDistance = 8;
-  protected static Map<TrackerPanel, Set<VectorStep>> vectors 
+  protected static Map<TrackerPanel, Set<VectorStep>> vectors
   		= new HashMap<TrackerPanel, Set<VectorStep>>();
   protected static TPoint tipPoint = new TPoint(); // used for layout position
   protected static TPoint tailPoint = new TPoint(); // used for layout position
@@ -64,7 +65,7 @@ public class VectorStep extends Step
   protected Map<TrackerPanel, Shape> tipShapes = new HashMap<TrackerPanel, Shape>();
   protected Map<TrackerPanel, Shape> shaftShapes = new HashMap<TrackerPanel, Shape>();
   protected TPoint attachmentPoint; // tail is attached to this pt
-  protected VectorChain chain;
+  public VectorChain chain;
   protected boolean brandNew = true;
   protected boolean firePropertyChangeEvents = false;
   protected boolean labelVisible = true;
@@ -700,7 +701,7 @@ public class VectorStep extends Step
 
   //______________________ inner Handle class ________________________
 
-  class Handle extends Step.Handle {
+  public class Handle extends Step.Handle {
 
     /**
      * Constructs a Handle with specified image coordinates.

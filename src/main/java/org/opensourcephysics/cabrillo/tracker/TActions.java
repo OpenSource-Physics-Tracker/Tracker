@@ -34,6 +34,9 @@ import java.net.URL;
 
 import javax.swing.*;
 
+import org.opensourcephysics.cabrillo.tracker.vector.Vector;
+import org.opensourcephysics.cabrillo.tracker.vector.VectorSum;
+import org.opensourcephysics.cabrillo.tracker.vector.VectorSumInspector;
 import org.opensourcephysics.controls.*;
 import org.opensourcephysics.display.ResizableIcon;
 import org.opensourcephysics.media.core.*;
@@ -453,7 +456,7 @@ public class TActions {
     AbstractAction vectorAction = new AbstractAction(
         TrackerRes.getString("Vector.Name"), null) { //$NON-NLS-1$
       public void actionPerformed(ActionEvent e) {
-        Vector vec = new Vector();
+        org.opensourcephysics.cabrillo.tracker.vector.Vector vec = new Vector();
         vec.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
         trackerPanel.addTrack(vec);
         trackerPanel.setSelectedPoint(null);

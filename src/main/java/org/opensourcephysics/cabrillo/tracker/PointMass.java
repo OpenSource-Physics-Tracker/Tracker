@@ -33,6 +33,7 @@ import java.awt.geom.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import org.opensourcephysics.cabrillo.tracker.vector.VectorStep;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.tools.FontSizer;
@@ -1782,7 +1783,7 @@ public class PointMass extends TTrack {
   }
 
   @Override
-  protected NumberField[] getNumberFieldsForStep(Step step) {
+  public NumberField[] getNumberFieldsForStep(Step step) {
   	NumberField[] fields;
   	String var;
   	boolean xMass = TToolBar.getToolbar(trackerPanel).xMassButton.isSelected();    	

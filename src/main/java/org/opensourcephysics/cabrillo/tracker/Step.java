@@ -398,7 +398,7 @@ public abstract class Step implements Cloneable {
   /**
    * An inner superclass of all handles.
    */
-  class Handle extends TPoint {
+  public class Handle extends TPoint {
 
     /**
      * Constructs a Handle with specified image coordinates.

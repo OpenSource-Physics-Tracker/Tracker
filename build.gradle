@@ -19,6 +19,10 @@ repositories {
 
 dependencies {
     compile group: 'com.nativelibs4java', name: 'bridj', version: '0.7.0'
+
     implementation 'com.github.OpenSource-Physics-Tracker:AppleJavaExstensions:70fb48e5fe'
     implementation 'com.github.OpenSource-Physics-Tracker:FFMpeg:ef6949741c'
+
+    compileOnly 'org.projectlombok:lombok:1.18.16'
+    annotationProcessor 'org.projectlombok:lombok:1.18.16'
 }

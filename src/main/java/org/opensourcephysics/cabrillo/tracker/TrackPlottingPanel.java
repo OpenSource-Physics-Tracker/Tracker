@@ -36,6 +36,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
+import org.opensourcephysics.cabrillo.tracker.vector.Vector;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.tools.*;
 import org.opensourcephysics.controls.*;
@@ -397,7 +398,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
     // refresh guests item
     TTrack track = TTrack.getTrack(trackID);
     Class<? extends TTrack> type = track instanceof PointMass? PointMass.class:
-    	track instanceof Vector? Vector.class: track.getClass();
+    	track instanceof org.opensourcephysics.cabrillo.tracker.vector.Vector ? Vector.class: track.getClass();
     ArrayList<? extends TTrack> tracks = trackerPanel.getDrawables(type);
     tracks.removeAll(trackerPanel.calibrationTools);
     tracks.remove(track);

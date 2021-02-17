@@ -31,6 +31,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import org.opensourcephysics.cabrillo.tracker.vector.Vector;
 import org.opensourcephysics.tools.FontSizer;
 
 /**
@@ -138,7 +139,7 @@ public class PlotGuestDialog extends JDialog {
     instructions.setTitle(TrackerRes.getString("PlotGuestDialog.Instructions")); //$NON-NLS-1$
     // make checkboxes for all similar tracks in trackerPanel
     Class<? extends TTrack> type = track instanceof PointMass? PointMass.class:
-    	track instanceof Vector? Vector.class: track.getClass();
+    	track instanceof org.opensourcephysics.cabrillo.tracker.vector.Vector ? Vector.class: track.getClass();
     ArrayList<? extends TTrack> tracks = trackerPanel.getDrawables(type);
     tracks.removeAll(trackerPanel.calibrationTools);
     tracks.remove(track);
