@@ -33,6 +33,7 @@ import java.awt.geom.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import org.opensourcephysics.cabrillo.tracker.bounce.BounceDerivatives;
 import org.opensourcephysics.cabrillo.tracker.vector.VectorStep;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;

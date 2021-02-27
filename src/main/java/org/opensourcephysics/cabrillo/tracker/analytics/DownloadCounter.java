@@ -68,7 +68,7 @@ public class DownloadCounter {
       String firstLine = in.readLine();
       in.close();
       if (firstLine!=null) {
-    		String[] split = firstLine.split("\t"); //$NON-NLS-1$
+    		String[] split = firstLine.split("\t");
     		if (split.length>0) {
     			String[] fileNames = new String[split.length-1];
     			System.arraycopy(split, 1, fileNames, 0, fileNames.length);
@@ -113,7 +113,7 @@ public class DownloadCounter {
     File file = new File(fileName);
 		try {
 			FileOutputStream stream = new FileOutputStream(file);
-			Charset charset = Charset.forName("UTF-8"); //$NON-NLS-1$
+			Charset charset = Charset.forName("UTF-8");
 			OutputStreamWriter out = new OutputStreamWriter(stream, charset);
 			BufferedWriter writer = new BufferedWriter(out);
 			writer.write(contents);
