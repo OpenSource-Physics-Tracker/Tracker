@@ -24,34 +24,35 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.io.*;
+import org.opensourcephysics.cabrillo.tracker.deploy.TrackerStarter;
+import org.opensourcephysics.controls.*;
+import org.opensourcephysics.display.Dataset;
+import org.opensourcephysics.display.GUIUtils;
+import org.opensourcephysics.display.OSPRuntime;
+import org.opensourcephysics.display.TeXParser;
+import org.opensourcephysics.media.core.DataTrackSupport;
+import org.opensourcephysics.media.core.Video;
+import org.opensourcephysics.media.core.VideoIO;
+import org.opensourcephysics.tools.*;
+
+import javax.swing.Timer;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.*;
-import java.util.jar.JarFile;
-import java.util.logging.Level;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.awt.*;
-import java.awt.event.*;
-
-import javax.swing.*;
-import javax.swing.Timer;
-import javax.swing.border.BevelBorder;
-import javax.swing.event.MouseInputAdapter;
-
-import org.opensourcephysics.display.Dataset;
-import org.opensourcephysics.display.GUIUtils;
-import org.opensourcephysics.display.OSPRuntime;
-import org.opensourcephysics.display.TeXParser;
-import org.opensourcephysics.cabrillo.tracker.deploy.TrackerStarter;
-import org.opensourcephysics.controls.*;
-import org.opensourcephysics.media.core.*;
-import org.opensourcephysics.tools.*;
+import java.util.*;
+import java.util.jar.JarFile;
+import java.util.logging.Level;
 
 /**
  * This is the default Tracker application.
@@ -73,11 +74,11 @@ public class Tracker {
     /**
      * the tracker icon
      */
-    public static final ImageIcon TRACKER_ICON = new ImageIcon("/home/arthur/IdeaProjects/Tracker/src/main/resources/images/tracker_icon_32.png"); //$NON-NLS-1$
+    public static final ImageIcon TRACKER_ICON = new ImageIcon("/resources/images/tracker_icon_32.png"); //$NON-NLS-1$
     /**
      * a larger tracker icon
      */
-    public static final ImageIcon TRACKER_ICON_256 = new ImageIcon("/home/arthur/IdeaProjects/Tracker/src/main/resources/images/tracker_icon_256.png"); //$NON-NLS-1$
+    public static final ImageIcon TRACKER_ICON_256 = new ImageIcon("/resources/images/tracker_icon_256.png"); //$NON-NLS-1$
 
     public static final String THETA = TeXParser.parseTeX("$\\theta"); //$NON-NLS-1$
     static final String OMEGA = TeXParser.parseTeX("$\\omega"); //$NON-NLS-1$
@@ -919,121 +920,6 @@ public class Tracker {
         };
     }
 
-//  /**
-//   * Attempts to relaunch Tracker with specified runtime parameters.
-//   *
-//   * @param memorySize the desired memory size in MB
-//   * @param javaPath the java executable path
-//   */
-//  protected static void relaunch(int memorySize, String javaPath) {
-////    try {
-////			JarFile jarfile = OSPRuntime.getLaunchJar();
-////			java.util.jar.Attributes att = jarfile.getManifest().getMainAttributes();
-////			Object mainclass = att.getValue("Main-Class"); //$NON-NLS-1$
-////			isTracker = mainclass.toString().endsWith("Tracker"); //$NON-NLS-1$
-////		} catch (Exception ex) {
-////		}
-////		// save tracker panels
-////		ArrayList<String> filenames = new ArrayList<String>();
-////		if (frame!=null) {
-////			for (int i = 0; i<frame.getTabCount(); i++) {
-////				TrackerPanel next = frame.getTrackerPanel(i);
-////				if (!next.save()) return;
-////				File datafile = next.getDataFile();
-////				if (datafile!=null && isTracker) {
-////	    		String fileName = XML.getAbsolutePath(next.getDataFile());
-////	    		filenames.add(fileName);
-////				}
-////			}
-////		}
-//	final int prevSize = Tracker.preferredMemorySize;
-//	int newSize = memorySize>minimumMemorySize? memorySize: -1;
-////		Tracker.preferredMemorySize = newSize;
-////		Tracker.savePreferences();
-//		
-//    final ArrayList<String> cmd = new ArrayList<String>();
-//    cmd.add(javaPath==null? "java": javaPath); //$NON-NLS-1$
-//    if (newSize>-1) {
-//	    cmd.add("-Xms32m"); //$NON-NLS-1$
-//	    cmd.add("-Xmx"+newSize+"m"); //$NON-NLS-1$ //$NON-NLS-2$
-//    }
-//    if (OSPRuntime.isMac()) {
-//	    cmd.add(use32BitMode? "-d32": "-d64"); //$NON-NLS-1$ //$NON-NLS-2$
-//    	cmd.add("-Xdock:name=Tracker"); //$NON-NLS-1$
-//    }
-//    cmd.add("-jar"); //$NON-NLS-1$
-//  	String jar = OSPRuntime.getLaunchJarPath();
-//    cmd.add(jar);
-////    if (frame!=null) {
-////	    for (String next: filenames) {
-////	    	cmd.add(next);
-////	    }
-////    }
-//    if (mainArgs!=null) {
-//	    for (String next: mainArgs) {
-//	    	cmd.add(next);
-//	    }
-//    }
-//  	cmd.add("relaunch"); //$NON-NLS-1$
-//    // create a timer to exit the system if relaunch is successful
-//    final Timer timer = new Timer(500, new ActionListener() {
-//      public void actionPerformed(ActionEvent e) {
-//        System.exit(0);
-//      }
-//    });
-//    timer.setRepeats(false);
-//    timer.start();
-//    // create a thread to launch in separate VM
-//    Runnable launchRunner = new Runnable() {
-//      public void run() {
-//        // log command for debugging
-//        String log = ""; //$NON-NLS-1$
-//        for (int i=0; i< cmd.size(); i++) {
-//        	log += cmd.get(i)+" "; //$NON-NLS-1$
-//        }
-//        writeRelaunchLog(log);
-//        try { 
-//        	ProcessBuilder builder = new ProcessBuilder(cmd);
-//        	Process proc = builder.start();
-//          BufferedInputStream errStream=new BufferedInputStream(proc.getErrorStream());
-//          errStream.read(); // blocks if no errors
-//          byte[] b = new byte[1024];
-//          int bytesRead=0;
-//          String strFileContents;
-//          while( (bytesRead = errStream.read(b)) != -1){
-//          	strFileContents = new String(b, 0, bytesRead);
-//          	OSPLog.warning(strFileContents);
-//          }
-//          timer.stop();
-//          errStream.close();
-//          Tracker.preferredMemorySize = prevSize;
-//        	Tracker.start(mainArgs);
-//        } catch(Exception ex) {}
-//      }
-//
-//    };
-//    Thread relauncher = new Thread(launchRunner);
-//    relauncher.setPriority(Thread.NORM_PRIORITY);
-//    relauncher.start();           
-//  }
-
-//  protected static void writeRelaunchLog(String cmd) {
-//    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss  MMM dd yyyy"); //$NON-NLS-1$
-//    Calendar cal = Calendar.getInstance();
-//    String logText = "Tracker version "+version+"  " //$NON-NLS-1$ //$NON-NLS-2$
-//		+sdf.format(cal.getTime())+"\n\n"; //$NON-NLS-1$
-//  	logText += "java command: "+cmd; //$NON-NLS-1$
-//    File file = new File(trackerHome, "tracker_relaunch.log"); //$NON-NLS-1$
-//    try {
-//      FileOutputStream stream = new FileOutputStream(file);
-//      Charset charset = Charset.forName("UTF-8"); //$NON-NLS-1$
-//      OutputStreamWriter out = new OutputStreamWriter(stream, charset);
-//    	BufferedWriter writer = new BufferedWriter(out);
-//      writer.write(logText);
-//      writer.flush();
-//      writer.close();
-//    } catch(IOException ex) {}
-//  }
 
     /**
      * Gets the full set of configuration properties.
@@ -1136,46 +1022,6 @@ public class Tracker {
     public static Collection<String> getDefaultAutoloadSearchPaths() {
         return OSPRuntime.getDefaultSearchPaths();
     }
-
-//  /**
-//   * Imports Data from a source into a DataTrack. 
-//   * Data must include "x" and "y" columns, may include "t". 
-//   * The returned DataTrack is the first one found in the selected TrackerPanel
-//   * that matches the Data name or ID. If none found, a new DataTrack is created.
-//   * The source Object may be a String path, JPanel controlPanel, Tool tool, etc
-//   * 
-//   * @param data the Data to import
-//   * @param source the data source (may be null)
-//   * @return the DataTrack with the Data (may return null)
-//   */
-//  public static DataTrack importData(Data data, Object source) {
-//  	// get shared Tracker  
-//  	Tracker tracker = getTracker();
-//  	TFrame frame = tracker.getFrame();
-//  	frame.setVisible(true);
-//  	
-//  	// look for matching DataTrack in selected TrackerPanel?
-//  	DataTrack model = null;
-//  	TrackerPanel trackerPanel = frame.getTrackerPanel(frame.getSelectedTab());  	
-//  	if (trackerPanel!=null) {
-//	  	model = trackerPanel.importData(data, source);
-//  	}
-//  	
-//  	// create new tab
-//  	if (model==null) {
-//	  	trackerPanel = new TrackerPanel();
-//	  	frame.addTab(trackerPanel);
-//	
-//	  	// pass the data and source to the TrackerPanel and get the DataTrack it creates
-//	  	model = trackerPanel.importData(data, source);
-//  	}
-//  	if (model==null) {
-//	  	frame.setVisible(false);
-//	  	return null;
-//  	}
-//  	return model;
-//  }
-//  
 
     /**
      * Gets the starting autoload search paths. Search paths may be later modified by the user.
@@ -1535,18 +1381,6 @@ public class Tracker {
      * @param args array of tracker or video file names
      */
     public static void main(String[] args) {
-//		String[] vars = {"TRACKER_HOME", "FFMPEG_HOME", "DYLD_LIBRARY_PATH"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-//		for (String next: vars) {
-//			OSPLog.warning("Environment variable "+next+": "+System.getenv(next)); //$NON-NLS-1$ //$NON-NLS-2$
-//		}
-
-//  	Map<String, String> map = System.getenv();
-//  	for (String key: map.keySet()) {
-//  		System.out.println("environment "+key+" = "+map.get(key));
-//  	}
-//  	for (Object key: System.getProperties().keySet()) {
-//  		System.out.println("property "+key+" = "+System.getProperties().get(key));
-//  	}
 
         // determine if this is tracker.jar (Tracker main class)
         boolean isTracker = false;
@@ -1874,43 +1708,6 @@ public class Tracker {
      */
     protected static boolean registerRemoteTool(Remote remoteTool) {
         final String toolname = remoteTool.getClass().getSimpleName();
-
-//		// create thread to see if registry is running and tool registered
-//    Thread registryThread = new Thread() {
-//      public void run() {
-//        toolRegistered = false;
-//      	toolNotFound = false;
-//        try { 
-//          registry = java.rmi.registry.LocateRegistry.getRegistry(DataTrackSupport.PORT);
-//          registry.lookup(toolname);
-//	        toolRegistered = true;
-//        }
-//        catch (Exception exc) {
-//        	toolNotFound = true;
-//        }       	
-//      }      
-//    };
-//    
-//    // start thread and check every half-second to see if completed
-//    registryThread.setPriority(Thread.NORM_PRIORITY);
-//    registryThread.start();
-//    int attempts = 0;
-//    int maxAttempts = 8;
-//    while (attempts<=maxAttempts) {
-//      attempts++;
-//      if (toolRegistered || toolNotFound) {
-//        break;
-//      }
-//      try { Thread.sleep(500); }
-//      catch(Exception exc) {}
-//    }
-//    if (toolRegistered) {
-//      OSPLog.finest("Registry thread found registered tool "+toolname); //$NON-NLS-1$
-//    	return true;
-//    }
-//    
-//    OSPLog.finest("Killing registry thread and registering tool "+toolname); //$NON-NLS-1$
-//    registryThread.interrupt();
 
         // register tool
         try {
@@ -2304,5 +2101,4 @@ public class Tracker {
             }
         }
     }
-
 }
