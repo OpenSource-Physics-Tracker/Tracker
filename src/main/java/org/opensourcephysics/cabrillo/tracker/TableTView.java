@@ -59,7 +59,7 @@ public class TableTView extends TrackChooserTView {
    */
   public TableTView(TrackerPanel panel) {
     super(panel);
-    icon = new ImageIcon("/home/arthur/IdeaProjects/Tracker/src/main/resources/images/datatable.gif"); //$NON-NLS-1$
+    icon = new ImageIcon("/resources/images/datatable.gif"); //$NON-NLS-1$
     getColumnsDialog();
   }
 
