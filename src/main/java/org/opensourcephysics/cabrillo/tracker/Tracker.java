@@ -199,7 +199,7 @@ public class Tracker {
         // get logo icons with ResourceLoader so launch jar file is identified
 
         // create grab cursor
-        Image grab = ResourceLoader.getImage("/images/grab.gif");
+        Image grab = ResourceLoader.getImage("resources/images/grab.gif");
         grabCursor = GUIUtils.createCustomCursor(grab, new Point(14, 10), "Grab", Cursor.HAND_CURSOR);
 
         // create static objects AFTER they are defined above
