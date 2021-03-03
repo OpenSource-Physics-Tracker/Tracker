@@ -85,10 +85,10 @@ public class PencilControl extends JDialog {
   private static Color lightgrey = new Color(230, 230, 230);
 
   static {
-  	undoIcon =  new ResizableIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\undo.gif"); //$NON-NLS-1$
-  	redoIcon =  new ResizableIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\redo.gif"); //$NON-NLS-1$
-  	undoDisabledIcon =  new ResizableIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\undo_disabled.gif"); //$NON-NLS-1$
-  	redoDisabledIcon =  new ResizableIcon("C:\\Users\\vartanyan\\IdeaProjects\\Tracker\\src\\main\\resources\\images\\redo_disabled.gif"); //$NON-NLS-1$
+  	undoIcon =  new ResizableIcon("/images/undo.gif"); 
+  	redoIcon =  new ResizableIcon("/images/redo.gif"); 
+  	undoDisabledIcon =  new ResizableIcon("/images/undo_disabled.gif"); 
+  	redoDisabledIcon =  new ResizableIcon("/images/redo_disabled.gif"); 
   }
   	
 	private PencilDrawer drawer;
@@ -147,7 +147,7 @@ public class PencilControl extends JDialog {
 				}
 			}			
 		};
-		trackerPanel.addPropertyChangeListener("stepnumber", stepListener); //$NON-NLS-1$
+		trackerPanel.addPropertyChangeListener("stepnumber", stepListener); 
 		tabListener = new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
@@ -163,7 +163,7 @@ public class PencilControl extends JDialog {
 		};
     TFrame frame = trackerPanel.getTFrame();
     if (frame != null) {
-      frame.addPropertyChangeListener("tab", tabListener); //$NON-NLS-1$
+      frame.addPropertyChangeListener("tab", tabListener); 
     }
 		clipListener = new PropertyChangeListener() {
 			@Override
@@ -172,7 +172,7 @@ public class PencilControl extends JDialog {
 				refreshGUI();
 			}			
 		};
-		trackerPanel.addPropertyChangeListener("stepcount", clipListener); //$NON-NLS-1$
+		trackerPanel.addPropertyChangeListener("stepcount", clipListener); 
 	}
 	
   /**
@@ -220,7 +220,7 @@ public class PencilControl extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				boolean isEmpty = selectedScene.getDrawings().isEmpty()
-						&& "".equals(selectedScene.getCaption().getText()); //$NON-NLS-1$
+						&& "".equals(selectedScene.getCaption().getText()); 
 				drawer.removeScene(selectedScene);
 				if (!isEmpty) {
 					postDeletionEdit(selectedScene);
@@ -285,7 +285,7 @@ public class PencilControl extends JDialog {
 		helpButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-        trackerPanel.getTFrame().showHelp("drawings", 0); //$NON-NLS-1$
+        trackerPanel.getTFrame().showHelp("drawings", 0); 
 			} 			
 		});
 		
@@ -381,7 +381,7 @@ public class PencilControl extends JDialog {
       public void keyReleased(KeyEvent e) {
       	if (e.getKeyCode()==KeyEvent.VK_ENTER) return;
       	String text = captionField.getText();
-      	if (!selectedScene.isCaptionPositioned && !"".equals(text.trim())) { //$NON-NLS-1$
+      	if (!selectedScene.isCaptionPositioned && !"".equals(text.trim())) { 
       		// place caption at center of viewPort
         	MainTView mainView = trackerPanel.getTFrame().getMainView(trackerPanel);
           Rectangle rect = mainView.scrollPane.getViewport().getViewRect();
@@ -571,28 +571,28 @@ public class PencilControl extends JDialog {
    */
 	protected void refreshGUI() {
 		refreshing = true;
-		setTitle(TrackerRes.getString("PencilControlDialog.Title")); //$NON-NLS-1$
+		setTitle(TrackerRes.getString("PencilControlDialog.Title")); 
 		// set label and button text
-		drawingLabel.setText(TrackerRes.getString("PencilControlDialog.Label.Drawing.Text")+":"); //$NON-NLS-1$ //$NON-NLS-2$
-		toLabel.setText(TrackerRes.getString("PencilControlDialog.Label.To.Text")); //$NON-NLS-1$
-		captionLabel.setText(TrackerRes.getString("PencilControlDialog.Label.Caption.Text")+":"); //$NON-NLS-1$ //$NON-NLS-2$
-		framesLabel.setText(TrackerRes.getString("PencilControlDialog.Label.Frames.Text")); //$NON-NLS-1$
-		newSceneButton.setText(TrackerRes.getString("PencilControlDialog.Button.NewScene.Text")); //$NON-NLS-1$
-		deleteSceneButton.setText(TrackerRes.getString("PencilControlDialog.Button.DeleteScene.Text")); //$NON-NLS-1$
-		clearAllButton.setText(TrackerRes.getString("PencilControlDialog.Button.ClearAll.Text")); //$NON-NLS-1$
-		closeButton.setText(TrackerRes.getString("Dialog.Button.Close")); //$NON-NLS-1$
-		helpButton.setText(TrackerRes.getString("Dialog.Button.Help")); //$NON-NLS-1$
-		heavyCheckbox.setText(TrackerRes.getString("PencilControlDialog.Checkbox.Heavy.Text")); //$NON-NLS-1$
+		drawingLabel.setText(TrackerRes.getString("PencilControlDialog.Label.Drawing.Text")+":");  
+		toLabel.setText(TrackerRes.getString("PencilControlDialog.Label.To.Text")); 
+		captionLabel.setText(TrackerRes.getString("PencilControlDialog.Label.Caption.Text")+":");  
+		framesLabel.setText(TrackerRes.getString("PencilControlDialog.Label.Frames.Text")); 
+		newSceneButton.setText(TrackerRes.getString("PencilControlDialog.Button.NewScene.Text")); 
+		deleteSceneButton.setText(TrackerRes.getString("PencilControlDialog.Button.DeleteScene.Text")); 
+		clearAllButton.setText(TrackerRes.getString("PencilControlDialog.Button.ClearAll.Text")); 
+		closeButton.setText(TrackerRes.getString("Dialog.Button.Close")); 
+		helpButton.setText(TrackerRes.getString("Dialog.Button.Help")); 
+		heavyCheckbox.setText(TrackerRes.getString("PencilControlDialog.Checkbox.Heavy.Text")); 
 		// set label and button tooltips
-		newSceneButton.setToolTipText(TrackerRes.getString("PencilControlDialog.Button.NewScene.Tooltip")); //$NON-NLS-1$
-		deleteSceneButton.setToolTipText(TrackerRes.getString("PencilControlDialog.Button.DeleteScene.Tooltip")); //$NON-NLS-1$
-		clearAllButton.setToolTipText(TrackerRes.getString("PencilControlDialog.Button.ClearAll.Tooltip")); //$NON-NLS-1$
-		heavyCheckbox.setToolTipText(TrackerRes.getString("PencilControlDialog.Checkbox.Heavy.Tooltip")); //$NON-NLS-1$
-		captionField.setToolTipText(TrackerRes.getString("PencilControlDialog.Field.Caption.Tooltip")); //$NON-NLS-1$		
-		sceneDropdown.setToolTipText(TrackerRes.getString("PencilControlDialog.Dropdown.Drawing.Tooltip")); //$NON-NLS-1$		
-		fontSizeSpinner.setToolTipText(TrackerRes.getString("PencilControlDialog.Spinner.FontSize.Tooltip")); //$NON-NLS-1$		
-		startFrameSpinner.setToolTipText(TrackerRes.getString("PencilControlDialog.Spinner.FrameRange.Tooltip")); //$NON-NLS-1$		
-		endFrameSpinner.setToolTipText(TrackerRes.getString("PencilControlDialog.Spinner.FrameRange.Tooltip")); //$NON-NLS-1$		
+		newSceneButton.setToolTipText(TrackerRes.getString("PencilControlDialog.Button.NewScene.Tooltip")); 
+		deleteSceneButton.setToolTipText(TrackerRes.getString("PencilControlDialog.Button.DeleteScene.Tooltip")); 
+		clearAllButton.setToolTipText(TrackerRes.getString("PencilControlDialog.Button.ClearAll.Tooltip")); 
+		heavyCheckbox.setToolTipText(TrackerRes.getString("PencilControlDialog.Checkbox.Heavy.Tooltip")); 
+		captionField.setToolTipText(TrackerRes.getString("PencilControlDialog.Field.Caption.Tooltip")); 		
+		sceneDropdown.setToolTipText(TrackerRes.getString("PencilControlDialog.Dropdown.Drawing.Tooltip")); 		
+		fontSizeSpinner.setToolTipText(TrackerRes.getString("PencilControlDialog.Spinner.FontSize.Tooltip")); 		
+		startFrameSpinner.setToolTipText(TrackerRes.getString("PencilControlDialog.Spinner.FrameRange.Tooltip")); 		
+		endFrameSpinner.setToolTipText(TrackerRes.getString("PencilControlDialog.Spinner.FrameRange.Tooltip")); 		
 		undoButton.setToolTipText(undoManager.getUndoPresentationName());
 		redoButton.setToolTipText(undoManager.getRedoPresentationName());
 		// enable/disable components
@@ -632,7 +632,7 @@ public class PencilControl extends JDialog {
 		// refresh color buttons
 		for (int i=0; i<colorButtons.length; i++) {
 	    for (ColorButton b: colorButtons[i]) {
-	    	b.setToolTipText(TrackerRes.getString("PencilControlDialog.Button.Color.Tooltip")); //$NON-NLS-1$
+	    	b.setToolTipText(TrackerRes.getString("PencilControlDialog.Button.Color.Tooltip")); 
 	    	b.setBorder(b.color==drawer.color && enabled? BorderFactory.createLineBorder(Color.GRAY, 2):
 	    		BorderFactory.createLineBorder(lightgrey, 2));
 	    	b.icon.setColor(enabled? b.color: Color.LIGHT_GRAY);
@@ -674,7 +674,7 @@ public class PencilControl extends JDialog {
 		TToolBar toolbar = TToolBar.getToolbar(trackerPanel);
 		toolbar.drawingButton.setSelected(vis);
     if (Tracker.showHints) {
-  		trackerPanel.setMessage(vis? TrackerRes.getString("PencilDrawer.Hint"): null); //$NON-NLS-1$
+  		trackerPanel.setMessage(vis? TrackerRes.getString("PencilDrawer.Hint"): null); 
     }
     isVisible = vis;
 	}
@@ -724,11 +724,11 @@ public class PencilControl extends JDialog {
 	
 	@Override
   public void dispose() {
-		trackerPanel.removePropertyChangeListener("stepnumber", stepListener); //$NON-NLS-1$
-		trackerPanel.removePropertyChangeListener("stepcount", clipListener); //$NON-NLS-1$
+		trackerPanel.removePropertyChangeListener("stepnumber", stepListener); 
+		trackerPanel.removePropertyChangeListener("stepcount", clipListener); 
     TFrame frame = trackerPanel.getTFrame();
     if (frame != null) {
-      frame.removePropertyChangeListener("tab", tabListener); //$NON-NLS-1$
+      frame.removePropertyChangeListener("tab", tabListener); 
     }
 		setSelectedScene(null);
   }
@@ -813,7 +813,7 @@ public class PencilControl extends JDialog {
       	setText(scene.getDescription(trackerPanel));
       }
       else {
-        setText(""); //$NON-NLS-1$
+        setText(""); 
       }
       return this;
     }
@@ -857,12 +857,12 @@ public class PencilControl extends JDialog {
 
     @Override
     public String getUndoPresentationName() {
-    	return TrackerRes.getString("PencilControlDialog.DrawingEdit.Undo.Text"); //$NON-NLS-1$
+    	return TrackerRes.getString("PencilControlDialog.DrawingEdit.Undo.Text"); 
     }
 
     @Override
     public String getRedoPresentationName() {
-    	return TrackerRes.getString("PencilControlDialog.DrawingEdit.Redo.Text"); //$NON-NLS-1$
+    	return TrackerRes.getString("PencilControlDialog.DrawingEdit.Redo.Text"); 
     }
 
   }
@@ -899,12 +899,12 @@ public class PencilControl extends JDialog {
     
     @Override
     public String getUndoPresentationName() {
-    	return TrackerRes.getString("PencilControlDialog.DeletionEdit.Undo.Text"); //$NON-NLS-1$
+    	return TrackerRes.getString("PencilControlDialog.DeletionEdit.Undo.Text"); 
     }
 
     @Override
     public String getRedoPresentationName() {
-    	return TrackerRes.getString("PencilControlDialog.DeletionEdit.Redo.Text"); //$NON-NLS-1$
+    	return TrackerRes.getString("PencilControlDialog.DeletionEdit.Redo.Text"); 
     }
 
   }
@@ -948,12 +948,12 @@ public class PencilControl extends JDialog {
 
     @Override
     public String getUndoPresentationName() {
-    	return TrackerRes.getString("PencilControlDialog.ClearEdit.Undo.Text"); //$NON-NLS-1$
+    	return TrackerRes.getString("PencilControlDialog.ClearEdit.Undo.Text"); 
     }
 
     @Override
     public String getRedoPresentationName() {
-    	return TrackerRes.getString("PencilControlDialog.ClearEdit.Redo.Text"); //$NON-NLS-1$
+    	return TrackerRes.getString("PencilControlDialog.ClearEdit.Redo.Text"); 
     }
 
   }
@@ -1001,12 +1001,12 @@ public class PencilControl extends JDialog {
 
     @Override
     public String getUndoPresentationName() {
-    	return TrackerRes.getString("PencilControlDialog.CaptionEdit.Undo.Text"); //$NON-NLS-1$
+    	return TrackerRes.getString("PencilControlDialog.CaptionEdit.Undo.Text"); 
     }
 
     @Override
     public String getRedoPresentationName() {
-    	return TrackerRes.getString("PencilControlDialog.CaptionEdit.Redo.Text"); //$NON-NLS-1$
+    	return TrackerRes.getString("PencilControlDialog.CaptionEdit.Redo.Text"); 
     }
 
   }

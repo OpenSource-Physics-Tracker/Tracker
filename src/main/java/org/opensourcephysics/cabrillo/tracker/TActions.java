@@ -56,7 +56,7 @@ public class TActions {
   // static fields
   static Map<TrackerPanel, Map<String, AbstractAction>> actionMaps 
   		= new HashMap<TrackerPanel, Map<String, AbstractAction>>(); // maps trackerPanel to actions map
-  static String newline = System.getProperty("line.separator", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+  static String newline = System.getProperty("line.separator", "\n");  
 
   /**
    * Private constructor.
@@ -94,7 +94,7 @@ public class TActions {
     actions = new HashMap<String, AbstractAction>();
     actionMaps.put(trackerPanel, actions);
     // clear tracks
-    final AbstractAction clearTracksAction = new AbstractAction(TrackerRes.getString("TActions.Action.ClearTracks"), null) { //$NON-NLS-1$
+    final AbstractAction clearTracksAction = new AbstractAction(TrackerRes.getString("TActions.Action.ClearTracks"), null) { 
      public void actionPerformed(ActionEvent e) {
        // check for locked tracks and get list of xml strings for undoableEdit
      	 ArrayList<String> xml= new ArrayList<String>();
@@ -109,8 +109,8 @@ public class TActions {
        }
        if (locked) {
          int i = JOptionPane.showConfirmDialog(trackerPanel,
-                 TrackerRes.getString("TActions.Dialog.DeleteLockedTracks.Message"), //$NON-NLS-1$
-                 TrackerRes.getString("TActions.Dialog.DeleteLockedTracks.Title"), //$NON-NLS-1$
+                 TrackerRes.getString("TActions.Dialog.DeleteLockedTracks.Message"), 
+                 TrackerRes.getString("TActions.Dialog.DeleteLockedTracks.Title"), 
                  JOptionPane.YES_NO_OPTION,
                  JOptionPane.WARNING_MESSAGE);
          if (i != 0) return;
@@ -120,9 +120,9 @@ public class TActions {
        trackerPanel.clearTracks();
      }
     };
-    actions.put("clearTracks", clearTracksAction); //$NON-NLS-1$
+    actions.put("clearTracks", clearTracksAction); 
     // new tab
-    AbstractAction newTabAction = new AbstractAction(TrackerRes.getString("TActions.Action.NewTab"), null) { //$NON-NLS-1$
+    AbstractAction newTabAction = new AbstractAction(TrackerRes.getString("TActions.Action.NewTab"), null) { 
       public void actionPerformed(ActionEvent e) {
         TFrame frame = trackerPanel.getTFrame();
         if (frame != null) {
@@ -135,9 +135,9 @@ public class TActions {
         }
       }
     };
-    actions.put("newTab", newTabAction); //$NON-NLS-1$
+    actions.put("newTab", newTabAction); 
     // pastexml
-    AbstractAction pasteAction = new AbstractAction(TrackerRes.getString("TActions.Action.Paste")) { //$NON-NLS-1$
+    AbstractAction pasteAction = new AbstractAction(TrackerRes.getString("TActions.Action.Paste")) { 
       public void actionPerformed(ActionEvent e) {
         if (!TrackerIO.pasteXML(trackerPanel)) {
         	// pasting XML failed, so try to paste data
@@ -146,10 +146,10 @@ public class TActions {
         }
       }
     };
-    actions.put("paste", pasteAction); //$NON-NLS-1$
+    actions.put("paste", pasteAction); 
     // open
-    Icon icon = new ResizableIcon("/resources/images/open.gif"); //$NON-NLS-1$
-    final AbstractAction openAction = new AbstractAction(TrackerRes.getString("TActions.Action.Open"), icon) { //$NON-NLS-1$
+    Icon icon = new ResizableIcon(new ImageIcon(TActions.class.getResource("/images/open.gif"))); 
+    final AbstractAction openAction = new AbstractAction(TrackerRes.getString("TActions.Action.Open"), icon) { 
       public void actionPerformed(ActionEvent e) {
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -162,24 +162,24 @@ public class TActions {
         }
       }
     };
-    actions.put("open", openAction); //$NON-NLS-1$
+    actions.put("open", openAction); 
     // open url
-    final AbstractAction openURLAction = new AbstractAction(TrackerRes.getString("TActions.Action.OpenURL")) { //$NON-NLS-1$
+    final AbstractAction openURLAction = new AbstractAction(TrackerRes.getString("TActions.Action.OpenURL")) { 
       public void actionPerformed(ActionEvent e) {
         Object input = JOptionPane.showInputDialog(trackerPanel.getTFrame(), 
-        		TrackerRes.getString("TActions.Dialog.OpenURL.Message") //$NON-NLS-1$
-        		+":                             ", //$NON-NLS-1$
-        		TrackerRes.getString("TActions.Dialog.OpenURL.Title"),   //$NON-NLS-1$
+        		TrackerRes.getString("TActions.Dialog.OpenURL.Message") 
+        		+":                             ", 
+        		TrackerRes.getString("TActions.Dialog.OpenURL.Title"),   
             JOptionPane.PLAIN_MESSAGE, null, null, null);
-        if(input==null || input.toString().trim().equals("")) { //$NON-NLS-1$
+        if(input==null || input.toString().trim().equals("")) { 
           return;
         }
         Resource res = ResourceLoader.getResource(input.toString().trim());
         if (res==null || res.getURL()==null) {
     	    JOptionPane.showMessageDialog(trackerPanel.getTFrame(),
-    	        TrackerRes.getString("TActions.Dialog.URLResourceNotFound.Message") //$NON-NLS-1$
-    	        +"\n\""+input.toString().trim()+"\"",  //$NON-NLS-1$ //$NON-NLS-2$
-    	        TrackerRes.getString("TActions.Dialog.URLResourceNotFound.Title"),  //$NON-NLS-1$ 
+    	        TrackerRes.getString("TActions.Dialog.URLResourceNotFound.Message") 
+    	        +"\n\""+input.toString().trim()+"\"",   
+    	        TrackerRes.getString("TActions.Dialog.URLResourceNotFound.Title"),   
     	        JOptionPane.ERROR_MESSAGE);
         	return;
         }
@@ -195,10 +195,10 @@ public class TActions {
         }
       }
     };
-    actions.put("openURL", openURLAction); //$NON-NLS-1$
+    actions.put("openURL", openURLAction); 
     // openBrowser
-    icon = new ResizableIcon("/resources/images/open_catalog.gif"); //$NON-NLS-1$
-    final AbstractAction openBrowserAction = new AbstractAction(TrackerRes.getString("TActions.Action.OpenBrowser"), icon) { //$NON-NLS-1$
+    icon = new ResizableIcon(new ImageIcon(TActions.class.getResource("/images/open_catalog.gif"))); 
+    final AbstractAction openBrowserAction = new AbstractAction(TrackerRes.getString("TActions.Action.OpenBrowser"), icon) { 
       public void actionPerformed(ActionEvent e) {
         TFrame frame = trackerPanel.getTFrame();
         if (frame != null) {
@@ -206,9 +206,9 @@ public class TActions {
         }
       }
     };
-    actions.put("openBrowser", openBrowserAction); //$NON-NLS-1$
+    actions.put("openBrowser", openBrowserAction); 
     // properties
-    final AbstractAction propertiesAction = new AbstractAction(TrackerRes.getString("TActions.Action.Properties")) { //$NON-NLS-1$
+    final AbstractAction propertiesAction = new AbstractAction(TrackerRes.getString("TActions.Action.Properties")) { 
       public void actionPerformed(ActionEvent e) {
         TFrame frame = trackerPanel.getTFrame();
         if (frame != null) {
@@ -216,9 +216,9 @@ public class TActions {
         }
       }
     };
-    actions.put("properties", propertiesAction); //$NON-NLS-1$
+    actions.put("properties", propertiesAction); 
     // close tab
-    AbstractAction closeAction = new AbstractAction(TrackerRes.getString("TActions.Action.Close")) { //$NON-NLS-1$
+    AbstractAction closeAction = new AbstractAction(TrackerRes.getString("TActions.Action.Close")) { 
       public void actionPerformed(ActionEvent e) {
         TFrame frame = trackerPanel.getTFrame();
         if (frame != null) {
@@ -226,9 +226,9 @@ public class TActions {
         }
       }
     };
-    actions.put("close", closeAction); //$NON-NLS-1$
+    actions.put("close", closeAction); 
     // close all tabs
-    AbstractAction closeAllAction = new AbstractAction(TrackerRes.getString("TActions.Action.CloseAll")) { //$NON-NLS-1$
+    AbstractAction closeAllAction = new AbstractAction(TrackerRes.getString("TActions.Action.CloseAll")) { 
       public void actionPerformed(ActionEvent e) {
         TFrame frame = trackerPanel.getTFrame();
         if (frame != null) {
@@ -236,88 +236,88 @@ public class TActions {
         }
       }
     };
-    actions.put("closeAll", closeAllAction); //$NON-NLS-1$
+    actions.put("closeAll", closeAllAction); 
     // import file
-    AbstractAction importAction = new AbstractAction(TrackerRes.getString("TActions.Action.ImportTRK")) { //$NON-NLS-1$
+    AbstractAction importAction = new AbstractAction(TrackerRes.getString("TActions.Action.ImportTRK")) { 
       public void actionPerformed(ActionEvent e) {
         TrackerIO.importFile(trackerPanel);
       }
     };
-    actions.put("import", importAction); //$NON-NLS-1$
+    actions.put("import", importAction); 
     // import data
-    AbstractAction importDataAction = new AbstractAction(TrackerRes.getString("TActions.Action.ImportData")) { //$NON-NLS-1$
+    AbstractAction importDataAction = new AbstractAction(TrackerRes.getString("TActions.Action.ImportData")) { 
       public void actionPerformed(ActionEvent e) {
-      	getAction("dataTrack", trackerPanel).actionPerformed(e); //$NON-NLS-1$
+      	getAction("dataTrack", trackerPanel).actionPerformed(e); 
       }
     };
-    actions.put("importData", importDataAction); //$NON-NLS-1$
+    actions.put("importData", importDataAction); 
     // save current tab
-    icon = new ResizableIcon("/resources/images/save.gif"); //$NON-NLS-1$
-    AbstractAction saveAction = new AbstractAction(TrackerRes.getString("TActions.Action.Save"), icon) { //$NON-NLS-1$
+    icon = new ResizableIcon(new ImageIcon(TActions.class.getResource("/images/save.gif"))); 
+    AbstractAction saveAction = new AbstractAction(TrackerRes.getString("TActions.Action.Save"), icon) { 
       public void actionPerformed(ActionEvent e) {
         TrackerIO.save(trackerPanel.getDataFile(), trackerPanel);
         trackerPanel.refreshNotesDialog();
       }
     };
-    actions.put("save", saveAction); //$NON-NLS-1$
+    actions.put("save", saveAction); 
     // save tab as
-    AbstractAction saveAsAction = new AbstractAction(TrackerRes.getString("TActions.Action.SaveAs"), null) { //$NON-NLS-1$
+    AbstractAction saveAsAction = new AbstractAction(TrackerRes.getString("TActions.Action.SaveAs"), null) { 
       public void actionPerformed(ActionEvent e) {
         TrackerIO.save(null, trackerPanel);
         trackerPanel.refreshNotesDialog();
       }
     };
-    actions.put("saveAs", saveAsAction); //$NON-NLS-1$
+    actions.put("saveAs", saveAsAction); 
     // save zip resource
-    icon = new ResizableIcon("/resources/images/save_zip.gif"); //$NON-NLS-1$
-    AbstractAction saveZipAction = new AbstractAction(TrackerRes.getString("TActions.Action.SaveZip")+"...", icon) { //$NON-NLS-1$ //$NON-NLS-2$
+    icon = new ResizableIcon(new ImageIcon(TActions.class.getResource("/images/save_zip.gif"))); 
+    AbstractAction saveZipAction = new AbstractAction(TrackerRes.getString("TActions.Action.SaveZip")+"...", icon) {  
       public void actionPerformed(ActionEvent e) {
       	ExportZipDialog zipDialog = ExportZipDialog.getDialog(trackerPanel);
       	zipDialog.setVisible(true);
       }
     };
-    actions.put("saveZip", saveZipAction); //$NON-NLS-1$
+    actions.put("saveZip", saveZipAction); 
     // save tabset as
-    AbstractAction saveTabsetAsAction = new AbstractAction(TrackerRes.getString("TActions.Action.SaveFrame"), null) { //$NON-NLS-1$
+    AbstractAction saveTabsetAsAction = new AbstractAction(TrackerRes.getString("TActions.Action.SaveFrame"), null) { 
       public void actionPerformed(ActionEvent e) {
         TrackerIO.saveTabset(null, trackerPanel.getTFrame());
         trackerPanel.refreshNotesDialog();
       }
     };
-    actions.put("saveTabsetAs", saveTabsetAsAction); //$NON-NLS-1$
+    actions.put("saveTabsetAs", saveTabsetAsAction); 
     // save video
-    AbstractAction saveVideoAction = new AbstractAction(TrackerRes.getString("TActions.Action.SaveVideoAs")) { //$NON-NLS-1$
+    AbstractAction saveVideoAction = new AbstractAction(TrackerRes.getString("TActions.Action.SaveVideoAs")) { 
       public void actionPerformed(ActionEvent e) {
         TrackerIO.saveVideo(null, trackerPanel);
       }
     };
-    actions.put("saveVideo", saveVideoAction); //$NON-NLS-1$
+    actions.put("saveVideo", saveVideoAction); 
     // export file
-    AbstractAction exportAction = new AbstractAction(TrackerRes.getString("TActions.Action.ImportTRK")) { //$NON-NLS-1$
+    AbstractAction exportAction = new AbstractAction(TrackerRes.getString("TActions.Action.ImportTRK")) { 
       public void actionPerformed(ActionEvent e) {
         TrackerIO.exportFile(trackerPanel);
       }
     };
-    actions.put("export", exportAction); //$NON-NLS-1$
+    actions.put("export", exportAction); 
     // delete track
-    AbstractAction deleteTrackAction = new AbstractAction(TrackerRes.getString("TActions.Action.Delete"), null) { //$NON-NLS-1$
+    AbstractAction deleteTrackAction = new AbstractAction(TrackerRes.getString("TActions.Action.Delete"), null) { 
       public void actionPerformed(ActionEvent e) {
         // action command is name of track to delete
         TTrack track = trackerPanel.getTrack(e.getActionCommand());
         if (track != null) track.delete();
       }
     };
-    actions.put("deleteTrack", deleteTrackAction); //$NON-NLS-1$
-    AbstractAction configAction = new AbstractAction(TrackerRes.getString("TActions.Action.Config"), null) { //$NON-NLS-1$
+    actions.put("deleteTrack", deleteTrackAction); 
+    AbstractAction configAction = new AbstractAction(TrackerRes.getString("TActions.Action.Config"), null) { 
       public void actionPerformed(ActionEvent e) {
       	TFrame frame = trackerPanel.getTFrame();
       	frame.showPrefsDialog();
       }
     };
-    actions.put("config", configAction); //$NON-NLS-1$
+    actions.put("config", configAction); 
     // axesVisible
-    icon = new ResizableIcon("/resources/images/axes.gif"); //$NON-NLS-1$
-    AbstractAction axesVisibleAction = new AbstractAction(TrackerRes.getString("TActions.Action.AxesVisible"), icon) { //$NON-NLS-1$
+    icon = new ResizableIcon(new ImageIcon(TActions.class.getResource("/images/axes.gif"))); 
+    AbstractAction axesVisibleAction = new AbstractAction(TrackerRes.getString("TActions.Action.AxesVisible"), icon) { 
       public void actionPerformed(ActionEvent e) {
       	CoordAxes axes = trackerPanel.getAxes();
         if (axes == null) return;
@@ -333,7 +333,7 @@ public class TActions {
         trackerPanel.repaint();
       }
     };
-    actions.put("axesVisible", axesVisibleAction); //$NON-NLS-1$
+    actions.put("axesVisible", axesVisibleAction); 
     // videoFilter
     AbstractAction videoFilterAction = new AbstractAction() {
       public void actionPerformed(ActionEvent e) {
@@ -364,10 +364,10 @@ public class TActions {
         trackerPanel.repaint();
       }
     };
-    actions.put("videoFilter", videoFilterAction); //$NON-NLS-1$
+    actions.put("videoFilter", videoFilterAction); 
     // about video
     AbstractAction aboutVideoAction = new AbstractAction(
-    		TrackerRes.getString("TActions.AboutVideo"), null) { //$NON-NLS-1$
+    		TrackerRes.getString("TActions.AboutVideo"), null) { 
       public void actionPerformed(ActionEvent e) {
         TFrame frame = trackerPanel.getTFrame();
         if (frame != null) {
@@ -378,16 +378,16 @@ public class TActions {
         }
       }
     };
-    actions.put("aboutVideo", aboutVideoAction); //$NON-NLS-1$
+    actions.put("aboutVideo", aboutVideoAction); 
     // print
-    AbstractAction printAction = new AbstractAction(TrackerRes.getString("TActions.Action.Print"), null) { //$NON-NLS-1$
+    AbstractAction printAction = new AbstractAction(TrackerRes.getString("TActions.Action.Print"), null) { 
       public void actionPerformed(ActionEvent e) {
         new TrackerIO.ComponentImage(trackerPanel).print();
       }
     };
-    actions.put("print", printAction); //$NON-NLS-1$
+    actions.put("print", printAction); 
     // exit
-    AbstractAction exitAction = new AbstractAction(TrackerRes.getString("TActions.Action.Exit"), null) { //$NON-NLS-1$
+    AbstractAction exitAction = new AbstractAction(TrackerRes.getString("TActions.Action.Exit"), null) { 
 			public void actionPerformed(ActionEvent e) {
         TFrame frame = trackerPanel.getTFrame();
         if (frame != null) {
@@ -404,12 +404,12 @@ public class TActions {
         System.exit(0);
       }
     };
-    actions.put("exit", exitAction); //$NON-NLS-1$
+    actions.put("exit", exitAction); 
     // new point mass
-    AbstractAction pointMassAction = new AbstractAction(TrackerRes.getString("PointMass.Name"), null) { //$NON-NLS-1$
+    AbstractAction pointMassAction = new AbstractAction(TrackerRes.getString("PointMass.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         PointMass pointMass = new PointMass();
-        pointMass.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        pointMass.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(pointMass);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -424,11 +424,11 @@ public class TActions {
           CenterOfMass cm = list.get(0);
           int result = JOptionPane.showConfirmDialog(
               trackerPanel,
-              "Add " + pointMass.getName() + " to center of mass \"" + //$NON-NLS-1$ //$NON-NLS-2$
-              cm.getName() + "\"?" + newline + //$NON-NLS-1$
-              "Note: \"" + cm.getName() + "\" will disappear until  " + //$NON-NLS-1$ //$NON-NLS-2$
-              pointMass.getName() + " is marked!", //$NON-NLS-1$
-              TrackerRes.getString("TActions.Dialog.NewPointMass.Title"), //$NON-NLS-1$
+              "Add " + pointMass.getName() + " to center of mass \"" +  
+              cm.getName() + "\"?" + newline + 
+              "Note: \"" + cm.getName() + "\" will disappear until  " +  
+              pointMass.getName() + " is marked!", 
+              TrackerRes.getString("TActions.Dialog.NewPointMass.Title"), 
               JOptionPane.YES_NO_OPTION,
               JOptionPane.QUESTION_MESSAGE);
           if (result == JOptionPane.YES_OPTION) {
@@ -437,12 +437,12 @@ public class TActions {
         }
       }
     };
-    actions.put("pointMass", pointMassAction); //$NON-NLS-1$
+    actions.put("pointMass", pointMassAction); 
     // new center of mass
-    AbstractAction cmAction = new AbstractAction(TrackerRes.getString("CenterOfMass.Name"), null) { //$NON-NLS-1$
+    AbstractAction cmAction = new AbstractAction(TrackerRes.getString("CenterOfMass.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         CenterOfMass cm = new CenterOfMass();
-        cm.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        cm.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(cm);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -451,13 +451,13 @@ public class TActions {
         cmInspector.setVisible(true);
       }
     };
-    actions.put("cm", cmAction); //$NON-NLS-1$
+    actions.put("cm", cmAction); 
     // new vector
     AbstractAction vectorAction = new AbstractAction(
-        TrackerRes.getString("Vector.Name"), null) { //$NON-NLS-1$
+        TrackerRes.getString("Vector.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         org.opensourcephysics.cabrillo.tracker.vector.Vector vec = new Vector();
-        vec.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        vec.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(vec);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -467,13 +467,13 @@ public class TActions {
         }
       }
     };
-    actions.put("vector", vectorAction); //$NON-NLS-1$
+    actions.put("vector", vectorAction); 
     // new vector sum
     AbstractAction vectorSumAction = new AbstractAction(
-        TrackerRes.getString("VectorSum.Name"), null) { //$NON-NLS-1$
+        TrackerRes.getString("VectorSum.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         VectorSum sum = new VectorSum();
-        sum.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        sum.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(sum);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -482,12 +482,12 @@ public class TActions {
         sumInspector.setVisible(true);
       }
     };
-    actions.put("vectorSum", vectorSumAction); //$NON-NLS-1$
+    actions.put("vectorSum", vectorSumAction); 
     // new offset origin item
-    AbstractAction offsetOriginAction = new AbstractAction(TrackerRes.getString("OffsetOrigin.Name"), null) { //$NON-NLS-1$
+    AbstractAction offsetOriginAction = new AbstractAction(TrackerRes.getString("OffsetOrigin.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         OffsetOrigin offset = new OffsetOrigin();
-        offset.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        offset.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(offset);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -495,12 +495,12 @@ public class TActions {
         trackerPanel.getAxes().setVisible(true);
       }
     };
-    actions.put("offsetOrigin", offsetOriginAction); //$NON-NLS-1$
+    actions.put("offsetOrigin", offsetOriginAction); 
     // new calibration item
-    AbstractAction calibrationAction = new AbstractAction(TrackerRes.getString("Calibration.Name"), null) { //$NON-NLS-1$
+    AbstractAction calibrationAction = new AbstractAction(TrackerRes.getString("Calibration.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         Calibration cal = new Calibration();
-        cal.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        cal.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(cal);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -508,24 +508,24 @@ public class TActions {
         trackerPanel.getAxes().setVisible(true);
       }
     };
-    actions.put("calibration", calibrationAction); //$NON-NLS-1$
+    actions.put("calibration", calibrationAction); 
     // new line profile item
-    AbstractAction lineProfileAction = new AbstractAction(TrackerRes.getString("LineProfile.Name"), null) { //$NON-NLS-1$
+    AbstractAction lineProfileAction = new AbstractAction(TrackerRes.getString("LineProfile.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         TTrack lineProfile = new LineProfile();
-        lineProfile.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        lineProfile.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(lineProfile);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
         trackerPanel.setSelectedTrack(lineProfile);
       }
     };
-    actions.put("lineProfile", lineProfileAction); //$NON-NLS-1$
+    actions.put("lineProfile", lineProfileAction); 
     // new RGBRegion item
-    AbstractAction rgbRegionAction = new AbstractAction(TrackerRes.getString("RGBRegion.Name"), null) { //$NON-NLS-1$
+    AbstractAction rgbRegionAction = new AbstractAction(TrackerRes.getString("RGBRegion.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         TTrack rgb = new RGBRegion();
-        rgb.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        rgb.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(rgb);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -535,12 +535,12 @@ public class TActions {
         }
       }
     };
-    actions.put("rgbRegion", rgbRegionAction); //$NON-NLS-1$
+    actions.put("rgbRegion", rgbRegionAction); 
     // new analytic particle item
-    AbstractAction analyticParticleAction = new AbstractAction(TrackerRes.getString("AnalyticParticle.Name"), null) { //$NON-NLS-1$
+    AbstractAction analyticParticleAction = new AbstractAction(TrackerRes.getString("AnalyticParticle.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         final AnalyticParticle model = new AnalyticParticle();
-        model.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        model.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(model);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -550,12 +550,12 @@ public class TActions {
         inspector.setVisible(true);
       }
     };
-    actions.put("analyticParticle", analyticParticleAction); //$NON-NLS-1$
+    actions.put("analyticParticle", analyticParticleAction); 
     // new dynamic particle item
-    AbstractAction dynamicParticleAction = new AbstractAction(TrackerRes.getString("DynamicParticle.Name"), null) { //$NON-NLS-1$
+    AbstractAction dynamicParticleAction = new AbstractAction(TrackerRes.getString("DynamicParticle.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         DynamicParticle model = new DynamicParticle();
-        model.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        model.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(model);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -565,12 +565,12 @@ public class TActions {
         inspector.setVisible(true);
       }
     };
-    actions.put("dynamicParticle", dynamicParticleAction); //$NON-NLS-1$
+    actions.put("dynamicParticle", dynamicParticleAction); 
     // new dynamic particle polar item
-    AbstractAction dynamicParticlePolarAction = new AbstractAction(TrackerRes.getString("DynamicParticlePolar.Name"), null) { //$NON-NLS-1$
+    AbstractAction dynamicParticlePolarAction = new AbstractAction(TrackerRes.getString("DynamicParticlePolar.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         DynamicParticle model = new DynamicParticlePolar();
-        model.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        model.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(model);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -580,12 +580,12 @@ public class TActions {
         inspector.setVisible(true);
       }
     };
-    actions.put("dynamicParticlePolar", dynamicParticlePolarAction); //$NON-NLS-1$
+    actions.put("dynamicParticlePolar", dynamicParticlePolarAction); 
     // new dynamic system item
-    AbstractAction dynamicSystemAction = new AbstractAction(TrackerRes.getString("DynamicSystem.Name"), null) { //$NON-NLS-1$
+    AbstractAction dynamicSystemAction = new AbstractAction(TrackerRes.getString("DynamicSystem.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
       	DynamicSystem model = new DynamicSystem();
-        model.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        model.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(model);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
@@ -597,12 +597,12 @@ public class TActions {
         systemInspector.setVisible(true);
       }
     };
-    actions.put("dynamicSystem", dynamicSystemAction); //$NON-NLS-1$
+    actions.put("dynamicSystem", dynamicSystemAction); 
     // new DataTrack from text file item
-    AbstractAction dataTrackAction = new AbstractAction(TrackerRes.getString("ParticleDataTrack.Name"), null) { //$NON-NLS-1$
+    AbstractAction dataTrackAction = new AbstractAction(TrackerRes.getString("ParticleDataTrack.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         // choose file and import data
-      	File[] files = TrackerIO.getChooserFiles("open data"); //$NON-NLS-1$
+      	File[] files = TrackerIO.getChooserFiles("open data"); 
         if (files==null) {
         	return;
         }
@@ -610,24 +610,24 @@ public class TActions {
 	      trackerPanel.importData(filePath, null);        
       }
     };
-    actions.put("dataTrack", dataTrackAction); //$NON-NLS-1$
+    actions.put("dataTrack", dataTrackAction); 
     // new DataTrack from ejs item
-    AbstractAction dataTrackfromEJSAction = new AbstractAction(TrackerRes.getString("ParticleDataTrack.Name"), null) { //$NON-NLS-1$
+    AbstractAction dataTrackfromEJSAction = new AbstractAction(TrackerRes.getString("ParticleDataTrack.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         // choose file and get its data
-      	File[] files = TrackerIO.getChooserFiles("open ejs"); //$NON-NLS-1$
+      	File[] files = TrackerIO.getChooserFiles("open ejs"); 
         if (files==null) {
         	return;
         }
         String filePath = files[0].getAbsolutePath();
         String ext = XML.getExtension(filePath);
-        if ("jar".equals(ext)) { //$NON-NLS-1$
+        if ("jar".equals(ext)) { 
         	if (!DataTrackTool.isDataSource(filePath)) {
-        		String jarName = TrackerRes.getString("TActions.Action.DataTrack.Unsupported.JarFile") //$NON-NLS-1$
-        				+ " \""+XML.getName(filePath)+"\" "; //$NON-NLS-1$ //$NON-NLS-2$
+        		String jarName = TrackerRes.getString("TActions.Action.DataTrack.Unsupported.JarFile") 
+        				+ " \""+XML.getName(filePath)+"\" ";  
       			JOptionPane.showMessageDialog(trackerPanel.getTFrame(), 
-      					jarName+TrackerRes.getString("TActions.Action.DataTrack.Unsupported.Message")+".", //$NON-NLS-1$ //$NON-NLS-2$
-      					TrackerRes.getString("TActions.Action.DataTrack.Unsupported.Title"), //$NON-NLS-1$
+      					jarName+TrackerRes.getString("TActions.Action.DataTrack.Unsupported.Message")+".",  
+      					TrackerRes.getString("TActions.Action.DataTrack.Unsupported.Title"), 
       					JOptionPane.WARNING_MESSAGE);
       			return;
         	}
@@ -635,14 +635,14 @@ public class TActions {
         }
       }
     };
-    actions.put("dataTrackFromEJS", dataTrackfromEJSAction); //$NON-NLS-1$
+    actions.put("dataTrackFromEJS", dataTrackfromEJSAction); 
     // new (read-only) tape measure
-    String s = TrackerRes.getString("TapeMeasure.Name"); //$NON-NLS-1$
+    String s = TrackerRes.getString("TapeMeasure.Name"); 
     AbstractAction tapeAction = new AbstractAction(s, null) {
       public void actionPerformed(ActionEvent e) {
         TapeMeasure tape = new TapeMeasure();
         tape.setReadOnly(true);
-        tape.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        tape.setDefaultNameAndColor(trackerPanel, " "); 
       	// place tape at center of viewport
       	MainTView mainView = trackerPanel.getTFrame().getMainView(trackerPanel);
         Rectangle rect = mainView.scrollPane.getViewport().getViewRect();
@@ -657,13 +657,13 @@ public class TActions {
         trackerPanel.setSelectedTrack(tape);
       }
     };
-    actions.put("tape", tapeAction); //$NON-NLS-1$
+    actions.put("tape", tapeAction); 
     // new protractor
     AbstractAction protractorAction = new AbstractAction(
-        TrackerRes.getString("Protractor.Name"), null) { //$NON-NLS-1$
+        TrackerRes.getString("Protractor.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
       	Protractor protractor = new Protractor();
-        protractor.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        protractor.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(protractor);
       	// place protractor at center of viewport
       	MainTView mainView = trackerPanel.getTFrame().getMainView(trackerPanel);
@@ -680,19 +680,19 @@ public class TActions {
         trackerPanel.setSelectedTrack(protractor);
       }
     };
-    actions.put("protractor", protractorAction); //$NON-NLS-1$
+    actions.put("protractor", protractorAction); 
     // new circle track
-    AbstractAction circleFitterAction = new AbstractAction(TrackerRes.getString("CircleFitter.Name"), null) { //$NON-NLS-1$
+    AbstractAction circleFitterAction = new AbstractAction(TrackerRes.getString("CircleFitter.Name"), null) { 
       public void actionPerformed(ActionEvent e) {
         CircleFitter track = new CircleFitter();
-        track.setDefaultNameAndColor(trackerPanel, " "); //$NON-NLS-1$
+        track.setDefaultNameAndColor(trackerPanel, " "); 
         trackerPanel.addTrack(track);
         trackerPanel.setSelectedPoint(null);
         trackerPanel.selectedSteps.clear();
         trackerPanel.setSelectedTrack(track);
       }
     };
-    actions.put("circleFitter", circleFitterAction); //$NON-NLS-1$
+    actions.put("circleFitter", circleFitterAction); 
     // clone track action
     AbstractAction cloneTrackAction = new AbstractAction() {
       public void actionPerformed(ActionEvent e) {
@@ -718,7 +718,7 @@ public class TActions {
       		} catch (Exception ex) {}
       		// create XMLControl of track, assign new name, and copy to clipboard
           XMLControl control = new XMLControlElement(track);          
-          control.setValue("name", name+n); //$NON-NLS-1$
+          control.setValue("name", name+n); 
           StringSelection data = new StringSelection(control.toXML());
           Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
           clipboard.setContents(data, data);
@@ -727,9 +727,9 @@ public class TActions {
       	}
       }
     };
-    actions.put("cloneTrack", cloneTrackAction); //$NON-NLS-1$
+    actions.put("cloneTrack", cloneTrackAction); 
     // clear filters action
-    final AbstractAction clearFiltersAction = new AbstractAction(TrackerRes.getString("TActions.Action.ClearFilters"), null) { //$NON-NLS-1$
+    final AbstractAction clearFiltersAction = new AbstractAction(TrackerRes.getString("TActions.Action.ClearFilters"), null) { 
       public void actionPerformed(ActionEvent e) {
         Video video = trackerPanel.getVideo();
         if (video != null) {
@@ -750,16 +750,16 @@ public class TActions {
         }
       }
     };
-    actions.put("clearFilters", clearFiltersAction); //$NON-NLS-1$
+    actions.put("clearFilters", clearFiltersAction); 
     // open video
-    AbstractAction openVideoAction = new AbstractAction(TrackerRes.getString("TActions.Action.ImportVideo"), null) { //$NON-NLS-1$
+    AbstractAction openVideoAction = new AbstractAction(TrackerRes.getString("TActions.Action.ImportVideo"), null) { 
       public void actionPerformed(ActionEvent e) {
         TrackerIO.importVideo(trackerPanel);
       }
     };
-    actions.put("openVideo", openVideoAction); //$NON-NLS-1$
+    actions.put("openVideo", openVideoAction); 
     // close video
-    AbstractAction closeVideoAction = new AbstractAction(TrackerRes.getString("TActions.Action.CloseVideo"), null) { //$NON-NLS-1$
+    AbstractAction closeVideoAction = new AbstractAction(TrackerRes.getString("TActions.Action.CloseVideo"), null) { 
       public void actionPerformed(ActionEvent e) {
         trackerPanel.setVideo(null);
         trackerPanel.repaint();
@@ -767,7 +767,7 @@ public class TActions {
         TMenuBar.getMenuBar(trackerPanel).refresh();
       }
     };
-    actions.put("closeVideo", closeVideoAction); //$NON-NLS-1$
+    actions.put("closeVideo", closeVideoAction); 
     // reference frame
     AbstractAction refFrameAction = new AbstractAction() {
       public void actionPerformed(ActionEvent e) {
@@ -775,7 +775,7 @@ public class TActions {
         trackerPanel.setReferenceFrame(item.getActionCommand());
       }
     };
-    actions.put("refFrame", refFrameAction); //$NON-NLS-1$
+    actions.put("refFrame", refFrameAction); 
     return actions;
   }
 }

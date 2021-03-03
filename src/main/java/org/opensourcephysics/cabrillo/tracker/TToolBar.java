@@ -52,119 +52,8 @@ import java.util.*;
  */
 public class TToolBar extends JToolBar implements PropertyChangeListener {
 
-    // static fields
-    protected static Map<TrackerPanel, TToolBar> toolbars = new HashMap<>();
-
-    protected static int[] trailLengths = {1, 4, 15, 0};
-    protected static String[] trailLengthNames = {"none", "short", "long", "full"};
-    protected ResizableIcon newTrackIcon = new ResizableIcon("/images/poof.gif");
-    protected static Icon trackControlIcon, trackControlOnIcon, trackControlDisabledIcon;
-    protected static Icon zoomIcon;
-    protected static Icon clipOffIcon, clipOnIcon;
-    protected static Icon axesOffIcon, axesOnIcon;
-    protected static Icon calibrationToolsOffIcon, calibrationToolsOnIcon;
-    protected static Icon calibrationToolsOffRolloverIcon, calibrationToolsOnRolloverIcon;
-    protected static Icon pointsOffIcon, pointsOnIcon;
-    protected static Icon velocOffIcon, velocOnIcon;
-    protected static Icon accelOffIcon, accelOnIcon;
-    protected static Icon traceOffIcon, traceOnIcon;
-    protected static Icon labelsOffIcon, labelsOnIcon;
-    protected static Icon stretchOffIcon, stretchOnIcon;
-    protected static Icon xmassOffIcon, xmassOnIcon;
-    protected static Icon fontSmallerIcon, fontBiggerIcon, fontSmallerDisabledIcon, fontBiggerDisabledIcon;
-    protected static Icon autotrackerOffIcon, autotrackerOnIcon, autotrackerDisabledIcon;
-    protected static Icon infoIcon, refreshIcon, htmlIcon, htmlDisabledIcon;
-    protected static Icon[] trailIcons = new Icon[4];
-    protected static int[] stretchValues = new int[]{1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
-    protected static Icon separatorIcon;
-    protected static Icon checkboxOffIcon, checkboxOnIcon;
-    protected ResizableIcon checkboxOnDisabledIcon = new ResizableIcon("/images/box_checked_disabled.gif");
-    protected static Icon pencilOffIcon, pencilOnIcon, pencilOffRolloverIcon, pencilOnRolloverIcon;
-    protected static NumberFormat zoomFormat = NumberFormat.getNumberInstance();
-
-    // instance fields
-    protected TrackerPanel trackerPanel; // manages & displays track data
-    protected boolean refreshing; // true when refreshing toolbar
-    protected WindowListener infoListener;
-    protected int vStretch = 1, aStretch = 1;
-    protected JButton openButton, openBrowserButton, saveButton, saveZipButton;
-    protected TButton newTrackButton;
-    protected JButton trackControlButton, clipSettingsButton;
-    protected CalibrationButton calibrationButton;
-    protected DrawingButton drawingButton;
-    protected JButton axesButton, zoomButton, autotrackerButton;
-    protected JButton traceVisButton, pVisButton, vVisButton, aVisButton;
-    public JButton xMassButton, trailButton, labelsButton, stretchButton;
-    protected JButton fontSmallerButton, fontBiggerButton;
-    protected int trailLength = trailLengths[Tracker.trailLengthIndex];
-    protected JPopupMenu newPopup = new JPopupMenu();
-    protected JMenu vStretchMenu, aStretchMenu;
-    protected ButtonGroup vGroup, aGroup;
-    protected JMenuItem showTrackControlItem, selectNoneItem, stretchOffItem;
-    protected JButton notesButton, refreshButton, desktopButton;
-    protected Component toolbarFiller;
-    protected int toolbarComponentHeight;
-    protected JMenu cloneMenu;
-    protected boolean notYetCalibrated = true;
-    protected ComponentListener clipSettingsDialogListener;
-    protected JPopupMenu zoomPopup = new JPopupMenu();
-    protected ArrayList<PageTView.TabData> pageViewTabs = new ArrayList<>();
-
-    static {
-//        newTrackIcon = new ImageIcon("/resources/images/poof.gif");
-        trackControlIcon = new ImageIcon("/resources/images/track_control.gif");
-        trackControlOnIcon = new ImageIcon("/resources/images/track_control_on.gif");
-        trackControlDisabledIcon = new ImageIcon("/resources/images/track_control_disabled.gif");
-        zoomIcon = new ImageIcon("/resources/images/zoom.gif");
-        clipOffIcon = new ImageIcon("/resources/images/clip_off.gif");
-        clipOnIcon = new ImageIcon("/resources/images/clip_on.gif");
-        axesOffIcon = new ImageIcon("/resources/images/axes.gif");
-        axesOnIcon = new ImageIcon("/resources/images/axes_on.gif");
-        calibrationToolsOffIcon = new ImageIcon("/resources/images/calibration_tool.gif");
-        calibrationToolsOnIcon = new ImageIcon("/resources/images/calibration_tool_on.gif");
-        calibrationToolsOffRolloverIcon = new ImageIcon("/resources/images/calibration_tool_rollover.gif");
-        calibrationToolsOnRolloverIcon = new ImageIcon("/resources/images/calibration_tool_on_rollover.gif");
-        pointsOffIcon = new ImageIcon("/resources/images/positions.gif");
-        pointsOnIcon = new ImageIcon("/resources/images/positions_on.gif");
-        velocOffIcon = new ImageIcon("/resources/images/velocities.gif");
-        velocOnIcon = new ImageIcon("/resources/images/velocities_on.gif");
-        accelOffIcon = new ImageIcon("/resources/images/accel.gif");
-        accelOnIcon = new ImageIcon("/resources/images/accel_on.gif");
-        traceOffIcon = new ImageIcon("/resources/images/trace.gif");
-        traceOnIcon = new ImageIcon("/resources/images/trace_on.gif");
-        labelsOffIcon = new ImageIcon("/resources/images/labels.gif");
-        labelsOnIcon = new ImageIcon("/resources/images/labels_on.gif");
-        stretchOffIcon = new ImageIcon("/resources/images/stretch.gif");
-        stretchOnIcon = new ImageIcon("/resources/images/stretch_on.gif");
-        xmassOffIcon = new ImageIcon("/resources/images/x_mass.gif");
-        xmassOnIcon = new ImageIcon("/resources/images/x_mass_on.gif");
-        fontSmallerDisabledIcon = new ImageIcon("/resources/images/font_smaller_disabled.gif");
-        fontBiggerDisabledIcon = new ImageIcon("/resources/images/font_bigger_disabled.gif");
-        autotrackerOffIcon = new ImageIcon("/resources/images/autotrack_off.gif");
-        autotrackerOnIcon = new ImageIcon("/resources/images/autotrack_on.gif");
-        autotrackerDisabledIcon = new ImageIcon("/resources/images/autotrack_disabled.gif");
-        infoIcon = new ImageIcon("/resources/images/info.gif");
-        refreshIcon = new ImageIcon("/resources/images/refresh.gif");
-        refreshIcon = new ImageIcon("/resources/images/refresh.gif");
-        htmlIcon = new ImageIcon("/resources/images/html.gif");
-        htmlDisabledIcon = new ImageIcon("/resources/images/html_disabled.gif");
-        trailIcons[0] = new ImageIcon("/resources/images/trails_off.gif");
-        trailIcons[1] = new ImageIcon("/resources/images/trails_1.gif");
-        trailIcons[2] = new ImageIcon("/resources/images/trails_2.gif");
-        trailIcons[3] = new ImageIcon("/resources/images/trails_on.gif");
-        separatorIcon = new ImageIcon("/resources/images/separator.gif");
-        checkboxOffIcon = new ImageIcon("/resources/images/box_unchecked.gif");
-        checkboxOnIcon = new ImageIcon("/resources/images/box_checked.gif");
-//        checkboxOnDisabledIcon = new ResizableIcon("/resources/images/box_checked_disabled.gif");
-        pencilOffIcon = new ImageIcon("/resources/images/pencil_off.gif");
-        pencilOnIcon = new ImageIcon("/resources/images/pencil_on.gif");
-        pencilOffRolloverIcon = new ImageIcon("/resources/images/pencil_off_rollover.gif");
-        pencilOnRolloverIcon = new ImageIcon("/resources/images/pencil_on_rollover.gif");
-        zoomFormat.setMaximumFractionDigits(0);
-    }
-
     /**
-     * TToolBar constructor.
+     * TToolBar constructor
      *
      * @param panel the tracker panel
      */
@@ -181,8 +70,192 @@ public class TToolBar extends JToolBar implements PropertyChangeListener {
         validate();
     }
 
+    protected static Map<TrackerPanel, TToolBar> toolbars = new HashMap<>();
+
+    protected static NumberFormat zoomFormat = NumberFormat.getNumberInstance();
+
+    protected ResizableIcon newTrackIcon =
+            new ResizableIcon(new ImageIcon(getClass().getResource("/images/poof.gif")));
+    protected ResizableIcon checkboxOnDisabledIcon =
+            new ResizableIcon(new ImageIcon(getClass().getResource("/images/box_checked_disabled.gif")));
+
+    protected static int[] trailLengths = {1, 4, 15, 0};
+    protected static int[] stretchValues = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
+
+    protected static String[] trailLengthNames = {"none", "short", "long", "full"};
+
     /**
-     * Creates the GUI.
+     * Static Icon arrays
+     */
+    protected static Icon[] trailIcons = {
+            new ImageIcon(TToolBar.class.getResource("/images/trails_off.gif")),
+            new ImageIcon(TToolBar.class.getResource("/images/trails_1.gif")),
+            new ImageIcon(TToolBar.class.getResource("/images/trails_2.gif")),
+            new ImageIcon(TToolBar.class.getResource("/images/trails_on.gif"))
+    };
+
+    /**
+     * Static Icons
+     */
+    protected static Icon trackControlIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/track_control.gif"));
+    protected static Icon trackControlDisabledIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/track_control_disabled.gif"));
+    protected static Icon trackControlOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/track_control_on.gif"));
+    protected static Icon zoomIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/zoom.gif"));
+    protected static Icon clipOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/clip_off.gif"));
+    protected static Icon clipOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/clip_on.gif"));
+    protected static Icon axesOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/axes.gif"));
+    protected static Icon axesOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/axes_on.gif"));
+    protected static Icon calibrationToolsOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/calibration_tool.gif"));
+    protected static Icon calibrationToolsOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/calibration_tool_on.gif"));
+    protected static Icon calibrationToolsOffRolloverIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/calibration_tool_rollover.gif"));
+    protected static Icon calibrationToolsOnRolloverIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/calibration_tool_on_rollover.gif"));
+    protected static Icon pointsOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/positions.gif"));
+    protected static Icon pointsOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/positions_on.gif"));
+    protected static Icon velocOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/velocities_on.gif"));
+    protected static Icon velocOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/velocities.gif"));
+    protected static Icon accelOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/accel_on.gif"));
+    protected static Icon accelOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/accel.gif"));
+    protected static Icon traceOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/trace_on.gif"));
+    protected static Icon traceOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/trace.gif"));
+    protected static Icon labelsOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/labels_on.gif"));
+    protected static Icon labelsOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/labels.gif"));
+    protected static Icon stretchOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/stretch_on.gif"));
+    protected static Icon stretchOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/stretch.gif"));
+    protected static Icon xmassOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/x_mass_on.gif"));
+    protected static Icon xmassOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/x_mass.gif"));
+    protected static Icon fontSmallerIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/"));
+    protected static Icon fontBiggerIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/"));
+    protected static Icon fontSmallerDisabledIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/font_smaller_disabled.gif"));
+    protected static Icon fontBiggerDisabledIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/font_bigger_disabled.gif"));
+    protected static Icon autotrackerOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/autotrack_off.gif"));
+    protected static Icon autotrackerOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/autotrack_on.gif"));
+    protected static Icon autotrackerDisabledIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/autotrack_disabled.gif"));
+    protected static Icon infoIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/info.gif"));
+    protected static Icon refreshIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/refresh.gif"));
+    protected static Icon htmlIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/html.gif"));
+    protected static Icon htmlDisabledIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/html_disabled.gif"));
+    protected static Icon separatorIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/separator.gif"));
+    protected static Icon checkboxOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/box_checked.gif"));
+    protected static Icon checkboxOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/box_unchecked.gif"));
+    protected static Icon pencilOffIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/pencil_off.gif"));
+    protected static Icon pencilOnIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/pencil_on.gif"));
+    protected static Icon pencilOffRolloverIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/pencil_off_rollover.gif"));
+    protected static Icon pencilOnRolloverIcon =
+            new ImageIcon(TToolBar.class.getResource("/images/pencil_on_rollover.gif"));
+
+    /**
+     * Manages & displays track data
+     */
+    protected TrackerPanel trackerPanel;
+
+    /**
+     * True when refreshing toolbar
+     */
+    protected boolean refreshing;
+
+    protected WindowListener infoListener;
+
+    protected int aStretch = 1;
+    protected int vStretch = 1;
+    protected int toolbarComponentHeight;
+    protected int trailLength = trailLengths[Tracker.trailLengthIndex];
+
+    public JButton stretchButton;
+    public JButton labelsButton;
+    public JButton trailButton;
+    public JButton xMassButton;
+    protected JButton openButton;
+    protected JButton openBrowserButton;
+    protected JButton saveButton;
+    protected JButton saveZipButton;
+    protected JButton clipSettingsButton;
+    protected JButton trackControlButton;
+    protected JButton autotrackerButton;
+    protected JButton zoomButton;
+    protected JButton axesButton;
+    protected JButton aVisButton;
+    protected JButton vVisButton;
+    protected JButton pVisButton;
+    protected JButton traceVisButton;
+    protected JButton notesButton;
+    protected JButton desktopButton;
+    protected JButton refreshButton;
+    protected JButton fontBiggerButton;
+    protected JButton fontSmallerButton;
+
+    protected TButton newTrackButton;
+    protected CalibrationButton calibrationButton;
+    protected DrawingButton drawingButton;
+
+    protected JPopupMenu newPopup;
+    protected JPopupMenu zoomPopup;
+
+    protected JMenu aStretchMenu;
+    protected JMenu vStretchMenu;
+    protected JMenu cloneMenu;
+
+    protected ButtonGroup aGroup;
+    protected ButtonGroup vGroup;
+
+    protected JMenuItem showTrackControlItem;
+    protected JMenuItem selectNoneItem;
+    protected JMenuItem stretchOffItem;
+
+    protected Component toolbarFiller;
+
+    protected ComponentListener clipSettingsDialogListener;
+
+    protected boolean notYetCalibrated = true;
+
+    protected ArrayList<PageTView.TabData> pageViewTabs = new ArrayList<>();
+
+
+
+    /**
+     * Creates the GUI
      */
     protected void createGUI() {
         setFloatable(false);
@@ -264,6 +337,7 @@ public class TToolBar extends JToolBar implements PropertyChangeListener {
         JMenuItem item = new JMenuItem(TrackerRes.getString("MainTView.Popup.MenuItem.ToFit"));
         item.setActionCommand("auto");
         item.addActionListener(zoomAction);
+        zoomPopup = new JPopupMenu();
         zoomPopup.add(item);
         zoomPopup.addSeparator();
         for (int i = 0; i < TrackerPanel.ZOOM_LEVELS.length; i++) {
@@ -642,6 +716,7 @@ public class TToolBar extends JToolBar implements PropertyChangeListener {
 
     protected void refreshZoomButton() {
         double zoom = trackerPanel.getMagnification() * 100;
+        zoomFormat.setMaximumFractionDigits(0);
         zoomButton.setText(zoomFormat.format(zoom) + "%");
     }
 
@@ -1001,6 +1076,7 @@ public class TToolBar extends JToolBar implements PropertyChangeListener {
      * @return the popup
      */
     protected JPopupMenu getNewTracksPopup() {
+        newPopup = new JPopupMenu();
         newPopup.removeAll();
         TMenuBar menubar = TMenuBar.getMenuBar(trackerPanel);
         menubar.refresh();
@@ -1495,8 +1571,5 @@ public class TToolBar extends JToolBar implements PropertyChangeListener {
             drawingVisibleCheckbox.setIcon(drawer.areDrawingsVisible() ? checkboxOnIcon : checkboxOffIcon);
             drawingVisibleCheckbox.setEnabled(!PencilDrawer.isDrawing(trackerPanel));
         }
-
     }
-
-
 }
