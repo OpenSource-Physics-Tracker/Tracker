@@ -3,7 +3,8 @@ plugins {
 }
 
 jar {
-    manifest { // Здесь указывается Main class для запуска приложений(иначе jar не запуститься)
+    manifest {
+        // This is where the Main class is specified for launching applications (otherwise the jar will not start)
         attributes 'Main-Class': 'org.opensourcephysics.cabrillo.tracker.Tracker'
     }
 }
@@ -13,7 +14,7 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
-    // Добавлен JitPack для работы с зависимостями через GitHub
+    // Added JitPack for working with dependencies via GitHub
     maven { url 'https://jitpack.io' }
 }
 
