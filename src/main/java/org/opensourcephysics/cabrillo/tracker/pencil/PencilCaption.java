@@ -22,7 +22,7 @@
  * For additional Tracker information and documentation, please see
  * <http://physlets.org/tracker/>.
  */
-package org.opensourcephysics.cabrillo.tracker;
+package org.opensourcephysics.cabrillo.tracker.pencil;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -38,6 +38,8 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.ImageIcon;
 
+import org.opensourcephysics.cabrillo.tracker.Tracker;
+import org.opensourcephysics.cabrillo.tracker.TrackerPanel;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.controls.XMLLoader;

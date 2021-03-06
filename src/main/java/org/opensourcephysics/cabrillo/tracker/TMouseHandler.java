@@ -30,6 +30,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
+import org.opensourcephysics.cabrillo.tracker.pencil.PencilDrawer;
 import org.opensourcephysics.cabrillo.tracker.vector.VectorStep;
 import org.opensourcephysics.cabrillo.tracker.vector.VectorSum;
 import org.opensourcephysics.display.*;

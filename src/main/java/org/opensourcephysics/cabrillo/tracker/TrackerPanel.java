@@ -36,6 +36,9 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.*;
 
+import org.opensourcephysics.cabrillo.tracker.pencil.PencilDrawer;
+import org.opensourcephysics.cabrillo.tracker.pencil.PencilDrawing;
+import org.opensourcephysics.cabrillo.tracker.pencil.PencilScene;
 import org.opensourcephysics.cabrillo.tracker.vector.Vector;
 import org.opensourcephysics.cabrillo.tracker.vector.VectorStep;
 import org.opensourcephysics.cabrillo.tracker.vector.VectorSum;

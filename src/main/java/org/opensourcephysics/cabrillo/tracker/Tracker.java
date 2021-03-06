@@ -142,7 +142,7 @@ public class Tracker {
     static String prefsPath;
     public static String rootXMLPath = ""; // path to root directory of trk files 
     static Cursor zoomInCursor, zoomOutCursor, grabCursor;
-    static boolean showHints = true;
+    public static boolean showHints = true;
     static boolean startupHintShown;
     static String pdfHelpPath = "/tracker_help.pdf";
     static JButton pdfHelpButton;
@@ -1334,17 +1334,17 @@ public class Tracker {
     public static void main(String[] args) {
 
         // determine if this is tracker.jar (Tracker main class)
-        boolean isTracker = false;
-        JarFile jarfile = OSPRuntime.getLaunchJar();
-        try {
-            assert jarfile != null;
-            Attributes att;
-            att = Objects.requireNonNull(jarfile).getManifest().getMainAttributes();
-            Object mainclass = att.getValue("Main-Class");
-            isTracker = mainclass.toString().endsWith("Tracker");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        boolean isTracker = false;
+//        JarFile jarfile = OSPRuntime.getLaunchJar();
+//        try {
+//            assert jarfile != null;
+//            Attributes att;
+//            att = Objects.requireNonNull(jarfile).getManifest().getMainAttributes();
+//            Object mainclass = att.getValue("Main-Class");
+//            isTracker = mainclass.toString().endsWith("org.opensourcephysics.cabrillo.tracker.Tracker");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         // determine if relaunch is needed
         boolean isRelaunch = args != null && args.length > 0 && "relaunch".equals(args[args.length - 1]);
@@ -1420,7 +1420,7 @@ public class Tracker {
 
 
             // attempt to relaunch if needed
-            if (isTracker && (needsJavaVM || needsMemory || needsEnvironment || updated)) {
+            if (/*isTracker && */(needsJavaVM || needsMemory || needsEnvironment || updated)) {
                 mainArgs = args;
                 if (requestedMemorySize <= 10) {
                     requestedMemorySize = TrackerStarter.DEFAULT_MEMORY_SIZE;

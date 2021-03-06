@@ -22,7 +22,7 @@
  * For additional Tracker information and documentation, please see
  * <http://physlets.org/tracker/>.
  */
-package org.opensourcephysics.cabrillo.tracker;
+package org.opensourcephysics.cabrillo.tracker.pencil;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -36,6 +36,9 @@ import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 
+import org.opensourcephysics.cabrillo.tracker.Tracker;
+import org.opensourcephysics.cabrillo.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.TrackerRes;
 import org.opensourcephysics.display.GUIUtils;
 import org.opensourcephysics.display.Interactive;
 import org.opensourcephysics.display.InteractivePanel;
@@ -70,9 +73,9 @@ public class PencilDrawer {
     private PencilDrawing newDrawing;
     private boolean drawingsVisible = true;
     TrackerPanel trackerPanel;
-    ArrayList<PencilScene> scenes = new ArrayList<PencilScene>();
+    public ArrayList<PencilScene> scenes = new ArrayList<PencilScene>();
     Color color = colors[0][0];
-    PencilControl drawingControl;
+    public PencilControl drawingControl;
 
     /**
      * Constructs a PencilDrawer.
@@ -89,7 +92,7 @@ public class PencilDrawer {
      * @param panel the TrackerPanel
      * @return the PencilDrawer
      */
-    protected static PencilDrawer getDrawer(TrackerPanel panel) {
+    public static PencilDrawer getDrawer(TrackerPanel panel) {
         PencilDrawer drawer = drawers.get(panel);
         if (drawer == null) {
             drawer = new PencilDrawer(panel);
@@ -130,7 +133,7 @@ public class PencilDrawer {
      *
      * @param panel the TrackerPanel
      */
-    protected static void dispose(TrackerPanel panel) {
+    public static void dispose(TrackerPanel panel) {
         PencilDrawer drawer = drawers.get(panel);
         if (drawer != null) {
             drawer.dispose();
@@ -184,7 +187,7 @@ public class PencilDrawer {
      * @param drawing the PencilDrawing to add
      * @return the newly added drawing
      */
-    protected PencilDrawing addDrawingtoSelectedScene(PencilDrawing drawing) {
+    public PencilDrawing addDrawingtoSelectedScene(PencilDrawing drawing) {
         PencilScene scene = getSelectedScene();
         if (scene == null) {
             scene = addNewScene();
@@ -210,7 +213,7 @@ public class PencilDrawer {
     /**
      * Removes all scenes.
      */
-    protected void clearScenes() {
+    public void clearScenes() {
         for (PencilScene scene : scenes) {
             trackerPanel.removeDrawable(scene);
         }
@@ -251,7 +254,7 @@ public class PencilDrawer {
      *
      * @return the new scene
      */
-    protected PencilScene addNewScene() {
+    public PencilScene addNewScene() {
         PencilScene scene = new PencilScene();
         scene.setStartFrame(trackerPanel.getFrameNumber());
         trackerPanel.addDrawable(scene);
@@ -275,7 +278,7 @@ public class PencilDrawer {
      *
      * @param pencilScenes a list of scenes
      */
-    protected void setScenes(ArrayList<PencilScene> pencilScenes) {
+    public void setScenes(ArrayList<PencilScene> pencilScenes) {
         if (pencilScenes == null || pencilScenes == scenes) return;
         // remove existing scenes
         clearScenes();
@@ -302,7 +305,7 @@ public class PencilDrawer {
      * @param frame the frame number
      * @return the earliest scene that starts at the frame or whose range includes the frame
      */
-    protected PencilScene getSceneAtFrame(int frame) {
+    public PencilScene getSceneAtFrame(int frame) {
         for (PencilScene scene : scenes) {
             if (scene.startframe == frame) {
                 return scene;
@@ -319,7 +322,6 @@ public class PencilDrawer {
     /**
      * Gets the scene at a given frame number. May return null.
      *
-     * @param frame the frame number
      * @return the earliest scene that starts at the frame or whose range includes the frame
      */
     protected PencilScene getSceneWithCaption(PencilCaption caption) {
@@ -336,7 +338,7 @@ public class PencilDrawer {
      *
      * @return the drawing control
      */
-    protected PencilControl getDrawingControl() {
+    public PencilControl getDrawingControl() {
         if (drawingControl == null) {
             drawingControl = new PencilControl(this);
         }
@@ -350,7 +352,7 @@ public class PencilDrawer {
      *
      * @return a pencil cursor
      */
-    protected Cursor getPencilCursor() {
+    public Cursor getPencilCursor() {
         return pencilCursor;
     }
 
@@ -359,7 +361,7 @@ public class PencilDrawer {
      *
      * @param e the mouse event
      */
-    protected void handleMouseAction(MouseEvent e) {
+    public void handleMouseAction(MouseEvent e) {
 
         // PencilCaption actions handled by PencilCaption
         Interactive ia = trackerPanel.getInteractive();
@@ -429,7 +431,7 @@ public class PencilDrawer {
     /**
      * Refreshes the PencilControl, if any, associated with this drawer.
      */
-    protected void refresh() {
+    public void refresh() {
         if (drawingControl != null) {
             drawingControl.refreshGUI();
         }

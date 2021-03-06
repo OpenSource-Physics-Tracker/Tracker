@@ -38,6 +38,7 @@ import javax.swing.event.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.Document;
 
+import org.opensourcephysics.cabrillo.tracker.pencil.PencilDrawer;
 import org.opensourcephysics.controls.*;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
@@ -1552,7 +1553,7 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
    * @param keywords the keywords of the help node to be displayed
    * @param pageNumber the html page number
    */
-  protected void showHelp(String keywords, int pageNumber) {
+  public void showHelp(String keywords, int pageNumber) {
   	boolean firstTime = helpDialog == null;
   	getHelpDialog(); // create dialog and launcher if needed
   	if (keywords == null && firstTime) {

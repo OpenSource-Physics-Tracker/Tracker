@@ -47,7 +47,7 @@ public class MainTView extends JPanel implements TView {
 	
   // instance fields
   private TrackerPanel trackerPanel;
-  JScrollPane scrollPane;
+  public JScrollPane scrollPane;
   Rectangle scrollRect = new Rectangle();
   private Point zoomCenter = new Point();
   private JToolBar playerBar;

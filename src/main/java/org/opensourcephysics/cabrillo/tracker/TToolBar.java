@@ -25,6 +25,8 @@
 package org.opensourcephysics.cabrillo.tracker;
 
 import org.opensourcephysics.cabrillo.tracker.PageTView.TabView;
+import org.opensourcephysics.cabrillo.tracker.pencil.PencilDrawer;
+import org.opensourcephysics.cabrillo.tracker.pencil.PencilScene;
 import org.opensourcephysics.cabrillo.tracker.vector.Vector;
 import org.opensourcephysics.controls.OSPLog;
 import org.opensourcephysics.controls.XML;
@@ -226,9 +228,9 @@ public class TToolBar extends JToolBar implements PropertyChangeListener {
     protected JButton fontBiggerButton;
     protected JButton fontSmallerButton;
 
+    public DrawingButton drawingButton;
     protected TButton newTrackButton;
     protected CalibrationButton calibrationButton;
-    protected DrawingButton drawingButton;
 
     protected JPopupMenu newPopup;
     protected JPopupMenu zoomPopup;
@@ -1490,7 +1492,7 @@ public class TToolBar extends JToolBar implements PropertyChangeListener {
     /**
      * A button to manage the visibility of the pencil scenes and control dialog
      */
-    protected class DrawingButton extends TButton
+    public class DrawingButton extends TButton
             implements ActionListener {
 
         boolean showPopup;

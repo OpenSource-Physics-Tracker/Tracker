@@ -31,6 +31,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import org.opensourcephysics.cabrillo.tracker.pencil.PencilScene;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.tools.*;

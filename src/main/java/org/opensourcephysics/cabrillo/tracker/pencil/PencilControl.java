@@ -22,7 +22,7 @@
  * For additional Tracker information and documentation, please see
  * <http://physlets.org/tracker/>.
  */
-package org.opensourcephysics.cabrillo.tracker;
+package org.opensourcephysics.cabrillo.tracker.pencil;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -68,6 +68,7 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEditSupport;
 
+import org.opensourcephysics.cabrillo.tracker.*;
 import org.opensourcephysics.display.ColorIcon;
 import org.opensourcephysics.display.DrawingPanel;
 import org.opensourcephysics.display.ResizableIcon;
@@ -518,7 +519,7 @@ public class PencilControl extends JDialog {
    * 
    * @param level the font level
    */
-  protected void setFontLevel(int level) {
+  public void setFontLevel(int level) {
 		FontSizer.setFonts(this, level);
 		pack();
   }
@@ -571,7 +572,7 @@ public class PencilControl extends JDialog {
    */
 	protected void refreshGUI() {
 		refreshing = true;
-		setTitle(TrackerRes.getString("PencilControlDialog.Title")); 
+		setTitle(TrackerRes.getString("PencilControlDialog.Title"));
 		// set label and button text
 		drawingLabel.setText(TrackerRes.getString("PencilControlDialog.Label.Drawing.Text")+":");  
 		toLabel.setText(TrackerRes.getString("PencilControlDialog.Label.To.Text")); 
@@ -693,7 +694,7 @@ public class PencilControl extends JDialog {
    * 
    * @param scene the scene to select. May be null.
    */
-	protected void setSelectedScene(PencilScene scene) {
+  public void setSelectedScene(PencilScene scene) {
 		if (selectedScene==scene) return;
 		if (selectedScene!=null) canvas.removeDrawable(selectedScene);
 		selectedScene = scene;
