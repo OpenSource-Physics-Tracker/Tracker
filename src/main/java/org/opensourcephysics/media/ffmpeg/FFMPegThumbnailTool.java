@@ -132,7 +132,7 @@ public class FFMPegThumbnailTool {
 		finished = false;
 		frameNumber = 0;
     try {
-    	URL imageURL = FFMPegThumbnailTool.class.getResource("../../resources/media/images/tracker_icon.png");
+    	URL imageURL = FFMPegThumbnailTool.class.getResource("/images/tracker_icon.png");
     	overlay = ImageIO.read(imageURL);
 	  } 
 	  catch (IllegalArgumentException e) { } 

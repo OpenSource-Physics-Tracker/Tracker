@@ -39,17 +39,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.Icon;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
@@ -62,19 +52,18 @@ import org.opensourcephysics.tools.ResourceLoader;
  * @version 1.0
  */
 public class RotateFilter extends Filter {
-	// static constants
-	private static final int NONE = -1, CCW_90 = 0, CW_90 = 1, FULL_180 = 2;
+
+	private static final int NONE = -1;
+	private static final int CCW_90 = 0;
+	private static final int CW_90 = 1;
+	private static final int FULL_180 = 2;
+
 	private static final int[] types = {NONE, CCW_90, CW_90, FULL_180};
-	private static final String[] typeNames = {"None", "CCW",  //$NON-NLS-1$ //$NON-NLS-2$
-		"CW", "180"}; //$NON-NLS-1$ //$NON-NLS-2$
-	private static Icon cwIcon, ccwIcon;
-	
-	static {
-    String path = "/org/opensourcephysics/resources/media/images/cw.gif";  //$NON-NLS-1$
-    cwIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/ccw.gif";  //$NON-NLS-1$
-    ccwIcon = ResourceLoader.getIcon(path);
-	}
+
+	private static final String[] typeNames = {"None", "CCW", "CW", "180"};
+
+    private static final Icon cwIcon = new ImageIcon(RotateFilter.class.getResource("/images/cw/cw.gif"));
+    private static final Icon ccwIcon = new ImageIcon(RotateFilter.class.getResource("/images/cw/ccw.gif"));
 	
   // instance fields
   private int[] pixelsIn, pixelsOut;

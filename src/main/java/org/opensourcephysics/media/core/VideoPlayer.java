@@ -62,30 +62,7 @@ import java.util.Locale;
 import java.util.TreeMap;
 import java.util.Hashtable;
 
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.Icon;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JSlider;
-import javax.swing.JSpinner;
-import javax.swing.JSplitPane;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -109,39 +86,37 @@ import org.opensourcephysics.tools.ResourceLoader;
  * @version 1.0
  */
 public class VideoPlayer extends JComponent implements PropertyChangeListener {
-	
-	// static fields
-  protected static Icon inOutIcon, playIcon, grayPlayIcon, pauseIcon;
-  protected static Icon resetIcon, loopIcon, noloopIcon, videoClipIcon;
-  protected static Icon stepIcon, grayStepIcon, backIcon, grayBackIcon;
+
+  // static fields
+  protected static Icon inOutIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/player/in_out.gif"));
+  protected static Icon playIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/player/play.gif"));
+  protected static Icon grayPlayIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/player/play_gray.gif"));
+  protected static Icon pauseIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/player/pause.gif"));
+  protected static Icon resetIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/player/reset.gif"));
+  protected static Icon loopIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/player/looping_on.gif"));
+  protected static Icon noloopIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/player/looping_off.gif"));
+  protected static Icon videoClipIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/video_clip.gif"));
+  protected static Icon stepIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/player/step.gif"));
+  protected static Icon grayStepIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/player/step_gray.gif"));
+  protected static Icon backIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/player/back.gif"));
+  protected static Icon grayBackIcon =
+          new ImageIcon(VideoPlayer.class.getResource("/images/player/back_gray.gif"));
+
   private static GoToDialog goToDialog;
+
   private static NumberFormat timeFormat = NumberFormat.getNumberInstance();
-  static {
-    String path = "/org/opensourcephysics/resources/media/images/in_out.gif";  //$NON-NLS-1$
-    inOutIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/play.gif";  //$NON-NLS-1$
-    playIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/play_gray.gif";  //$NON-NLS-1$
-    grayPlayIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/pause.gif";  //$NON-NLS-1$
-    pauseIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/reset.gif";  //$NON-NLS-1$
-    resetIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/looping_on.gif";  //$NON-NLS-1$
-    loopIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/looping_off.gif";  //$NON-NLS-1$
-    noloopIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/video_clip.gif";  //$NON-NLS-1$
-    videoClipIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/step.gif";  //$NON-NLS-1$
-    stepIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/step_gray.gif";  //$NON-NLS-1$
-    grayStepIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/back.gif";  //$NON-NLS-1$
-    backIcon = ResourceLoader.getIcon(path);
-    path = "/org/opensourcephysics/resources/media/images/back_gray.gif";  //$NON-NLS-1$
-    grayBackIcon = ResourceLoader.getIcon(path);
-  }
+
 	
   // instance fields
   protected VideoPanel vidPanel;
