@@ -622,7 +622,7 @@ public class TActions {
         String filePath = files[0].getAbsolutePath();
         String ext = XML.getExtension(filePath);
         if ("jar".equals(ext)) { 
-        	if (!DataTrackTool.isDataSource(filePath)) {
+        	if (DataTrackTool.isDataSource(filePath)) {
         		String jarName = TrackerRes.getString("TActions.Action.DataTrack.Unsupported.JarFile") 
         				+ " \""+XML.getName(filePath)+"\" ";  
       			JOptionPane.showMessageDialog(trackerPanel.getTFrame(), 

@@ -24,37 +24,24 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.*;
-import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
-import java.util.TreeMap;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
-
 import org.opensourcephysics.cabrillo.tracker.vector.VectorStep;
-import org.opensourcephysics.media.core.ImageCoordSystem;
-import org.opensourcephysics.media.core.TPoint;
-import org.opensourcephysics.media.core.VideoClip;
-import org.opensourcephysics.media.core.VideoPlayer;
-import org.opensourcephysics.tools.FontSizer;
-import org.opensourcephysics.tools.FunctionEditor;
-import org.opensourcephysics.tools.Parameter;
-import org.opensourcephysics.tools.UserFunction;
-import org.opensourcephysics.tools.UserFunctionEditor;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.display.DatasetManager;
 import org.opensourcephysics.display.DrawingPanel;
+import org.opensourcephysics.media.core.ImageCoordSystem;
+import org.opensourcephysics.media.core.TPoint;
+import org.opensourcephysics.media.core.VideoClip;
+import org.opensourcephysics.media.core.VideoPlayer;
+import org.opensourcephysics.tools.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.TreeMap;
 
 /**
  * This models a system of 2 particles that interact via internal forces.
@@ -73,7 +60,7 @@ public class DynamicSystem extends DynamicParticlePolar {
   protected StepArray realSteps;
   protected StepArray noSteps;
   protected int systemInspectorX = Integer.MIN_VALUE, systemInspectorY;
-  protected TreeMap<Integer,double[]> relativeStates = new TreeMap<Integer,double[]>();
+  protected TreeMap<Integer,double[]> relativeStates = new TreeMap<>();
   protected boolean refreshing = false;
 
 	/**
@@ -122,7 +109,7 @@ public class DynamicSystem extends DynamicParticlePolar {
     panels.add((TrackerPanel)panel);   // keep a list of drawing panels
     // add particles in particleNames
     if (particleNames.length > 0) {
-    	ArrayList<DynamicParticle> toAdd = new ArrayList<DynamicParticle>();
+    	ArrayList<DynamicParticle> toAdd = new ArrayList<>();
       ArrayList<DynamicParticle> parts = trackerPanel.getDrawables(DynamicParticle.class);
       for (int i = 0; i < particleNames.length; i++) {
         for (DynamicParticle p: parts) {
@@ -152,11 +139,7 @@ public class DynamicSystem extends DynamicParticlePolar {
 			y = Math.min(y, dim.height-systemInspector.getHeight());
 			systemInspector.setLocation(x, y);
 			systemInspectorX = Integer.MIN_VALUE;
-			Runnable runner = new Runnable() {
-	    	public void run() {
-	    		systemInspector.setVisible(true);
-	    	}
-	    };
+			Runnable runner = () -> systemInspector.setVisible(true);
 	    SwingUtilities.invokeLater(runner);		
 		}
     if (particles.length==0) {
@@ -176,7 +159,7 @@ public class DynamicSystem extends DynamicParticlePolar {
    * @return the display name
    */
   public String getDisplayName() {
-		StringBuffer buf  = new StringBuffer(getName());
+		StringBuilder buf  = new StringBuilder(getName());
 		buf.append(" ("); //$NON-NLS-1$
 		if (particles == null || particles.length==0) {
 			buf.append(TrackerRes.getString("DynamicSystem.Empty")); //$NON-NLS-1$
@@ -200,13 +183,11 @@ public class DynamicSystem extends DynamicParticlePolar {
   public JMenu getMenu(TrackerPanel trackerPanel) {
     // create a system inspector item
   	systemInspectorItem = new JMenuItem(TrackerRes.getString("DynamicSystem.MenuItem.Inspector")); //$NON-NLS-1$
-  	systemInspectorItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	DynamicSystemInspector inspector = getSystemInspector();
-        inspector.updateDisplay();
-        inspector.setVisible(true);
-      }
-    });
+  	systemInspectorItem.addActionListener(e -> {
+		  DynamicSystemInspector inspector = getSystemInspector();
+		inspector.updateDisplay();
+		inspector.setVisible(true);
+	  });
     // assemble the menu
     JMenu menu = super.getMenu(trackerPanel);
     menu.add(systemInspectorItem, 1);
@@ -235,9 +216,9 @@ public class DynamicSystem extends DynamicParticlePolar {
   	mass = 0;
   	if (particles==null) 
   		return mass;
-    for (int i = 0; i < particles.length; i++) {
-    	mass += particles[i].getMass();
-    }
+	  for (DynamicParticle particle : particles) {
+		  mass += particle.getMass();
+	  }
     return mass;
   }
   
@@ -272,19 +253,21 @@ public class DynamicSystem extends DynamicParticlePolar {
    * Removes a particle from this system.
    * 
    * @param particle the particle to remove
-   * @return true if particle removed
    */
-  public boolean removeParticle(DynamicParticle particle) {
+  public void removeParticle(DynamicParticle particle) {
   	if (particles.length==1 && particles[0]==particle) {
-  		return setParticles(new DynamicParticle[0]);
+		setParticles(new DynamicParticle[0]);
+		return;
   	}
   	if (particles.length==2) {
-  		if (particles[0]==particle)
-    		return setParticles(new DynamicParticle[] {particles[1]});
-  		if (particles[1]==particle)
-    		return setParticles(new DynamicParticle[] {particles[0]});  			
+  		if (particles[0]==particle) {
+			setParticles(new DynamicParticle[]{particles[1]});
+			return;
+		}
+  		if (particles[1]==particle) {
+			setParticles(new DynamicParticle[]{particles[0]});
+		}
   	}
-		return false;
   }
 
   /**
@@ -332,9 +315,10 @@ public class DynamicSystem extends DynamicParticlePolar {
   	for (DynamicParticle particle: particles) {
   		boolean cleanMe = true;
     	for (DynamicParticle next: newParticles) {
-    		if (next == particle) {
-    			cleanMe = false;
-    		}
+			if (next == particle) {
+				cleanMe = false;
+				break;
+			}
     	}
     	if (cleanMe) {
 				particle.system = null;
@@ -368,25 +352,25 @@ public class DynamicSystem extends DynamicParticlePolar {
 			points[i] = new Point2D.Double();
 		}		
 		points[points.length-1] = point;
-		
-		for (int i = 0; i < particles.length; i++) {
-			particles[i].removePropertyChangeListener("mass", this); //$NON-NLS-1$
-			particles[i].removePropertyChangeListener("step", this); //$NON-NLS-1$
-			particles[i].removePropertyChangeListener("steps", this); //$NON-NLS-1$
-			particles[i].addPropertyChangeListener("mass", this); //$NON-NLS-1$
-			particles[i].addPropertyChangeListener("step", this); //$NON-NLS-1$
-			particles[i].addPropertyChangeListener("steps", this); //$NON-NLS-1$
-			particles[i].system = this;
-			particles[i].refreshInitialTime();
-			if (systemInspector!=null) {
-				particles[i].removePropertyChangeListener("name", systemInspector); //$NON-NLS-1$
-				particles[i].removePropertyChangeListener("color", systemInspector); //$NON-NLS-1$
-				particles[i].removePropertyChangeListener("footprint", systemInspector); //$NON-NLS-1$
-				particles[i].addPropertyChangeListener("name", systemInspector); //$NON-NLS-1$
-				particles[i].addPropertyChangeListener("color", systemInspector); //$NON-NLS-1$
-				particles[i].addPropertyChangeListener("footprint", systemInspector); //$NON-NLS-1$
-			}
-		}
+
+	  for (DynamicParticle particle : particles) {
+		  particle.removePropertyChangeListener("mass", this); //$NON-NLS-1$
+		  particle.removePropertyChangeListener("step", this); //$NON-NLS-1$
+		  particle.removePropertyChangeListener("steps", this); //$NON-NLS-1$
+		  particle.addPropertyChangeListener("mass", this); //$NON-NLS-1$
+		  particle.addPropertyChangeListener("step", this); //$NON-NLS-1$
+		  particle.addPropertyChangeListener("steps", this); //$NON-NLS-1$
+		  particle.system = this;
+		  particle.refreshInitialTime();
+		  if (systemInspector != null) {
+			  particle.removePropertyChangeListener("name", systemInspector); //$NON-NLS-1$
+			  particle.removePropertyChangeListener("color", systemInspector); //$NON-NLS-1$
+			  particle.removePropertyChangeListener("footprint", systemInspector); //$NON-NLS-1$
+			  particle.addPropertyChangeListener("name", systemInspector); //$NON-NLS-1$
+			  particle.addPropertyChangeListener("color", systemInspector); //$NON-NLS-1$
+			  particle.addPropertyChangeListener("footprint", systemInspector); //$NON-NLS-1$
+		  }
+	  }
     refreshSystemParameters();
     if (modelBuilder != null)
     	modelBuilder.refreshDropdown(null);
@@ -683,21 +667,21 @@ public class DynamicSystem extends DynamicParticlePolar {
       dataFrames.add(n);
     }
     // store the mass in the data properties
-    Double m = getMass();
+    double m = getMass();
     String desc = TrackerRes.getString("ParticleModel.Parameter.Mass.Description"); //$NON-NLS-1$
-    data.setConstant("m", m, m.toString(), desc); //$NON-NLS-1$
+    data.setConstant("m", m, Double.toString(m), desc); //$NON-NLS-1$
   }
 
 //______________________________ protected methods __________________________
 	
   @Override
   protected void dispose() {
-		for (int i = 0; i < particles.length; i++) {
-			particles[i].removePropertyChangeListener("mass", this); //$NON-NLS-1$
-			particles[i].removePropertyChangeListener("step", this); //$NON-NLS-1$
-			particles[i].removePropertyChangeListener("steps", this); //$NON-NLS-1$
-			particles[i].system = null;
-		}
+	  for (DynamicParticle particle : particles) {
+		  particle.removePropertyChangeListener("mass", this); //$NON-NLS-1$
+		  particle.removePropertyChangeListener("step", this); //$NON-NLS-1$
+		  particle.removePropertyChangeListener("steps", this); //$NON-NLS-1$
+		  particle.system = null;
+	  }
   	super.dispose();
 		if (systemInspector != null) systemInspector.dispose();
   }
@@ -869,37 +853,6 @@ public class DynamicSystem extends DynamicParticlePolar {
 	}
 	
   /**
-	 * Gets the state of this system based on the states of its particles.
-	 * 
-	 * @param state the particle state {x1, vx1, y1, vy1, x2, vx2, y2, vy2, t}
-	 * @return the system state {x_cm, vx_cm, y_cm, vy_cm, t}
-	 */
-  protected double[] getSystemState(double[] state) {
-		double mass = 0;
-		for (int i = 0; i < particleState.length; i++) {
-			particleState[i] = 0;
-		}
-    particleState[4] = state[state.length-1];	// time
-		if (particles.length>0) {
-			// state is {x1, vx1, y1, vy1, x2, vx2, y2, vy2, t}
-			// systemState is {x_cm, vx_cm, y_cm, vy_cm, t}
-	    for (int i = 0; i < particles.length; i++) {
-	      double m = particles[i].getMass();
-	      mass += m;
-	      particleState[0] += m * state[4*i];
-	      particleState[1] += m * state[4*i+1];
-	      particleState[2] += m * state[4*i+2];
-	      particleState[3] += m * state[4*i+3];
-	    }
-	    particleState[0] /= mass;	// cm x coordinate
-	    particleState[1] /= mass;	// cm y coordinate
-	    particleState[2] /= mass;	// cm x velocity
-	    particleState[3] /= mass;	// cm y velocity
-		}
-    return particleState;
-	}
-	
-  /**
    * Gets the current state of the specified particle.
    * 
    * @param particle the particle
@@ -929,9 +882,7 @@ public class DynamicSystem extends DynamicParticlePolar {
 	protected ParticleModel[] getModels() {
 		if (models.length != particles.length+1) {
 			models = new ParticleModel[particles.length+1];
-			for (int i = 0; i < models.length-1; i++) {
-				models[i] = particles[i];
-			}
+			System.arraycopy(particles, 0, models, 0, models.length - 1);
 			models[models.length-1] = this;
 		}
 		return models;

@@ -17,6 +17,7 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import org.opensourcephysics.tools.Resource;
@@ -35,17 +36,17 @@ public class LaunchCounter {
   public static void main(String[] args) {
   	
     // create StringBuffer and append date/time
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
   	buffer.append(getDateAndTime());
   	
     // get file names (first line of dataFile except data/time)
   	String[] filenames = getFileNames(dataFile);
   	
   	// go through file names and append tabs and download counts
-		for (int j = 0; j<filenames.length; j++) {
-	  	String count = getCount(filenames[j]);
-	  	buffer.append("\t"+count); //$NON-NLS-1$
-  	}
+      for (String filename : filenames) {
+          String count = getCount(filename);
+          buffer.append("\t").append(count); //$NON-NLS-1$
+      }
 		
 		// get current contents and add StringBuffer at end
 		String contents = read(dataFile);
@@ -75,6 +76,7 @@ public class LaunchCounter {
     		}
       }
     } catch(IOException ex) {
+        ex.printStackTrace();
     }
     return new String[0];
   }
@@ -93,13 +95,15 @@ public class LaunchCounter {
       buffer = new StringBuffer();
       String line = in.readLine();
       while(line!=null) {
-        buffer.append(line+NEW_LINE);
+        buffer.append(line).append(NEW_LINE);
         line = in.readLine();
       }
       in.close();
     } catch(IOException ex) {
-     }
-    return buffer.toString();
+        ex.printStackTrace();
+    }
+      assert buffer != null;
+      return buffer.toString();
   }
   
   /**
@@ -112,14 +116,15 @@ public class LaunchCounter {
     File file = new File(fileName);
 		try {
 			FileOutputStream stream = new FileOutputStream(file);
-			Charset charset = Charset.forName("UTF-8"); //$NON-NLS-1$
+			Charset charset = StandardCharsets.UTF_8; //$NON-NLS-1$
 			OutputStreamWriter out = new OutputStreamWriter(stream, charset);
 			BufferedWriter writer = new BufferedWriter(out);
 			writer.write(contents);
 			writer.flush();
 			writer.close();
 		} catch (IOException ex) {
-		}
+            ex.printStackTrace();
+        }
   }
   
   
@@ -136,7 +141,8 @@ public class LaunchCounter {
 			Resource res = new Resource(url);
     	return res.getString().trim();
 		} catch (MalformedURLException e) {
-		}
+        e.printStackTrace();
+    }
   	return null;
   }
   

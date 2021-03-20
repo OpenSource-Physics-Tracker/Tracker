@@ -60,25 +60,25 @@ public class LineProfile extends TTrack {
   	formatVariables = new String[] {"xy", "RGB", "luma"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   	
 		// assemble format map
-		formatMap = new HashMap<String, ArrayList<String>>();
+		formatMap = new HashMap<>();
 		
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list = new ArrayList<>();
 		list.add(dataVariables[1]); 
 		list.add(dataVariables[2]); 
 		formatMap.put(formatVariables[0], list);
 		
-		list = new ArrayList<String>();
+		list = new ArrayList<>();
 		list.add(dataVariables[3]); 
 		list.add(dataVariables[4]); 
 		list.add(dataVariables[5]); 
 		formatMap.put(formatVariables[1], list);
 		
-		list = new ArrayList<String>();
+		list = new ArrayList<>();
 		list.add(dataVariables[6]); 
 		formatMap.put(formatVariables[2], list);
 		
 		// assemble format description map
-		formatDescriptionMap = new HashMap<String, String>();
+		formatDescriptionMap = new HashMap<>();
 		formatDescriptionMap.put(formatVariables[0], TrackerRes.getString("PointMass.Position.Name")); //$NON-NLS-1$ 
 		formatDescriptionMap.put(formatVariables[1], TrackerRes.getString("LineProfile.Description.RGB")); //$NON-NLS-1$ 
 		formatDescriptionMap.put(formatVariables[2], TrackerRes.getString("LineProfile.Data.Brightness")); //$NON-NLS-1$ 
@@ -130,14 +130,12 @@ public class LineProfile extends TTrack {
     Border empty = BorderFactory.createEmptyBorder(0, 4, 0, 2);
     spreadLabel.setBorder(empty);
     spreadField = new IntegerField(3);
-    spreadField.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setSpread(spreadField.getIntValue());
-        spreadField.setIntValue(getSpread());
-        spreadField.selectAll();
-        spreadField.requestFocusInWindow();
-        firePropertyChange("data", null, LineProfile.this); // to views //$NON-NLS-1$
-      }
+    spreadField.addActionListener(e -> {
+      setSpread(spreadField.getIntValue());
+      spreadField.setIntValue(getSpread());
+      spreadField.selectAll();
+      spreadField.requestFocusInWindow();
+      firePropertyChange("data", null, LineProfile.this); // to views //$NON-NLS-1$
     });
     spreadField.addFocusListener(new FocusAdapter() {
       public void focusGained(FocusEvent e) {
@@ -153,34 +151,28 @@ public class LineProfile extends TTrack {
     spreadField.addMouseListener(formatMouseListener);
     // create fixed line item
     fixedLineItem = new JCheckBoxMenuItem(TrackerRes.getString("LineProfile.MenuItem.Fixed")); //$NON-NLS-1$
-    fixedLineItem.addItemListener(new ItemListener() {
-      public void itemStateChanged(ItemEvent e) {
-        setFixed(fixedLineItem.isSelected());
-      }
-    });
+    fixedLineItem.addItemListener(e -> setFixed(fixedLineItem.isSelected()));
     // create orientation items
     orientationMenu = new JMenu(TrackerRes.getString("LineProfile.Menu.Orientation")); //$NON-NLS-1$
     ButtonGroup group = new ButtonGroup();
     horizOrientationItem = new JRadioButtonMenuItem(
     		TrackerRes.getString("LineProfile.MenuItem.Horizontal")); //$NON-NLS-1$
     horizOrientationItem.setSelected(true);
-    horizOrientationItem.addItemListener(new ItemListener() {
-      public void itemStateChanged(ItemEvent e) {
-      	if (trackerPanel == null) return;
-      	XMLControl control = new XMLControlElement(LineProfile.this);
-        isHorizontal = horizOrientationItem.isSelected();
-        if (!steps.isEmpty()) {
-	        int n = trackerPanel.getFrameNumber();
-	        LineProfileStep step = (LineProfileStep)steps.getStep(n);
-	        refreshStep(step);
-	        trackerPanel.repaint();
-	        if (!loading)
-	        	Undo.postTrackEdit(LineProfile.this, control);
-        }
-        trackerPanel.getTFrame().getToolBar(trackerPanel).refresh(false);
-        dataValid = false;
-        support.firePropertyChange("data", null, null); // to views //$NON-NLS-1$
+    horizOrientationItem.addItemListener(e -> {
+        if (trackerPanel == null) return;
+        XMLControl control = new XMLControlElement(LineProfile.this);
+      isHorizontal = horizOrientationItem.isSelected();
+      if (!steps.isEmpty()) {
+          int n = trackerPanel.getFrameNumber();
+          LineProfileStep step = (LineProfileStep)steps.getStep(n);
+          refreshStep(step);
+          trackerPanel.repaint();
+          if (!loading)
+              Undo.postTrackEdit(LineProfile.this, control);
       }
+      trackerPanel.getTFrame().getToolBar(trackerPanel).refresh(false);
+      dataValid = false;
+      support.firePropertyChange("data", null, null); // to views //$NON-NLS-1$
     });
     orientationMenu.add(horizOrientationItem);
     group.add(horizOrientationItem);
@@ -273,7 +265,8 @@ public class LineProfile extends TTrack {
    *
    * @param visible ignored
    */
-  public void setTrailVisible(boolean visible) {/** empty block */}
+  public void setTrailVisible(boolean visible) {
+  }
 
   /**
    * Creates a new step.
@@ -655,8 +648,7 @@ public class LineProfile extends TTrack {
      * @return the newly created object
      */
     public Object createObject(XMLControl control) {
-    	LineProfile profile = new LineProfile();
-      return profile;
+        return new LineProfile();
     }
 
     /**

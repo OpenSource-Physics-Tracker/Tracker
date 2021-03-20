@@ -2553,7 +2553,7 @@ public class TrackerPanel extends VideoPanel implements Scrollable {
             dataBuilder.setFontLevel(level);
         }
         if (autoTracker != null) {
-            autoTracker.getWizard().setFontLevel(level);
+            autoTracker.getWizard().setFontLevel();
         }
         if (attachmentDialog != null) {
             attachmentDialog.setFontLevel(level);
@@ -2866,7 +2866,7 @@ public class TrackerPanel extends VideoPanel implements Scrollable {
     protected AutoTracker getAutoTracker() {
         if (autoTracker == null) {
             autoTracker = new AutoTracker(this);
-            autoTracker.getWizard().setFontLevel(FontSizer.getLevel());
+            autoTracker.getWizard().setFontLevel();
         }
         return autoTracker;
     }

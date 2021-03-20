@@ -41,7 +41,7 @@ public interface Mark {
    * @param g the Graphics2D context
    * @param highlighted <code>true</code> to draw a highlighted version
    */
-  public void draw(Graphics2D g, boolean highlighted);
+  void draw(Graphics2D g, boolean highlighted);
 
   /**
    * Gets the bounds of this object.
@@ -49,6 +49,6 @@ public interface Mark {
    * @param highlighted <code>true</code> to get the highlighted bounds
    * @return the bounding rectangle
    */
-  public Rectangle getBounds(boolean highlighted);
+  Rectangle getBounds(boolean highlighted);
 
 }

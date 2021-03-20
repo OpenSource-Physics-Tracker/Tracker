@@ -43,18 +43,17 @@ import java.util.*;
  */
 public class PositionStep extends Step {
 	
-	private static Point[] twoPoints = new Point[2];
+	private static final Point[] twoPoints = new Point[2];
 
   // instance fields
   protected Position p;
   protected boolean labelVisible;
   protected boolean rolloverVisible;
   protected Map<TrackerPanel, TextLayout> textLayouts 
-  		= new HashMap<TrackerPanel, TextLayout>();
+  		= new HashMap<>();
   protected Map<TrackerPanel, Rectangle> layoutBounds 
-  		= new HashMap<TrackerPanel, Rectangle>();
+  		= new HashMap<>();
 	protected CircleFootprint innerCircleFootprint = new CircleFootprint("CircleFootprint.Circle", 2); //$NON-NLS-1$
-//  protected Font font;
 
   /**
    * Constructs a PositionStep with specified image coordinates.
@@ -99,15 +98,6 @@ public class PositionStep extends Step {
    */
   public void setLabelVisible(boolean visible) {
     labelVisible = visible;
-  }
-
-  /**
-   * Gets the rollover visibility.
-   *
-   * @return <code>true</code> if labels are visible on rollover only
-   */
-  public boolean isRolloverVisible() {
-    return rolloverVisible;
   }
 
   /**
@@ -182,7 +172,7 @@ public class PositionStep extends Step {
    */
   protected Mark getMark(TrackerPanel trackerPanel) {
     Mark mark = marks.get(trackerPanel);
-    TPoint selection = null;
+    TPoint selection;
     if (mark == null) {
       selection = trackerPanel.getSelectedPoint();
       Point p = null; // draws this step as "selected" shape if not null
@@ -190,9 +180,7 @@ public class PositionStep extends Step {
       for (int n = 0; n < points.length; n++) {
       	if (!valid) continue;
       	// determine if point is valid (ie not NaN)
-      	valid = valid 
-      			&& !Double.isNaN(points[n].getX()) 
-      			&& !Double.isNaN(points[n].getY());
+      	valid = !Double.isNaN(points[n].getX()) && !Double.isNaN(points[n].getY());
         screenPoints[n] = points[n].getScreenPosition(trackerPanel);
         // step is "selected" if trackerPanel selectedPoint is position or selectedSteps contains this step 
         if (valid && (selection==points[n] || trackerPanel.selectedSteps.contains(this))) {
@@ -312,8 +300,12 @@ public class PositionStep extends Step {
     PositionStep step = (PositionStep)super.clone();
     if (step != null)
       step.points[0] = step.p = step.new Position(p.getX(), p.getY());
-    step.textLayouts = new HashMap<TrackerPanel, TextLayout>();
-    step.layoutBounds = new HashMap<TrackerPanel, Rectangle>();
+    if (step != null) {
+      step.textLayouts = new HashMap<>();
+    }
+    if (step != null) {
+      step.layoutBounds = new HashMap<>();
+    }
     return step;
   }
 
@@ -358,7 +350,7 @@ public class PositionStep extends Step {
       	}
       	track.updateDerivatives(n);
     	}  
-      track.support.firePropertyChange("step", null, new Integer(n)); //$NON-NLS-1$
+      track.support.firePropertyChange("step", null, n); //$NON-NLS-1$
     }
 
     /**
@@ -413,7 +405,7 @@ public class PositionStep extends Step {
     	}
     	if (!adjusting) {
     		m.updateDerivatives(n);
-    	  m.support.firePropertyChange("step", null, new Integer(n)); //$NON-NLS-1$
+    	  m.support.firePropertyChange("step", null, n); //$NON-NLS-1$
     	}
       m.support.firePropertyChange("adjusting", null, adjusting); //$NON-NLS-1$    	
     }

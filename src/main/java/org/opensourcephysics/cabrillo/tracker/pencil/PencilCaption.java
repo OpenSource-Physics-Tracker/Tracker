@@ -56,7 +56,7 @@ import org.opensourcephysics.display.InteractiveTextLine;
  */
 public class PencilCaption extends InteractiveTextLine {
 	
-	private static Cursor handCursor;
+	private static final Cursor handCursor;
   static Font baseFont = new Font("SansSerif", Font.PLAIN, 32); //$NON-NLS-1$
 	static {
     ImageIcon icon = new ImageIcon(
@@ -66,7 +66,7 @@ public class PencilCaption extends InteractiveTextLine {
 	  XML.setLoader(PencilCaption.class, PencilCaption.getLoader());
 	}
 	
-	private AffineTransform transform = new AffineTransform();
+	private final AffineTransform transform = new AffineTransform();
 	private Rectangle2D bounds;
   private double offsetX, offsetY;
   private boolean isSelected;
@@ -274,8 +274,7 @@ public class PencilCaption extends InteractiveTextLine {
     public Object createObject(XMLControl control) {
     	String text = control.getString("text"); //$NON-NLS-1$
     	double[] loc = (double[])control.getObject("position"); //$NON-NLS-1$
-    	int size = control.getInt("font_size"); //$NON-NLS-1$
-    	float fontSize = size;
+        float fontSize = control.getInt("font_size");
     	Font font = baseFont.deriveFont(fontSize);
       return new PencilCaption(text, loc[0], loc[1], font);
     }

@@ -67,12 +67,12 @@ public class LineFootprint implements Footprint, Cloneable {
    * @return the footprint
    */
   public static Footprint getFootprint(String name) {
-    Iterator<LineFootprint> it = footprints.iterator();
-    while(it.hasNext()) {
-      LineFootprint footprint = it.next();
-      if (name == footprint.getName()) try {
-        return (LineFootprint)footprint.clone();
-      } catch(CloneNotSupportedException ex) {ex.printStackTrace();}
+    for (LineFootprint footprint : footprints) {
+      if (name.equals(footprint.getName())) try {
+        return (LineFootprint) footprint.clone();
+      } catch (CloneNotSupportedException ex) {
+        ex.printStackTrace();
+      }
     }
     return null;
   }
@@ -252,13 +252,11 @@ public class LineFootprint implements Footprint, Cloneable {
   }
 
   // static fields
-  private static Collection<LineFootprint> footprints = new HashSet<LineFootprint>();
+  private static final Collection<LineFootprint> footprints = new HashSet<>();
 
   // static constants  
   /** A dashed line pattern */
   public static final float[] DASHED_LINE = new float[] {10, 4};
-  /** A dotted line pattern */
-  public static final float[] DOTTED_LINE = new float[] {2, 1};
   protected static final Shape HIGHLIGHT;
   private static final LineFootprint LINE;
   private static final LineFootprint BOLD_LINE;

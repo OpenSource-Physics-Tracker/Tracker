@@ -124,8 +124,7 @@ public class MultiPositionStep extends PositionStep {
    * @return the bounding rectangle
    */
   public Rectangle getBounds(TrackerPanel trackerPanel) {
-    Rectangle bounds = getMark(trackerPanel).getBounds(false);
-    return bounds;
+      return getMark(trackerPanel).getBounds(false);
   }
 
   /**
@@ -134,10 +133,7 @@ public class MultiPositionStep extends PositionStep {
    * @return a cloned step
    */
   public Object clone() {
-    MultiPositionStep step = (MultiPositionStep)super.clone();
-//    if (step != null)
-//      step.points[0] = step.p = step.new Position(p.getX(), p.getY());
-    return step;
+    return super.clone();
   }
 
   /**

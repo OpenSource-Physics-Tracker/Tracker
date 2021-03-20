@@ -1333,18 +1333,18 @@ public class Tracker {
      */
     public static void main(String[] args) {
 
-        // determine if this is tracker.jar (Tracker main class)
-//        boolean isTracker = false;
-//        JarFile jarfile = OSPRuntime.getLaunchJar();
-//        try {
-//            assert jarfile != null;
-//            Attributes att;
-//            att = Objects.requireNonNull(jarfile).getManifest().getMainAttributes();
-//            Object mainclass = att.getValue("Main-Class");
-//            isTracker = mainclass.toString().endsWith("org.opensourcephysics.cabrillo.tracker.Tracker");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+//         determine if this is tracker.jar (Tracker main class)
+        boolean isTracker = false;
+        JarFile jarfile = OSPRuntime.getLaunchJar();
+        try {
+            assert jarfile != null;
+            Attributes att;
+            att = Objects.requireNonNull(jarfile).getManifest().getMainAttributes();
+            Object mainclass = att.getValue("Main-Class");
+            isTracker = mainclass.toString().endsWith("org.opensourcephysics.cabrillo.tracker.Tracker");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // determine if relaunch is needed
         boolean isRelaunch = args != null && args.length > 0 && "relaunch".equals(args[args.length - 1]);

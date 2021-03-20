@@ -84,11 +84,11 @@ public class PlotTrackView extends TrackView {
       plots[i].dataset.setMarkerColor(track.getColor());
       Double D = (Double)track.getProperty("yMinPlot"+i); //$NON-NLS-1$
       if (D != null) {
-        plots[i].setPreferredMinMaxY(D.doubleValue(), plots[i].getPreferredYMax());
+        plots[i].setPreferredMinMaxY(D, plots[i].getPreferredYMax());
       }
       D = (Double)track.getProperty("yMaxPlot"+i); //$NON-NLS-1$
       if (D != null) {
-        plots[i].setPreferredMinMaxY(plots[i].getPreferredYMin(), D.doubleValue());
+        plots[i].setPreferredMinMaxY(plots[i].getPreferredYMin(), D);
       }
       plots[i].isCustom = false;
     }
@@ -101,29 +101,28 @@ public class PlotTrackView extends TrackView {
   	TTrack track = getTrack();
   	if (track==null) return;  	
     track.getData(trackerPanel);
-    for (int i = 0; i < plots.length; i++) {
-      HighlightableDataset data = plots[i].getDataset();
-      data.setMarkerColor(track.getColor());
-      if (track.getColor().equals(Color.WHITE)) {
-      	data.setMarkerColor(Color.GRAY);
+      for (TrackPlottingPanel plot : plots) {
+          HighlightableDataset data = plot.getDataset();
+          data.setMarkerColor(track.getColor());
+          if (track.getColor().equals(Color.WHITE)) {
+              data.setMarkerColor(Color.GRAY);
+          }
+          // set up highlights
+          plot.highlightIndices.clear();
+          if (highlightVisible) {
+              if (trackerPanel.selectedSteps.size() > 0) {
+                  data.setHighlightColor(track.getColor());
+                  for (Step step : trackerPanel.selectedSteps) {
+                      if (step.getTrack() != this.getTrack()) continue;
+                      plot.addHighlight(step.getFrameNumber());
+                  }
+              } else {
+                  data.setHighlightColor(Color.GRAY);
+                  plot.addHighlight(frameNumber);
+              }
+          }
+          plot.plotData();
       }
-      // set up highlights
-      plots[i].highlightIndices.clear();
-      if (highlightVisible) {
-      	if (trackerPanel.selectedSteps.size()>0) {
-      		data.setHighlightColor(track.getColor());
-      		for (Step step: trackerPanel.selectedSteps) {
-      			if (step.getTrack()!=this.getTrack()) continue;
-        		plots[i].addHighlight(step.getFrameNumber());
-      		}
-      	}
-      	else {
-      		data.setHighlightColor(Color.GRAY);
-      		plots[i].addHighlight(frameNumber);
-      	}
-      }
-      plots[i].plotData();
-    }
     mainView.repaint();
   }
 
@@ -149,11 +148,11 @@ public class PlotTrackView extends TrackView {
     plotsButton.setToolTipText(TrackerRes.getString("PlotTrackView.Button.PlotCount.ToolTip")); //$NON-NLS-1$
   	TTrack track = getTrack();
     track.getData(trackerPanel); // load the current data
-    for (int i = 0; i < plots.length; i++) {
-    	boolean custom = plots[i].isCustom;
-      plots[i].createVarChoices();
-      plots[i].isCustom = custom;
-    }
+      for (TrackPlottingPanel plot : plots) {
+          boolean custom = plot.isCustom;
+          plot.createVarChoices();
+          plot.isCustom = custom;
+      }
   }
 
   /**
@@ -225,9 +224,7 @@ public class PlotTrackView extends TrackView {
   public TrackPlottingPanel[] getPlots() {
     int n = mainView.getComponentCount();
     TrackPlottingPanel[] visiblePlots = new TrackPlottingPanel[n];
-    for (int i = 0; i < n; i++) {
-    	visiblePlots[i] = plots[i];
-    }
+      if (n >= 0) System.arraycopy(plots, 0, visiblePlots, 0, n);
     return visiblePlots;
   }
 
@@ -346,12 +343,10 @@ public class PlotTrackView extends TrackView {
     // create popup menu
     popup = new JPopupMenu();
     // make a listener for plot count items
-    ActionListener plotCountSetter = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        JMenuItem item = (JMenuItem)e.getSource();
-        setPlotCount(Integer.parseInt(item.getText()));
-        refresh(trackerPanel.getFrameNumber());
-      }
+    ActionListener plotCountSetter = e -> {
+      JMenuItem item = (JMenuItem)e.getSource();
+      setPlotCount(Integer.parseInt(item.getText()));
+      refresh(trackerPanel.getFrameNumber());
     };
     // create plotCount menuitems
     plotCountItems = new JRadioButtonMenuItem[plots.length];
@@ -366,11 +361,7 @@ public class PlotTrackView extends TrackView {
     // create link checkbox
     linkCheckBox = new JCheckBox();
     linkCheckBox.setOpaque(false);
-    linkCheckBox.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	setXAxesLinked(linkCheckBox.isSelected());
-      }
-    });
+    linkCheckBox.addActionListener(e -> setXAxesLinked(linkCheckBox.isSelected()));
     // plots button
     plotsButton = new TButton() {
     	// override getMaximumSize method so has same height as chooser button

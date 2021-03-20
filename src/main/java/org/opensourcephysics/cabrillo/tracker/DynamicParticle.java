@@ -58,7 +58,7 @@ public class DynamicParticle
   protected int iterationsPerStep = 100;
   protected DynamicSystem system;
   protected Point2D[] points;
-  protected HashMap<Integer, double[]> frameStates = new HashMap<Integer, double[]>();
+  protected HashMap<Integer, double[]> frameStates = new HashMap<>();
   protected ModelBooster modelBooster = new ModelBooster();
   
   /**
@@ -79,7 +79,7 @@ public class DynamicParticle
 	public void draw(DrawingPanel panel, Graphics _g) {
 		// if a booster is named, set the booster to the named point mass
 		if (boosterName!=null && panel instanceof TrackerPanel) {
-			for (PointMass track: ((TrackerPanel)panel).getDrawables(PointMass.class)) {
+			for (PointMass track: panel.getDrawables(PointMass.class)) {
 				if (track.getName().equals(boosterName)) {
 					setBooster(track);
 					boosterName = null;
@@ -173,17 +173,17 @@ public class DynamicParticle
     	// clear all steps if empty system or no frames included in clip
   		if (emptySystem ||
   				(end==getStartFrame() && !clip.includesFrame(getStartFrame()))) {
-  			for (int i = 0; i < models.length; i++) {
-  		  	models[i].steps.setLength(1);
-	  			models[i].steps.setStep(0, null);
-	      	for (TrackerPanel panel: panels) {
-	      		models[i].getVArray(panel).setLength(0);
-	      		models[i].getAArray(panel).setLength(0);
-	      	}
-			    models[i].traceX = new double[0];
-			    models[i].traceY = new double[0];
-			    models[i].support.firePropertyChange("steps", null, null); //$NON-NLS-1$
-  			}
+			for (ParticleModel model : models) {
+				model.steps.setLength(1);
+				model.steps.setStep(0, null);
+				for (TrackerPanel panel : panels) {
+					model.getVArray(panel).setLength(0);
+					model.getAArray(panel).setLength(0);
+				}
+				model.traceX = new double[0];
+				model.traceY = new double[0];
+				model.support.firePropertyChange("steps", null, null); //$NON-NLS-1$
+			}
   	    return;
   		}
     	// find first frame included in both model and clip
@@ -556,11 +556,21 @@ public class DynamicParticle
 			Parameter param = params[i];
 			String name = param.getName();
 			double value = Double.NaN; // default
-			
-			if (name.equals("x")) value = state[0]; //$NON-NLS-1$
-			else if (name.equals("vx")) value = state[1]; //$NON-NLS-1$
-			else if (name.equals("y")) value = state[2]; //$NON-NLS-1$
-			else if (name.equals("vy")) value = state[3]; //$NON-NLS-1$
+
+			switch (name) {
+				case "x":
+					value = state[0]; //$NON-NLS-1$
+					break;
+				case "vx":
+					value = state[1]; //$NON-NLS-1$
+					break;
+				case "y":
+					value = state[2]; //$NON-NLS-1$
+					break;
+				case "vy":
+					value = state[3]; //$NON-NLS-1$
+					break;
+			}
 			
 			// replace parameter with new one if not null
 			if (!Double.isNaN(value)) {
@@ -702,7 +712,9 @@ public class DynamicParticle
 	        try { // load the solver class
 	          Class<?> solverClass = Class.forName(solver);
 	          p.setSolver(solverClass);
-	        } catch(Exception ex2) {/** empty block */}  	    		
+	        } catch(Exception ex2) {
+				ex2.printStackTrace();
+			}
 	    	}
 	  		String t = control.getString("t0"); //$NON-NLS-1$
 	  		p.getInitEditor().setExpression("t", t, false); //$NON-NLS-1$

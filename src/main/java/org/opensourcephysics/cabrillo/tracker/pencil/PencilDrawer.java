@@ -55,7 +55,7 @@ public class PencilDrawer {
     static Cursor pencilCursor;
     static BasicStroke lightStroke, heavyStroke;
 
-    private static HashMap<TrackerPanel, PencilDrawer> drawers = new HashMap<TrackerPanel, PencilDrawer>();
+    private static final HashMap<TrackerPanel, PencilDrawer> drawers = new HashMap<>();
 
     static {
         lightStroke = new BasicStroke(2);
@@ -73,7 +73,7 @@ public class PencilDrawer {
     private PencilDrawing newDrawing;
     private boolean drawingsVisible = true;
     TrackerPanel trackerPanel;
-    public ArrayList<PencilScene> scenes = new ArrayList<PencilScene>();
+    public ArrayList<PencilScene> scenes = new ArrayList<>();
     Color color = colors[0][0];
     public PencilControl drawingControl;
 
@@ -185,29 +185,14 @@ public class PencilDrawer {
      * a new one is created.
      *
      * @param drawing the PencilDrawing to add
-     * @return the newly added drawing
      */
-    public PencilDrawing addDrawingtoSelectedScene(PencilDrawing drawing) {
+    public void addDrawingtoSelectedScene(PencilDrawing drawing) {
         PencilScene scene = getSelectedScene();
         if (scene == null) {
             scene = addNewScene();
         }
         scene.getDrawings().add(drawing);
         trackerPanel.changed = true;
-        return drawing;
-    }
-
-    /**
-     * Gets the active drawing, defined as the last one added. May return null.
-     *
-     * @return the active drawing
-     */
-    protected PencilDrawing getActiveDrawing() {
-        PencilScene scene = getSelectedScene();
-        if (scene != null && !scene.getDrawings().isEmpty()) {
-            return scene.getDrawings().get(scene.getDrawings().size() - 1);
-        }
-        return null;
     }
 
     /**
@@ -283,7 +268,7 @@ public class PencilDrawer {
         // remove existing scenes
         clearScenes();
         // add new scenes
-        scenes = new ArrayList<PencilScene>(pencilScenes);
+        scenes = new ArrayList<>(pencilScenes);
         Collections.sort(scenes);
         for (PencilScene scene : scenes) {
             trackerPanel.addDrawable(scene);

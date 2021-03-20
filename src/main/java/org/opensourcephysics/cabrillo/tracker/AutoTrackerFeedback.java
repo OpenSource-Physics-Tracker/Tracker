@@ -1,7 +1,6 @@
 package org.opensourcephysics.cabrillo.tracker;
 
 import org.opensourcephysics.cabrillo.tracker.AutoTrackerCore.KeyFrame;
-import org.opensourcephysics.cabrillo.tracker.AutoTrackerCore.FrameData;
 
 
 /**

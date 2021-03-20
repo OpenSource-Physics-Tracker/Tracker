@@ -51,6 +51,6 @@ public interface Derivative {
    * @param data the input data
    * @return Object[] result
    */
-  public Object[] evaluate(Object[] data);
+  Object[] evaluate(Object[] data);
 
 }

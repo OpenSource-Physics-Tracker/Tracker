@@ -67,12 +67,12 @@ public class MultiLineFootprint implements Footprint, Cloneable {
    * @return the footprint
    */
   public static MultiLineFootprint getFootprint(String name) {
-    Iterator<MultiLineFootprint> it = footprints.iterator();
-    while(it.hasNext()) {
-    	MultiLineFootprint footprint = it.next();
-      if (name == footprint.getName()) try {
-        return (MultiLineFootprint)footprint.clone();
-      } catch(CloneNotSupportedException ex) {ex.printStackTrace();}
+    for (MultiLineFootprint footprint : footprints) {
+      if (name.equals(footprint.getName())) try {
+        return (MultiLineFootprint) footprint.clone();
+      } catch (CloneNotSupportedException ex) {
+        ex.printStackTrace();
+      }
     }
     return null;
   }
@@ -181,20 +181,6 @@ public class MultiLineFootprint implements Footprint, Cloneable {
   }
 
   /**
-   * Sets the dash array.
-   *
-   * @param dashArray the desired dash array
-   */
-  public void setDashArray(float[] dashArray) {
-    setStroke(new BasicStroke(baseStroke.getLineWidth(),
-                              BasicStroke.CAP_BUTT,
-                              BasicStroke.JOIN_MITER,
-                              8,
-                              dashArray,
-                              baseStroke.getDashPhase()));
-  }
-
-  /**
    * Sets the line width.
    *
    * @param w the desired line width
@@ -238,7 +224,6 @@ public class MultiLineFootprint implements Footprint, Cloneable {
   /**
    * Sets the closed property.
    *
-   * @param true to draw closed paths
    */
   public void setClosed(boolean closed) {
   	this.closed = closed;
@@ -271,7 +256,7 @@ public class MultiLineFootprint implements Footprint, Cloneable {
   }
 
   // static fields
-  private static Collection<MultiLineFootprint> footprints = new HashSet<MultiLineFootprint>();
+  private static final Collection<MultiLineFootprint> footprints = new HashSet<>();
 
   // static constants  
   private static final MultiLineFootprint LINE;

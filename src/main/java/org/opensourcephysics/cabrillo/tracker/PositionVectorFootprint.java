@@ -37,7 +37,6 @@ public class PositionVectorFootprint extends PointShapeFootprint {
 
   // instance fields
 	LineFootprint arrow;
-	Point[] onePoint = new Point[1];
 
   /**
    * Constructs a PositionVectorFootprint.
@@ -48,7 +47,9 @@ public class PositionVectorFootprint extends PointShapeFootprint {
   public PositionVectorFootprint(String name, int w) {
     super(name, new Ellipse2D.Double(-2, -2, 4, 4));
     arrow = (LineFootprint)LineFootprint.getFootprint("Footprint.Arrow"); //$NON-NLS-1$
-    arrow.setLineWidth(w);
+    if (arrow != null) {
+      arrow.setLineWidth(w);
+    }
     baseStroke = null;
   }
   

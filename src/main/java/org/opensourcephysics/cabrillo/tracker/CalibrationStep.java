@@ -42,7 +42,7 @@ import org.opensourcephysics.tools.FontSizer;
 public class CalibrationStep extends Step {
 
   // instance fields
-  private Calibration cal;
+  private final Calibration cal;
   protected double worldX0, worldY0, worldX1=1, worldY1;
 
   /**
@@ -110,7 +110,7 @@ public class CalibrationStep extends Step {
    */
   protected Mark getMark(TrackerPanel trackerPanel) {
     Mark mark = marks.get(trackerPanel);
-    TPoint selection = null;
+    TPoint selection;
     if (mark == null) {
       ImageCoordSystem coords = trackerPanel.getCoords();
       int n = trackerPanel.getFrameNumber();

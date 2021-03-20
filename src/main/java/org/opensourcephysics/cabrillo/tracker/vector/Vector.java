@@ -54,7 +54,7 @@ public class Vector extends TTrack {
     public static Map<String, String> formatDescriptionMap;
 
     static {
-        ArrayList<String> names = new ArrayList<String>();
+        ArrayList<String> names = new ArrayList<>();
         names.add("t"); //$NON-NLS-1$ 0
         names.add("x"); //$NON-NLS-1$ 1
         names.add("y"); //$NON-NLS-1$ 2
@@ -64,7 +64,7 @@ public class Vector extends TTrack {
         names.add("y_{tail}"); //$NON-NLS-1$ 6
         names.add("step"); //$NON-NLS-1$ 7
         names.add("frame"); //$NON-NLS-1$ 8
-        dataVariables = names.toArray(new String[names.size()]);
+        dataVariables = names.toArray(new String[0]);
 
         // assemble field variables
         names.clear();
@@ -73,23 +73,23 @@ public class Vector extends TTrack {
         names.add(dataVariables[2]); // 2
         names.add(dataVariables[3]); // 3
         names.add(dataVariables[4]); // 4
-        fieldVariables = names.toArray(new String[names.size()]);
+        fieldVariables = names.toArray(new String[0]);
 
         // assemble format variables
         names.clear();
         names.add("t"); //$NON-NLS-1$ 1
         names.add("xy"); //$NON-NLS-1$ 2
         names.add(Tracker.THETA); // 7
-        formatVariables = names.toArray(new String[names.size()]);
+        formatVariables = names.toArray(new String[0]);
 
         // assemble format map
-        formatMap = new HashMap<String, ArrayList<String>>();
+        formatMap = new HashMap<>();
 
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         list.add(dataVariables[0]);
         formatMap.put(formatVariables[0], list);
 
-        list = new ArrayList<String>();
+        list = new ArrayList<>();
         list.add(dataVariables[1]);
         list.add(dataVariables[2]);
         list.add(dataVariables[3]);
@@ -97,12 +97,12 @@ public class Vector extends TTrack {
         list.add(dataVariables[6]);
         formatMap.put(formatVariables[1], list);
 
-        list = new ArrayList<String>();
+        list = new ArrayList<>();
         list.add(dataVariables[4]);
         formatMap.put(formatVariables[2], list);
 
         // assemble format description map
-        formatDescriptionMap = new HashMap<String, String>();
+        formatDescriptionMap = new HashMap<>();
         formatDescriptionMap.put(formatVariables[0], TrackerRes.getString("Vector.Data.Description.0")); //$NON-NLS-1$
         formatDescriptionMap.put(formatVariables[1], TrackerRes.getString("Vector.Description.Magnitudes")); //$NON-NLS-1$
         formatDescriptionMap.put(formatVariables[2], TrackerRes.getString("Vector.Data.Description.4")); //$NON-NLS-1$
@@ -111,7 +111,7 @@ public class Vector extends TTrack {
     // instance fields
     protected JMenuItem tailsToOriginItem = new JMenuItem();
     protected JCheckBoxMenuItem labelsVisibleItem;
-    protected Map<TrackerPanel, Boolean> visMap = new HashMap<TrackerPanel, Boolean>();
+    protected Map<TrackerPanel, Boolean> visMap = new HashMap<>();
 
     /**
      * Constructs a Vector.
@@ -179,42 +179,36 @@ public class Vector extends TTrack {
         magField.addFocusListener(magAngleFocusListener);
         angleField.addFocusListener(magAngleFocusListener);
         // tails to origin item
-        tailsToOriginItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // snap all vectors to the snapPoint
-                Iterator<TrackerPanel> it = Vector.this.panels.iterator();
-                while (it.hasNext()) {
-                    TrackerPanel panel = it.next();
-                    TPoint p = panel.getSnapPoint();
-                    Step[] steps = Vector.this.getSteps();
-                    for (int i = 0; i < steps.length; i++) {
-                        if (steps[i] != null) {
-                            VectorStep v = (VectorStep) steps[i];
-                            if (v.chain != null) v.chain.clear();
-                            // detach any existing point
-                            v.attach(null);
-                            v.attach(p);
-                        }
+        tailsToOriginItem.addActionListener(e -> {
+            // snap all vectors to the snapPoint
+            for (TrackerPanel panel : Vector.this.panels) {
+                TPoint p = panel.getSnapPoint();
+                Step[] steps = Vector.this.getSteps();
+                for (Step step : steps) {
+                    if (step != null) {
+                        VectorStep v = (VectorStep) step;
+                        if (v.chain != null) v.chain.clear();
+                        // detach any existing point
+                        v.attach(null);
+                        v.attach(p);
                     }
-                    panel.repaint();
                 }
+                panel.repaint();
             }
         });
         // labels visible item
         labelsVisibleItem = new JCheckBoxMenuItem(TrackerRes.getString("Vector.MenuItem.Label")); //$NON-NLS-1$
         labelsVisibleItem.setSelected(true);
-        labelsVisibleItem.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                Step[] steps = getSteps();
-                for (int i = 0; i < steps.length; i++) {
-                    if (steps[i] != null) {
-                        VectorStep step = (VectorStep) steps[i];
-                        step.setLabelVisible(labelsVisibleItem.isSelected());
-                        step.erase();
-                    }
+        labelsVisibleItem.addItemListener(e -> {
+            Step[] steps = getSteps();
+            for (Step value : steps) {
+                if (value != null) {
+                    VectorStep step = (VectorStep) value;
+                    step.setLabelVisible(labelsVisibleItem.isSelected());
+                    step.erase();
                 }
-                repaint();
             }
+            repaint();
         });
     }
 
@@ -251,12 +245,11 @@ public class Vector extends TTrack {
      */
     public Step createStep(int n, double x, double y, double xc, double yc) {
         if (locked) return null;
-        VectorStep step = (VectorStep) getStep(n);
-        step = new VectorStep(this, n, x, y, xc, yc);
+        VectorStep step = new VectorStep(this, n, x, y, xc, yc);
         step.setFirePropertyChangeEvents(true);
         steps.setStep(n, step);
         step.setFootprint(getFootprint());
-        support.firePropertyChange("step", null, new Integer(n)); //$NON-NLS-1$
+        support.firePropertyChange("step", null, n); //$NON-NLS-1$
         return step;
     }
 
@@ -288,8 +281,8 @@ public class Vector extends TTrack {
         if (panel instanceof TrackerPanel) {
             TrackerPanel trackerPanel = (TrackerPanel) panel;
             if (!isVectorsVisible(trackerPanel)) return;
-//      // snap after loading 
-//      boolean changed = trackerPanel.changed;
+//      snap after loading
+//     boolean changed = trackerPanel.changed;
 //      if (!snapVectors.isEmpty() && panel.getClass().equals(TrackerPanel.class)) {
 //      	Iterator it = snapVectors.iterator();
 //      	while (it.hasNext()) {
@@ -311,8 +304,8 @@ public class Vector extends TTrack {
     public void setLocked(boolean locked) {
         super.setLocked(locked);
         Step[] steps = getSteps();
-        for (int i = 0; i < steps.length; i++) {
-            VectorStep step = (VectorStep) steps[i];
+        for (Step value : steps) {
+            VectorStep step = (VectorStep) value;
             if (step != null) step.setTipEnabled(!isLocked());
         }
     }
@@ -385,9 +378,9 @@ public class Vector extends TTrack {
         }
         // get data at each non-null step included in the videoclip
         Step[] stepArray = getSteps();
-        for (int n = 0; n < stepArray.length; n++) {
-            if (stepArray[n] == null) continue;
-            VectorStep step = (VectorStep) stepArray[n];
+        for (Step value : stepArray) {
+            if (value == null) continue;
+            VectorStep step = (VectorStep) value;
             // get the frame number of the step
             int frame = step.getFrameNumber();
             // check that the frame is included in the clip
@@ -412,7 +405,7 @@ public class Vector extends TTrack {
             yTail.append(t, tailPosition.getY());
             stepNum.append(t, stepNumber);
             frameNum.append(t, frame);
-            dataFrames.add(new Integer(frame));
+            dataFrames.add(frame);
         }
     }
 
@@ -470,43 +463,11 @@ public class Vector extends TTrack {
      */
     public void setLabelsVisible(boolean visible) {
         Step[] steps = this.getSteps();
-        for (int i = 0; i < steps.length; i++) {
-            VectorStep step = (VectorStep) steps[i];
+        for (Step value : steps) {
+            VectorStep step = (VectorStep) value;
             if (step != null) {
                 step.setLabelVisible(visible);
                 step.setRolloverVisible(!visible);
-            }
-        }
-    }
-
-    /**
-     * Gets the labels visibility.
-     *
-     * @return <code>true</code> if labels are visible
-     */
-    public boolean isLabelsVisible() {
-        Step[] steps = this.getSteps();
-        for (int i = 0; i < steps.length; i++) {
-            VectorStep step = (VectorStep) steps[i];
-            if (step != null) return step.isLabelVisible();
-        }
-        return false;
-    }
-
-    /**
-     * Sets the visibility of the vectors on the specified tracker panel.
-     *
-     * @param panel   the tracker panel
-     * @param visible <code>true</code> to show vectors
-     */
-    public void setVectorsVisible(TrackerPanel panel, boolean visible) {
-        if (visible == isVectorsVisible(panel)) return;
-        visMap.put(panel, new Boolean(visible));
-        if (!visible) {
-            Step step = panel.getSelectedStep();
-            if (step != null && step == getStep(step.getFrameNumber())) {
-                panel.setSelectedPoint(null);
-                panel.selectedSteps.clear();
             }
         }
     }
@@ -521,12 +482,8 @@ public class Vector extends TTrack {
         if (trackerPanel instanceof WorldTView) {
             trackerPanel = ((WorldTView) trackerPanel).getTrackerPanel();
         }
-        Boolean vis = visMap.get(trackerPanel);
-        if (vis == null) {
-            vis = new Boolean(true);        // vectors are visible by default
-            visMap.put(trackerPanel, vis);
-        }
-        return vis.booleanValue();
+        // vectors are visible by default
+        return visMap.computeIfAbsent(trackerPanel, k -> Boolean.TRUE);
     }
 
     /**
@@ -579,8 +536,7 @@ public class Vector extends TTrack {
      * @return the DataSetManager
      */
     public ArrayList<Component> getToolbarTrackComponents(TrackerPanel trackerPanel) {
-        ArrayList<Component> list = super.getToolbarTrackComponents(trackerPanel);
-        return list;
+        return super.getToolbarTrackComponents(trackerPanel);
     }
 
     /**
@@ -728,9 +684,7 @@ public class Vector extends TTrack {
      * in the x and y fields.
      */
     private void setXYComponents() {
-        Iterator<TrackerPanel> it = panels.iterator();
-        while (it.hasNext()) {
-            TrackerPanel trackerPanel = it.next();
+        for (TrackerPanel trackerPanel : panels) {
             TPoint p = trackerPanel.getSelectedPoint();
             VectorStep step = (VectorStep) getStep(p, trackerPanel);
             if (step != null) {
@@ -767,9 +721,7 @@ public class Vector extends TTrack {
         double theta = angleField.getValue();
         double xval = magField.getValue() * Math.cos(theta);
         double yval = magField.getValue() * Math.sin(theta);
-        Iterator<TrackerPanel> it = panels.iterator();
-        while (it.hasNext()) {
-            TrackerPanel trackerPanel = it.next();
+        for (TrackerPanel trackerPanel : panels) {
             TPoint p = trackerPanel.getSelectedPoint();
             VectorStep step = (VectorStep) getStep(p, trackerPanel);
             if (step != null) {
@@ -801,7 +753,7 @@ public class Vector extends TTrack {
         public double x, y, xc, yc;
         public boolean independent;
 
-        FrameData() {/** empty block */}
+        FrameData() {/* empty block */}
 
         FrameData(VectorStep v, boolean dependent) {
             x = v.getTail().getX();

@@ -172,10 +172,10 @@ public class BounceMatrix {
 
     static class LUDecomposition {
 
-        private double[][] LU;
-        private int m;
-        private int n;
-        private int[] piv;
+        private final double[][] LU;
+        private final int m;
+        private final int n;
+        private final int[] piv;
 
         public LUDecomposition(BounceMatrix A) {
 
@@ -279,10 +279,10 @@ public class BounceMatrix {
 
     static class QRDecomposition {
 
-        private double[][] QR;
-        private int m;
-        private int n;
-        private double[] Rdiag;
+        private final double[][] QR;
+        private final int m;
+        private final int n;
+        private final double[] Rdiag;
 
         public QRDecomposition(BounceMatrix A) {
             QR = A.getArrayCopy();

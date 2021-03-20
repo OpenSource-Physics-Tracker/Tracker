@@ -46,8 +46,6 @@ import org.opensourcephysics.tools.FontSizer;
 public class CircleFitterStep extends Step {
 	
   protected static AffineTransform transform = new AffineTransform();
-	protected static TPoint endPoint1 = new TPoint(); // used for large radius case
-  protected static TPoint endPoint2 = new TPoint(); // used for large radius case
 	protected static boolean doRefresh = true;
 	
   // instance fields
@@ -57,9 +55,9 @@ public class CircleFitterStep extends Step {
   protected CenterPoint center; 
   protected TPoint edge; 
   protected double radius;
-  protected Map<TrackerPanel, Shape> circleHitShapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, Shape> centerHitShapes = new HashMap<TrackerPanel, Shape>();
-  protected ArrayList<Map<TrackerPanel, Shape>> pointHitShapes = new ArrayList<Map<TrackerPanel, Shape>>();
+  protected Map<TrackerPanel, Shape> circleHitShapes = new HashMap<>();
+  protected Map<TrackerPanel, Shape> centerHitShapes = new HashMap<>();
+  protected ArrayList<Map<TrackerPanel, Shape>> pointHitShapes = new ArrayList<>();
   protected Shape selectedShape;
   
   /**
@@ -83,7 +81,6 @@ public class CircleFitterStep extends Step {
    *
    * @param p the data point (may be null)
    * @param column the array index
-   * @param index the array index
    * @param refreshAndPostEdit true to refresh circle, fire event and post undo edit
    * @param reduceArrayLengthIfNull true to eliminate null elements
    */
@@ -173,7 +170,8 @@ public class CircleFitterStep extends Step {
       	circleFitter.trackerPanel.changed = true;
       }
 		}
-  	if (n==circleFitter.trackerPanel.getFrameNumber()) {
+	  assert circleFitter.trackerPanel != null;
+	  if (n==circleFitter.trackerPanel.getFrameNumber()) {
 	    repaint();
   		circleFitter.refreshFields(n);
   	}
@@ -207,15 +205,14 @@ public class CircleFitterStep extends Step {
    * This return points from all columns, with user-marked points (column 0) first.
    */
   public ArrayList<DataPoint> getValidDataPoints() {
-  	ArrayList<DataPoint> validPoints = new ArrayList<DataPoint>();
-  	for (int col=0; col<dataPoints.length; col++) {
-  		DataPoint[] pts = dataPoints[col];
-  		for (int row=0; row<pts.length; row++) {
-	  		if (pts[row]!=null) {
-	  			validPoints.add(pts[row]);
-	  		}
-  		}
-  	}
+  	ArrayList<DataPoint> validPoints = new ArrayList<>();
+	  for (DataPoint[] pts : dataPoints) {
+		  for (DataPoint pt : pts) {
+			  if (pt != null) {
+				  validPoints.add(pt);
+			  }
+		  }
+	  }
     return validPoints;
   }
 
@@ -277,7 +274,7 @@ public class CircleFitterStep extends Step {
 
     }
     
-  	if (hit!=null && hit instanceof DataPoint && ((DataPoint)hit).isAttached()) {
+  	if (hit instanceof DataPoint && ((DataPoint) hit).isAttached()) {
   		return null;
   	}
 
@@ -295,7 +292,7 @@ public class CircleFitterStep extends Step {
   @Override
   protected Mark getMark(TrackerPanel trackerPanel) {
     Mark mark = marks.get(trackerPanel);
-    TPoint selection = null;
+    TPoint selection;
     if (mark==null) {
       selection = trackerPanel.getSelectedPoint();
       // assemble screen points array
@@ -362,7 +359,7 @@ public class CircleFitterStep extends Step {
       }
       for (int i=2; i<shapes.length; i++) {
       	if (pointHitShapes.size()<=i-1) {
-      		Map<TrackerPanel, Shape> newMap = new HashMap<TrackerPanel, Shape>();
+      		Map<TrackerPanel, Shape> newMap = new HashMap<>();
       		pointHitShapes.add(newMap);
       	}
       	Map<TrackerPanel, Shape> map = pointHitShapes.get(i-2);
@@ -466,10 +463,6 @@ public class CircleFitterStep extends Step {
   		}
   		else erase();
   	}
-  	
-//  	if (isVisible) {
-//  		circleFitter.refreshFields(n);
-//  	}
   }
   
   /**
@@ -614,10 +607,10 @@ public class CircleFitterStep extends Step {
   public Object clone() {
     CircleFitterStep step = (CircleFitterStep)super.clone();
     if (step != null) {
-      step.points[0] = step.center = step.new CenterPoint(center.x, center.y);
+      step.points[0] = step.center = new CenterPoint(center.x, center.y);
       step.points[1] = step.edge = new TPoint(edge.getX(), edge.getY());
-      step.circleHitShapes = new HashMap<TrackerPanel, Shape>();
-      step.pointHitShapes = new ArrayList<Map<TrackerPanel, Shape>>();
+      step.circleHitShapes = new HashMap<>();
+      step.pointHitShapes = new ArrayList<>();
       step.dataPoints = new DataPoint[2][0];
       step.dataPoints[0] = new DataPoint[dataPoints[0].length];
       for (int i=0; i<dataPoints[0].length; i++) {
@@ -659,9 +652,9 @@ public class CircleFitterStep extends Step {
    * @return a descriptive string
    */
   public String toString() {
-  	String s = ""; //$NON-NLS-1$
+  	StringBuilder s = new StringBuilder(); //$NON-NLS-1$
   	for (int i=0; i<dataPoints[0].length; i++) {
-  		s += "\n"+i+": "+dataPoints[0][i]; //$NON-NLS-1$ //$NON-NLS-2$
+  		s.append("\n").append(i).append(": ").append(dataPoints[0][i]); //$NON-NLS-1$ //$NON-NLS-2$
   	}
     return "CircleFitterStep "+n+" [center ("+center.x+", "+center.y+"), radius "+radius+"]"+s; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
   }
@@ -766,7 +759,7 @@ public class CircleFitterStep extends Step {
 
   }
   
-  class CenterPoint extends TPoint {
+  static class CenterPoint extends TPoint {
   	
     /**
      * Constructs a CenterPoint with specified image coordinates.
@@ -785,8 +778,7 @@ public class CircleFitterStep extends Step {
      * @param y the y coordinate
      */
     public void setXY(double x, double y) {
-      return;
-    }
+	}
 
   }
   
@@ -887,12 +879,10 @@ public class CircleFitterStep extends Step {
   		step.refreshCircle();
     	if (step.circleFitter!=null) {
     		final CircleFitterStep cstep = step;
-    		Runnable runner = new Runnable() {
-    			public void run() {
-        		cstep.circleFitter.dataValid = false;
-        		cstep.circleFitter.firePropertyChange("data", null, null); //$NON-NLS-1$
-    			}
-    		};
+    		Runnable runner = () -> {
+			cstep.circleFitter.dataValid = false;
+			cstep.circleFitter.firePropertyChange("data", null, null); //$NON-NLS-1$
+			};
     		SwingUtilities.invokeLater(runner);
     	}
     	return obj;

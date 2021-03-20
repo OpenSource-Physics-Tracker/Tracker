@@ -24,16 +24,18 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.beans.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
+import org.opensourcephysics.controls.XML;
+import org.opensourcephysics.controls.XMLControl;
+import org.opensourcephysics.display.DatasetManager;
+import org.opensourcephysics.display.DrawingPanel;
+import org.opensourcephysics.display.Interactive;
+import org.opensourcephysics.media.core.TPoint;
 
 import javax.swing.*;
-
-import org.opensourcephysics.display.*;
-import org.opensourcephysics.media.core.*;
-import org.opensourcephysics.controls.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * A CenterOfMass tracks the position, velocity and acceleration
@@ -45,7 +47,7 @@ public class CenterOfMass extends PointMass {
 	
   // instance fields
   protected PointMass[] masses;
-  protected ArrayList<String> massNames = new ArrayList<String>();
+  protected ArrayList<String> massNames = new ArrayList<>();
   protected JMenuItem inspectorItem;
   protected DatasetManager newData;
   protected CenterOfMassInspector inspector;
@@ -78,10 +80,10 @@ public class CenterOfMass extends PointMass {
     defaultFootprint = getFootprint();
     this.masses = masses;
     setColor(defaultColors[0]);
-    for (int i = 0; i < masses.length; i++) {
-      masses[i].addPropertyChangeListener("mass", this); //$NON-NLS-1$
-      masses[i].addPropertyChangeListener("step", this); //$NON-NLS-1$
-      masses[i].addPropertyChangeListener("steps", this); //$NON-NLS-1$
+    for (PointMass pointMass : masses) {
+      pointMass.addPropertyChangeListener("mass", this); //$NON-NLS-1$
+      pointMass.addPropertyChangeListener("step", this); //$NON-NLS-1$
+      pointMass.addPropertyChangeListener("steps", this); //$NON-NLS-1$
     }
     locked = true;
     // set initial hint
@@ -104,10 +106,8 @@ public class CenterOfMass extends PointMass {
       	trackerPanel = ((WorldTView)trackerPanel).getTrackerPanel();
       }
       ArrayList<PointMass> masses = trackerPanel.getDrawables(PointMass.class);
-      Iterator<String> it = massNames.iterator();
-      while (it.hasNext()) {
-        String name = it.next();
-        for (PointMass mass: masses) {
+      for (String name : massNames) {
+        for (PointMass mass : masses) {
           if (mass.getName().equals(name))
             addMass(mass);
         }
@@ -125,8 +125,8 @@ public class CenterOfMass extends PointMass {
   public void addMass(PointMass m) {
     synchronized(masses) {
       // don't add if already present
-      for (int i = 0; i < masses.length; i++) {
-        if (masses[i] == m) return;
+      for (PointMass pointMass : masses) {
+        if (pointMass == m) return;
       }
       PointMass[] newMasses = new PointMass[masses.length + 1];
       System.arraycopy(masses, 0, newMasses, 0, masses.length);
@@ -180,8 +180,8 @@ public class CenterOfMass extends PointMass {
    */
   public boolean containsMass(PointMass m) {
     synchronized(masses) {
-      for (int i = 0; i < masses.length; i++) {
-        if (masses[i] == m) return true;
+      for (PointMass pointMass : masses) {
+        if (pointMass == m) return true;
       }
       return false;
     }
@@ -222,14 +222,16 @@ public class CenterOfMass extends PointMass {
    *
    * @param locked ignored
    */
-  public void setLocked(boolean locked) {/** empty block */}
+  public void setLocked(boolean locked) {
+  }
 
   /**
    * Overrides PointMass setMass method. Mass is determined by masses.
    *
    * @param mass ignored
    */
-  public void setMass(double mass) {/** empty block */}
+  public void setMass(double mass) {
+  }
 
   /**
    * Overrides TTrack isStepComplete method. Always returns true.
@@ -274,14 +276,17 @@ public class CenterOfMass extends PointMass {
         removeMass((PointMass)track);
     }
     if (e.getSource() instanceof PointMass) {
-      if (name.equals("mass")) //$NON-NLS-1$
-        update();
-      else if (name.equals("step")){ //$NON-NLS-1$
-        int n = ((Integer)e.getNewValue()).intValue();
-        update(n, true);
-      }
-      else if (name.equals("steps")){ //$NON-NLS-1$
-        update();
+      switch (name) {
+        case "mass": //$NON-NLS-1$
+          update();
+          break;
+        case "step":  //$NON-NLS-1$
+          int n = (Integer) e.getNewValue();
+          update(n, true);
+          break;
+        case "steps":  //$NON-NLS-1$
+          update();
+          break;
       }
     }
     else super.propertyChange(e);
@@ -310,9 +315,9 @@ public class CenterOfMass extends PointMass {
     // update mass and count steps
     mass = 0;
     int length = getSteps().length;
-    for (int i = 0; i < masses.length; i++) {
-      mass += masses[i].getMass();
-      length = Math.max(length, masses[i].getSteps().length);
+    for (PointMass pointMass : masses) {
+      mass += pointMass.getMass();
+      length = Math.max(length, pointMass.getSteps().length);
     }
     // update steps
     for (int n = 0; n < length; n++)
@@ -346,24 +351,23 @@ public class CenterOfMass extends PointMass {
     }
     double x = 0, y = 0; // cm x and y coordinates in imagespace
     // determine cm step position in imagespace
-    for (int i = 0; i < masses.length; i++) {
-      PositionStep step = (PositionStep)masses[i].getStep(n);
+    for (PointMass pointMass : masses) {
+      PositionStep step = (PositionStep) pointMass.getStep(n);
       if (step == null || !step.valid) {           // if any mass data missing,
         if (getStep(n) != null) {   // delete existing cm step if any
-        	if (firePropertyChange) {
-    	      locked = false;
+          if (firePropertyChange) {
+            locked = false;
             Step deletedStep = deleteStep(n);
             repaint(deletedStep);
-        	}
-        	else {
-            steps.setStep(n, null);    		
-        	}
+          } else {
+            steps.setStep(n, null);
+          }
           locked = true;
         }
         return;
       }
 
-      double m = masses[i].getMass();
+      double m = pointMass.getMass();
       x += m * step.getPosition().getX();
       y += m * step.getPosition().getY();
     }
@@ -408,12 +412,10 @@ public class CenterOfMass extends PointMass {
   public JMenu getMenu(TrackerPanel trackerPanel) {
     // create a cm inspector item
     inspectorItem = new JMenuItem(TrackerRes.getString("CenterOfMass.MenuItem.Inspector")); //$NON-NLS-1$
-    inspectorItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        CenterOfMassInspector inspector = getInspector();
-        inspector.updateDisplay();
-        inspector.setVisible(true);
-      }
+    inspectorItem.addActionListener(e -> {
+      CenterOfMassInspector inspector = getInspector();
+      inspector.updateDisplay();
+      inspector.setVisible(true);
     });
     // assemble the menu
     JMenu menu = super.getMenu(trackerPanel);
@@ -498,10 +500,10 @@ public class CenterOfMass extends PointMass {
     public void saveObject(XMLControl control, Object obj) {
       CenterOfMass cm = (CenterOfMass)obj;
       // save mass names
-      ArrayList<String> list = new ArrayList<String>();
+      ArrayList<String> list = new ArrayList<>();
       PointMass[] masses = cm.getMasses();
-      for (int i = 0; i < masses.length; i++) {
-        list.add(masses[i].getName());
+      for (PointMass pointMass : masses) {
+        list.add(pointMass.getName());
       }
       control.setValue("masses", list); //$NON-NLS-1$
       // save point mass data
@@ -529,10 +531,9 @@ public class CenterOfMass extends PointMass {
       CenterOfMass cm = (CenterOfMass)obj;
       XML.getLoader(PointMass.class).loadObject(control, obj);
       // load mass names
-      Collection<?> names = Collection.class.cast(control.getObject("masses")); //$NON-NLS-1$
-      Iterator<?> it = names.iterator();
-      while (it.hasNext()) {
-        cm.massNames.add((String)it.next());
+      Collection<?> names = (Collection) control.getObject("masses"); //$NON-NLS-1$
+      for (Object o : names) {
+        cm.massNames.add((String) o);
       }
       return obj;
     }

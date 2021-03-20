@@ -48,20 +48,6 @@ public class VectorChain extends ArrayList<VectorStep> {
   }
 
   /**
-   * Constructs a chain.
-   *
-   * @param start the start vector
-   * @param end the end vector
-   */
-  public VectorChain(VectorStep start, VectorStep end) {
-    if (isAllowed(start) && isAllowed(end)) {
-      start.chain = this;
-      super.add(start);
-      add(end);
-    }
-  }
-
-  /**
    * Gets the end of the chain.
    *
    * @return the end vector
@@ -99,34 +85,18 @@ public class VectorChain extends ArrayList<VectorStep> {
    * becomes the tail vector of a new chain.
    *
    * @param vector the vector
-   * @return the new chain, if any
    */
-  public VectorChain breakAt(VectorStep vector) {
-    if (vector.chain != this ||
-        vector == getStart()) {
-      return null;
-    }
+  public void breakAt(VectorStep vector) {
     if (vector == getEnd()) {
       removeEnd();
-      return null;
     }
-    // remove the downstream linked vectors from this chain
-    ArrayList<VectorStep> list = remove(vector);
-    // create a new chain and add the removed vectors
-    VectorChain chain = new VectorChain(vector);
-    for (int i = 1; i < list.size(); i++) {
-      chain.add(list.get(i));
-    }
-    return chain;
   }
 
   /**
    * Overrides ArrayList method.
    */
   public void clear() {
-    Iterator<VectorStep> it = iterator();
-    while (it.hasNext()) {
-      VectorStep link = it.next();
+    for (VectorStep link : this) {
       // detach link and remove reference to this chain
       link.chain = null;
       link.attach(null);
@@ -178,9 +148,8 @@ public class VectorChain extends ArrayList<VectorStep> {
    */
   public boolean addAll(Collection<? extends VectorStep> c) {
     boolean added = false;
-    Iterator<? extends VectorStep> it = c.iterator();
-    while (it.hasNext()) {
-      added = add(it.next()) || added;
+    for (VectorStep vectorStep : c) {
+      added = add(vectorStep) || added;
     }
     return added;
   }
@@ -191,7 +160,8 @@ public class VectorChain extends ArrayList<VectorStep> {
    * @param index the index
    * @param v the vector to add
    */
-  public void add(int index, VectorStep v) {/** empty block */}
+  public void add(int index, VectorStep v) {
+  }
 
   /**
    * Overrides ArrayList method.
@@ -219,7 +189,8 @@ public class VectorChain extends ArrayList<VectorStep> {
    * @param from index
    * @param to index
    */
-  public void removeRange(int from, int to) {/** empty block */}
+  public void removeRange(int from, int to) {
+  }
 
   /**
    * Overrides ArrayList method.
@@ -275,7 +246,7 @@ public class VectorChain extends ArrayList<VectorStep> {
    * @return the list of vectors removed
    */
   protected ArrayList<VectorStep> remove(VectorStep vector) {
-    ArrayList<VectorStep> list = new ArrayList<VectorStep>();
+    ArrayList<VectorStep> list = new ArrayList<>();
     int length = size();
     for (int i = indexOf(vector); i < length; i++) {
       list.add(0, removeEnd());

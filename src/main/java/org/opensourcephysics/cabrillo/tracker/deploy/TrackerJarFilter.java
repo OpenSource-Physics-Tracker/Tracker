@@ -51,18 +51,20 @@ public class TrackerJarFilter implements FilenameFilter {
       String[] intArray = version.split("\\."); //$NON-NLS-1$
       if (intArray.length<=3) {
       	try {
-      		for (int i=0; i<intArray.length; i++) {
-      			Integer.parseInt(intArray[i].trim());
-      		}
+			for (String s : intArray) {
+				Integer.parseInt(s.trim());
+			}
       		return true;
   			} catch (Exception ex) {
-  			}
+			ex.printStackTrace();
+		}
       }
     	try {
 				Double.parseDouble(version);
       	return true;
 			} catch (Exception ex) {
-			}
+			ex.printStackTrace();
+		}
     }
     return false;
   }

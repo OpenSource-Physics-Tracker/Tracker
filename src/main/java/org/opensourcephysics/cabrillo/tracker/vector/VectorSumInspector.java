@@ -73,9 +73,7 @@ public class VectorSumInspector extends JDialog
       }
     }
     // listener for the checkboxes
-    listener = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {updateSum();}
-    };
+    listener = e -> updateSum();
     setTitle(TrackerRes.getString("VectorSumInspector.Title") //$NON-NLS-1$
              + " \"" + sum.getName() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
     setResizable(false);
@@ -112,9 +110,7 @@ public class VectorSumInspector extends JDialog
     checkboxPanel.removeAll();
     if (trackerPanel != null) {
       trackerPanel.removePropertyChangeListener("track", this); //$NON-NLS-1$
-      Iterator<Vector> it = trackerPanel.getDrawables(Vector.class).iterator();
-      while (it.hasNext()) {
-        Vector v = it.next();
+      for (Vector v : trackerPanel.getDrawables(Vector.class)) {
         v.removePropertyChangeListener("name", this); //$NON-NLS-1$
         v.removePropertyChangeListener("color", this); //$NON-NLS-1$
         v.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
@@ -157,9 +153,7 @@ public class VectorSumInspector extends JDialog
              + " \"" + sum.getName() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
     // make checkboxes for all vectors (but not vector sums) in tracker panel
     checkboxPanel.removeAll();
-    Iterator<Vector> it = trackerPanel.getDrawables(Vector.class).iterator();
-    while (it.hasNext()) {
-      Vector v = it.next();
+    for (Vector v : trackerPanel.getDrawables(Vector.class)) {
       v.removePropertyChangeListener("name", this); //$NON-NLS-1$
       v.removePropertyChangeListener("color", this); //$NON-NLS-1$
       v.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
@@ -168,7 +162,7 @@ public class VectorSumInspector extends JDialog
       v.addPropertyChangeListener("footprint", this); //$NON-NLS-1$
       if (v instanceof VectorSum) continue; // don't include other sums
       JCheckBoxMenuItem checkbox = new JCheckBoxMenuItem(
-          v.getName(), v.getFootprint().getIcon(21, 16));
+              v.getName(), v.getFootprint().getIcon(21, 16));
       // check the checkbox and show components if vector is in the sum
       if (sum.contains(v)) {
         checkbox.setSelected(true);
@@ -204,11 +198,7 @@ public class VectorSumInspector extends JDialog
     // create ok button
     okButton = new JButton(TrackerRes.getString("Dialog.Button.OK")); //$NON-NLS-1$
     okButton.setForeground(new Color(0, 0, 102));
-    okButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-      }
-    });
+    okButton.addActionListener(e -> setVisible(false));
     // create buttonbar at bottom
     JPanel buttonbar = new JPanel(new GridLayout(1, 3));
     buttonbar.setBorder(BorderFactory.createEmptyBorder(1, 0, 3, 0));
@@ -226,19 +216,20 @@ public class VectorSumInspector extends JDialog
   private void updateSum() {
     // get the checkbox array
     Component[] checkboxes = checkboxPanel.getComponents();
-    for (int i = 0; i < checkboxes.length; i++) {
-      JCheckBoxMenuItem checkbox = (JCheckBoxMenuItem)checkboxes[i];
+    for (Component component : checkboxes) {
+      JCheckBoxMenuItem checkbox = (JCheckBoxMenuItem) component;
       // get the vector
       Vector v = getVector(checkbox.getActionCommand());
       if (checkbox.isSelected() && !sum.contains(v)) {
         // add and show selected vectors
         sum.addVector(v);
+        assert v != null;
         v.setVisible(true);
       }
       if (!checkbox.isSelected() && sum.contains(v))
         // remove unselected vectors
         sum.removeVector(v);
-     }
+    }
      if (trackerPanel != null) {
        if (trackerPanel.getSelectedTrack() == sum &&
            trackerPanel.getSelectedPoint() != null) {
@@ -258,7 +249,7 @@ public class VectorSumInspector extends JDialog
     if (trackerPanel != null) {
       ArrayList<Vector> tracks = trackerPanel.getDrawables(Vector.class);
       for (Vector v: tracks) {
-        if (v.getName() == name) return v;
+        if (v.getName().equals(name)) return v;
       }
     }
     return null;

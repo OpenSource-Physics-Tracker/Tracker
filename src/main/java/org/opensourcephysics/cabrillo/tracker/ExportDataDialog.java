@@ -24,6 +24,7 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -55,7 +56,10 @@ public class ExportDataDialog extends JDialog {
   protected TrackerPanel trackerPanel;
   protected JButton saveAsButton, closeButton;
   protected JComponent tablePanel, delimiterPanel, contentPanel, formatPanel;
-  protected JComboBox formatDropdown, delimiterDropdown, tableDropdown, contentDropdown;
+  protected JComboBox<String> formatDropdown;
+    protected JComboBox delimiterDropdown;
+    protected JComboBox<String> tableDropdown;
+    protected JComboBox<String> contentDropdown;
   protected HashMap<Object, DataTable> tables;
   protected HashMap<DataTable, String> trackNames;
   protected boolean refreshing;
@@ -107,70 +111,74 @@ public class ExportDataDialog extends JDialog {
     JPanel lower = new JPanel(new GridLayout(1, 2));
     
     // table panel
-    tables = new HashMap<Object, DataTable>();
-    trackNames = new HashMap<DataTable, String>();
+    tables = new HashMap<>();
+    trackNames = new HashMap<>();
     tablePanel = Box.createVerticalBox();
-    tableDropdown = new JComboBox();
+    tableDropdown = new JComboBox<>();
   	tablePanel.add(tableDropdown);
     
     // delimiter panel
     delimiterPanel = new JPanel(new GridLayout(0, 1));
     delimiterDropdown = new JComboBox();
     delimiterPanel.add(delimiterDropdown);
-    delimiterDropdown.addItemListener(new ItemListener() {
-    	public void itemStateChanged(ItemEvent e) {
-    		if (refreshing) return;
-    		if (e.getStateChange()==ItemEvent.SELECTED) {
-    			Object selected = delimiterDropdown.getSelectedItem();
-        	boolean isAdd = selected.equals(
-        			TrackerRes.getString("ExportDataDialog.Delimiter.Add")); //$NON-NLS-1$
-        	boolean isRemove = selected.equals(
-        			TrackerRes.getString("ExportDataDialog.Delimiter.Remove")); //$NON-NLS-1$
-        	String delimiter = TrackerIO.getDelimiter();
-    			if (isAdd) {
-          	Object response = JOptionPane.showInputDialog(ExportDataDialog.this, 
-                TrackerRes.getString("TableTrackView.Dialog.CustomDelimiter.Message"),      //$NON-NLS-1$
-                TrackerRes.getString("TableTrackView.Dialog.CustomDelimiter.Title"),        //$NON-NLS-1$
-                JOptionPane.PLAIN_MESSAGE, null, null, delimiter);
-            if (response!=null && !"".equals(response.toString())) { //$NON-NLS-1$ 
-            	String s = response.toString();
-              TrackerIO.setDelimiter(s);
-              TrackerIO.addCustomDelimiter(s);
-            }    				
-            refreshGUI();
-    			}
-    			else if (isRemove) {
-          	String[] choices = TrackerIO.customDelimiters.values().toArray(new String[1]);
-          	Object response = JOptionPane.showInputDialog(ExportDataDialog.this, 
-                TrackerRes.getString("TableTrackView.Dialog.RemoveDelimiter.Message"),      //$NON-NLS-1$
-                TrackerRes.getString("TableTrackView.Dialog.RemoveDelimiter.Title"),        //$NON-NLS-1$
-                JOptionPane.PLAIN_MESSAGE, null, choices, null);
-            if (response!=null) {
-            	String s = response.toString();
-              TrackerIO.removeCustomDelimiter(s);
+    delimiterDropdown.addItemListener(e -> {
+        if (refreshing) return;
+        if (e.getStateChange()==ItemEvent.SELECTED) {
+            Object selected = delimiterDropdown.getSelectedItem();
+            boolean isAdd = false; //$NON-NLS-1$
+            if (selected != null) {
+                isAdd = selected.equals(
+                        TrackerRes.getString("ExportDataDialog.Delimiter.Add"));
             }
-            refreshGUI();
-    			}
-    			else {
-    				if (TrackerIO.delimiters.keySet().contains(selected))
-    					TrackerIO.setDelimiter(TrackerIO.delimiters.get(selected));
-    				else if (TrackerIO.customDelimiters.keySet().contains(selected))
-    					TrackerIO.setDelimiter(TrackerIO.customDelimiters.get(selected));
-    			}
-    		}
-    	}
+            boolean isRemove = false; //$NON-NLS-1$
+            if (selected != null) {
+                isRemove = selected.equals(
+                    TrackerRes.getString("ExportDataDialog.Delimiter.Remove"));
+            }
+            String delimiter = TrackerIO.getDelimiter();
+            if (isAdd) {
+          Object response = JOptionPane.showInputDialog(ExportDataDialog.this,
+TrackerRes.getString("TableTrackView.Dialog.CustomDelimiter.Message"),      //$NON-NLS-1$
+TrackerRes.getString("TableTrackView.Dialog.CustomDelimiter.Title"),        //$NON-NLS-1$
+JOptionPane.PLAIN_MESSAGE, null, null, delimiter);
+if (response!=null && !"".equals(response.toString())) { //$NON-NLS-1$
+            String s = response.toString();
+TrackerIO.setDelimiter(s);
+TrackerIO.addCustomDelimiter(s);
+}
+refreshGUI();
+            }
+            else if (isRemove) {
+          String[] choices = TrackerIO.customDelimiters.values().toArray(new String[1]);
+          Object response = JOptionPane.showInputDialog(ExportDataDialog.this,
+TrackerRes.getString("TableTrackView.Dialog.RemoveDelimiter.Message"),      //$NON-NLS-1$
+TrackerRes.getString("TableTrackView.Dialog.RemoveDelimiter.Title"),        //$NON-NLS-1$
+JOptionPane.PLAIN_MESSAGE, null, choices, null);
+if (response!=null) {
+            String s = response.toString();
+TrackerIO.removeCustomDelimiter(s);
+}
+refreshGUI();
+            }
+            else {
+                if (TrackerIO.delimiters.containsKey(selected))
+                    TrackerIO.setDelimiter(TrackerIO.delimiters.get(selected));
+                else if (TrackerIO.customDelimiters.containsKey(selected))
+                    TrackerIO.setDelimiter(TrackerIO.customDelimiters.get(selected));
+            }
+        }
     });
     ListCellRenderer renderer = delimiterDropdown.getRenderer();
     delimiterDropdown.setRenderer(new SeparatorRenderer(renderer));
     
     // content panel
     contentPanel = new JPanel(new GridLayout(0, 1));
-    contentDropdown = new JComboBox();
+    contentDropdown = new JComboBox<>();
   	contentPanel.add(contentDropdown);
     
     // format panel
     formatPanel = new JPanel(new GridLayout(0, 1));
-    formatDropdown = new JComboBox();
+    formatDropdown = new JComboBox<>();
     formatPanel.add(formatDropdown);
     
     // assemble 
@@ -184,52 +192,44 @@ public class ExportDataDialog extends JDialog {
     // buttons
     saveAsButton = new JButton();
     saveAsButton.setForeground(new Color(0, 0, 102));
-    saveAsButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	JFileChooser chooser = TrackerIO.getChooser();
-  	    chooser.setAcceptAllFileFilterUsed(true);
-        chooser.setDialogTitle(TrackerRes.getString("ExportDataDialog.Chooser.SaveData.Title")); //$NON-NLS-1$
-        chooser.setSelectedFile(new File(""));  //$NON-NLS-1$
-        File[] files = TrackerIO.getChooserFiles("save"); //$NON-NLS-1$
-        if (files==null || files.length==0)
-        	return;
-      	DataTable table = tables.get(tableDropdown.getSelectedItem());
-      	boolean asFormatted = formatDropdown.getSelectedItem().equals(
-      			TrackerRes.getString("TableTrackView.MenuItem.Formatted")); //$NON-NLS-1$
-      	boolean allCells = contentDropdown.getSelectedItem().equals(
-      			TrackerRes.getString("ExportDataDialog.Content.AllCells")); //$NON-NLS-1$
-        String trackName = trackNames.get(table)+XML.NEW_LINE;
-        trackName = trackName.replace(' ', '_');
-      	if (allCells) {
-      		// get current selection state
-      		int[] selectedRows = table.getSelectedRows();
-      		int[] selectedCols = table.getSelectedColumns();
-      		// select all
-          table.selectAll();
-          // get data and write to output file
-          StringBuffer buf = TrackerIO.getData(table, asFormatted);
-          write(files[0], trackName+buf.toString());
-          // restore previous selection state
-          table.clearSelection();
-          for (int row: selectedRows)
-          	table.addRowSelectionInterval(row, row);
-          for (int col: selectedCols)
-          	table.addColumnSelectionInterval(col, col);
-      	}
-      	else {
-          // get data and write to output file
-      		StringBuffer buf = TrackerIO.getData(table, asFormatted);
-          write(files[0], trackName+buf.toString());
-      	}
-      }
+    saveAsButton.addActionListener(e -> {
+        JFileChooser chooser = TrackerIO.getChooser();
+        chooser.setAcceptAllFileFilterUsed(true);
+      chooser.setDialogTitle(TrackerRes.getString("ExportDataDialog.Chooser.SaveData.Title")); //$NON-NLS-1$
+      chooser.setSelectedFile(new File(""));  //$NON-NLS-1$
+      File[] files = TrackerIO.getChooserFiles("save"); //$NON-NLS-1$
+      if (files==null || files.length==0)
+          return;
+        DataTable table = tables.get(tableDropdown.getSelectedItem());
+        boolean asFormatted = Objects.equals(formatDropdown.getSelectedItem(), TrackerRes.getString("TableTrackView.MenuItem.Formatted")); //$NON-NLS-1$
+        boolean allCells = Objects.equals(contentDropdown.getSelectedItem(), TrackerRes.getString("ExportDataDialog.Content.AllCells")); //$NON-NLS-1$
+      String trackName = trackNames.get(table)+XML.NEW_LINE;
+      trackName = trackName.replace(' ', '_');
+        if (allCells) {
+            // get current selection state
+            int[] selectedRows = table.getSelectedRows();
+            int[] selectedCols = table.getSelectedColumns();
+            // select all
+        table.selectAll();
+        // get data and write to output file
+        StringBuffer buf = TrackerIO.getData(table, asFormatted);
+        write(files[0], trackName+buf.toString());
+        // restore previous selection state
+        table.clearSelection();
+        for (int row: selectedRows)
+            table.addRowSelectionInterval(row, row);
+        for (int col: selectedCols)
+            table.addColumnSelectionInterval(col, col);
+        }
+        else {
+        // get data and write to output file
+            StringBuffer buf = TrackerIO.getData(table, asFormatted);
+        write(files[0], trackName+buf.toString());
+        }
     });
     closeButton = new JButton();
     closeButton.setForeground(new Color(0, 0, 102));
-    closeButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-      }
-    });
+    closeButton.addActionListener(e -> setVisible(false));
     // buttonbar
     JPanel buttonbar = new JPanel();
     contentPane.add(buttonbar, BorderLayout.SOUTH);
@@ -367,7 +367,7 @@ public class ExportDataDialog extends JDialog {
     }
     try {
       FileOutputStream stream = new FileOutputStream(file);
-      java.nio.charset.Charset charset = java.nio.charset.Charset.forName("UTF-8"); //$NON-NLS-1$
+      java.nio.charset.Charset charset = StandardCharsets.UTF_8; //$NON-NLS-1$
       Writer out = new BufferedWriter(new OutputStreamWriter(stream, charset));
       out.write(content);
       out.flush();
@@ -384,7 +384,7 @@ public class ExportDataDialog extends JDialog {
   /**
    * Custom renderer to separator in dropdown list
    */
-  class SeparatorRenderer extends JLabel implements ListCellRenderer {
+  static class SeparatorRenderer extends JLabel implements ListCellRenderer {
   	
   	ListCellRenderer renderer;
 

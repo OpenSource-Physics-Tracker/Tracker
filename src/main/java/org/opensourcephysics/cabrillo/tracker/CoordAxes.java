@@ -24,20 +24,25 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.awt.*;
+import org.opensourcephysics.controls.XML;
+import org.opensourcephysics.controls.XMLControl;
+import org.opensourcephysics.display.DrawingPanel;
+import org.opensourcephysics.display.Interactive;
+import org.opensourcephysics.display.ResizableIcon;
+import org.opensourcephysics.media.core.ImageCoordSystem;
+import org.opensourcephysics.media.core.NumberField;
+import org.opensourcephysics.media.core.TPoint;
+import org.opensourcephysics.tools.FontSizer;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import java.awt.event.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
-import java.util.*;
-
-import org.opensourcephysics.display.*;
-import org.opensourcephysics.media.core.*;
-import org.opensourcephysics.tools.FontSizer;
-import org.opensourcephysics.controls.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A CoordAxes displays and controls the image coordinate system of
@@ -58,18 +63,18 @@ public class CoordAxes extends TTrack {
         formatVariables = new String[]{"pixel", Tracker.THETA}; 
 
         // assemble format map
-        formatMap = new HashMap<String, ArrayList<String>>();
-        ArrayList<String> list = new ArrayList<String>();
+        formatMap = new HashMap<>();
+        ArrayList<String> list = new ArrayList<>();
         list.add(dataVariables[0]);
         list.add(dataVariables[1]);
         formatMap.put(formatVariables[0], list);
 
-        list = new ArrayList<String>();
+        list = new ArrayList<>();
         list.add(dataVariables[2]);
         formatMap.put(formatVariables[1], list);
 
         // assemble format description map
-        formatDescriptionMap = new HashMap<String, String>();
+        formatDescriptionMap = new HashMap<>();
         formatDescriptionMap.put(formatVariables[0], TrackerRes.getString("CoordAxes.Origin.Label")); 
         formatDescriptionMap.put(formatVariables[1], TrackerRes.getString("CoordAxes.Label.Angle")); 
 
@@ -110,23 +115,21 @@ public class CoordAxes extends TTrack {
         step.setFootprint(getFootprint());
         steps.setStep(0, step);
         // configure angle field components
-        angleField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (trackerPanel == null) return;
-                double theta = angleField.getValue();
-                // get the origin and handle of the current step
-                int n = trackerPanel.getFrameNumber();
-                CoordAxesStep step = (CoordAxesStep) CoordAxes.this.getStep(n);
-                TPoint origin = step.getOrigin();
-                TPoint handle = step.getHandle();
-                // move the handle to the new angle at same distance from origin
-                double d = origin.distance(handle);
-                double x = origin.getX() + d * Math.cos(theta);
-                double y = origin.getY() - d * Math.sin(theta);
-                handle.setXY(x, y);
-                angleField.setValue(trackerPanel.getCoords().getAngle(n));
-                angleField.requestFocusInWindow();
-            }
+        angleField.addActionListener(e -> {
+            if (trackerPanel == null) return;
+            double theta = angleField.getValue();
+            // get the origin and handle of the current step
+            int n = trackerPanel.getFrameNumber();
+            CoordAxesStep step1 = (CoordAxesStep) CoordAxes.this.getStep(n);
+            TPoint origin = step1.getOrigin();
+            TPoint handle = step1.getHandle();
+            // move the handle to the new angle at same distance from origin
+            double d = origin.distance(handle);
+            double x = origin.getX() + d * Math.cos(theta);
+            double y = origin.getY() - d * Math.sin(theta);
+            handle.setXY(x, y);
+            angleField.setValue(trackerPanel.getCoords().getAngle(n));
+            angleField.requestFocusInWindow();
         });
         angleField.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
@@ -164,9 +167,6 @@ public class CoordAxes extends TTrack {
                 }
             }
         };
-        // configure x and y origin field components
-//    xField = new DecimalField(5, 2);
-//    yField = new DecimalField(5, 2);
 
         xField.addActionListener(setOriginAction);
         yField.addActionListener(setOriginAction);
@@ -189,11 +189,7 @@ public class CoordAxes extends TTrack {
         gridCheckbox = new JCheckBox();
         gridCheckbox.setBorder(BorderFactory.createEmptyBorder());
         gridCheckbox.setOpaque(false);
-        gridCheckbox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setGridVisible(gridCheckbox.isSelected());
-            }
-        });
+        gridCheckbox.addActionListener(e -> setGridVisible(gridCheckbox.isSelected()));
 
         gridButton = new TButton(gridOptionsIcon) {
 
@@ -207,55 +203,49 @@ public class CoordAxes extends TTrack {
             protected JPopupMenu getPopup() {
                 JPopupMenu popup = new JPopupMenu();
                 JMenuItem colorItem = new JMenuItem(TrackerRes.getString("CoordAxes.MenuItem.GridColor")); 
-                colorItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        // show the grid if not visible
-                        if (!grid.isVisible()) {
-                            gridCheckbox.doClick(0);
-                        }
+                colorItem.addActionListener(e -> {
+                    // show the grid if not visible
+                    if (!grid.isVisible()) {
+                        gridCheckbox.doClick(0);
+                    }
 
-                        Color color = grid.getColor();
-                        Color newColor = chooseColor(color, TrackerRes.getString("CoordAxes.Dialog.GridColor.Title")); 
-                        if (newColor != color) {
-                            grid.setColor(newColor);
-                            for (TrackerPanel next : panels) {
-                                next.repaint();
-                            }
+                    Color color = grid.getColor();
+                    Color newColor = chooseColor(color, TrackerRes.getString("CoordAxes.Dialog.GridColor.Title"));
+                    if (newColor != color) {
+                        grid.setColor(newColor);
+                        for (TrackerPanel next : panels) {
+                            next.repaint();
                         }
                     }
                 });
                 popup.add(colorItem);
                 JMenuItem transparencyItem = new JMenuItem(TrackerRes.getString("CoordAxes.MenuItem.GridOpacity")); 
-                transparencyItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        // show the grid if not visible
-                        if (!grid.isVisible()) {
-                            gridCheckbox.doClick(0);
+                transparencyItem.addActionListener(e -> {
+                    // show the grid if not visible
+                    if (!grid.isVisible()) {
+                        gridCheckbox.doClick(0);
+                    }
+
+                    // show a dialog with a transparency slider
+                    int alpha = grid.getAlpha();
+                    final JSlider slider = new JSlider(0, 255, alpha);
+                    slider.setMaximum(255);
+                    slider.setMinimum(0);
+                    slider.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+                    slider.addChangeListener(e1 -> {
+                        grid.setAlpha(slider.getValue());
+                        for (TrackerPanel next : panels) {
+                            next.repaint();
                         }
+                    });
 
-                        // show a dialog with a transparency slider
-                        int alpha = grid.getAlpha();
-                        final JSlider slider = new JSlider(0, 255, alpha);
-                        slider.setMaximum(255);
-                        slider.setMinimum(0);
-                        slider.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
-                        slider.addChangeListener(new ChangeListener() {
-                            public void stateChanged(ChangeEvent e) {
-                                grid.setAlpha(slider.getValue());
-                                for (TrackerPanel next : panels) {
-                                    next.repaint();
-                                }
-                            }
-                        });
-
-                        int response = JOptionPane.showConfirmDialog(trackerPanel, slider,
-                                TrackerRes.getString("CoordAxes.Dialog.GridOpacity.Title"),  
-                                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-                        if (response == JOptionPane.CANCEL_OPTION) {
-                            grid.setAlpha(alpha);
-                            for (TrackerPanel next : panels) {
-                                next.repaint();
-                            }
+                    int response = JOptionPane.showConfirmDialog(trackerPanel, slider,
+                            TrackerRes.getString("CoordAxes.Dialog.GridOpacity.Title"),
+                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                    if (response == JOptionPane.CANCEL_OPTION) {
+                        grid.setAlpha(alpha);
+                        for (TrackerPanel next : panels) {
+                            next.repaint();
                         }
                     }
                 });
@@ -324,7 +314,8 @@ public class CoordAxes extends TTrack {
      *
      * @param visible ignored
      */
-    public void setTrailVisible(boolean visible) {/** empty block */}
+    public void setTrailVisible(boolean visible) {
+    }
 
     /**
      * Mimics step creation by setting the origin position.
@@ -339,7 +330,7 @@ public class CoordAxes extends TTrack {
         Step step = getStep(0);
         if (trackerPanel.getSelectedPoint() instanceof CoordAxesStep.Handle) {
             ((CoordAxesStep) step).getHandle().setXY(x, y);
-            ;
+
         } else ((CoordAxesStep) step).getOrigin().setXY(x, y);
         return step;
     }
