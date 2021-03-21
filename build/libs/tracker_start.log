@@ -1,0 +1,18 @@
+TrackerStarter version 5.2.0.0  00:56:49  мар. 18 2021
+
+ - relaunch initiated by Tracker
+ - TrackerStarter runnning in jre: /usr/lib/jvm/java-11-openjdk-amd64
+ - launching with main arguments: null
+ - osp.prefs FFMPEG_HOME: /usr/share/java/ffmpeg
+ - using ffmpegHome: /usr/share/java/ffmpeg
+ - loading starter preferences from: /home/arthur/.config/OSP/.tracker.prefs
+ - system property PREFERRED_TRACKER_JAR = /home/arthur/IdeaProjects/Tracker/build/libs/Tracker-1.0-SNAPSHOT.jar
+ - preferred version: 1.0-SNAPSHOT
+ - no preferred or bundled java VM, using default
+ - system property PREFERRED_MEMORY_SIZE = 256
+ - preferred memory size: 256 MB
+ - setting TRACKER_HOME = /home/arthur/IdeaProjects/Tracker/build/libs
+ - setting FFMPEG_HOME = /usr/share/java/ffmpeg
+ - executing command: /usr/lib/jvm/java-11-openjdk-amd64/bin/java -Xms32m -Xmx256m -jar /home/arthur/IdeaProjects/Tracker/build/libs/Tracker-1.0-SNAPSHOT.jar 
+ - writing start log to /home/arthur/IdeaProjects/Tracker/build/libs/tracker_start.log
+ - writing start log to /home/arthur/IdeaProjects/Tracker/build/libs/tracker_start.log
