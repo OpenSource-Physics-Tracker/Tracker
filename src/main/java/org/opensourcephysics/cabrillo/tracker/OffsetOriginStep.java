@@ -38,7 +38,7 @@ import org.opensourcephysics.tools.FontSizer;
 public class OffsetOriginStep extends Step {
 
   // instance fields
-  private OffsetOrigin offset;
+  private final OffsetOrigin offset;
   private Position p;
   protected double worldX, worldY;
 
@@ -112,7 +112,7 @@ public class OffsetOriginStep extends Step {
    */
   protected Mark getMark(TrackerPanel trackerPanel) {
     Mark mark = marks.get(trackerPanel);
-    TPoint selection = null;
+    TPoint selection;
     if (mark == null) {
       ImageCoordSystem coords = trackerPanel.getCoords();
       int n = trackerPanel.getFrameNumber();

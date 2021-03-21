@@ -48,26 +48,25 @@ import org.opensourcephysics.tools.FontSizer;
 public class CircleFitterFootprint implements Footprint, Cloneable {
 
 	// static constants
-  @SuppressWarnings("javadoc")
-  private static BasicStroke hitStroke = new BasicStroke(4);
+  private static final BasicStroke hitStroke = new BasicStroke(4);
   private static final CircleFitterFootprint CIRCLE_4, CIRCLE_7, 
   		CIRCLE_4_BOLD, CIRCLE_7_BOLD, CIRCLE_4_POINTS_ONLY;
   protected static final int MAX_RADIUS = 100000;
 
 	// static fields
-  private static Collection<CircleFitterFootprint> footprints 
-			= new HashSet<CircleFitterFootprint>();
-  private static Shape hitShape = new Ellipse2D.Double(-6, -6, 12, 12);
-  private static Shape emptyHitShape = new Rectangle();
-  private static Line2D line = new Line2D.Double();
-  private static AffineTransform transform = new AffineTransform();
-  private static Arc2D.Float iconArc = new Arc2D.Float(); 
+  private static final Collection<CircleFitterFootprint> footprints
+			= new HashSet<>();
+  private static final Shape hitShape = new Ellipse2D.Double(-6, -6, 12, 12);
+  private static final Shape emptyHitShape = new Rectangle();
+  private static final Line2D line = new Line2D.Double();
+  private static final AffineTransform transform = new AffineTransform();
+  private static final Arc2D.Float iconArc = new Arc2D.Float();
 
   // instance fields
   protected String name;
   protected BasicStroke baseStroke, stroke;
   protected Color color = Color.black;
-  protected ArrayList<Shape> hitShapes = new ArrayList<Shape>();
+  protected ArrayList<Shape> hitShapes = new ArrayList<>();
 	protected Ellipse2D circle;
 	protected double radius;
 	protected Shape marker;
@@ -185,7 +184,7 @@ public class CircleFitterFootprint implements Footprint, Cloneable {
    * @return the hit shapes
    */
   public Shape[] getHitShapes() {
-    return hitShapes.toArray(new Shape[hitShapes.size()]);
+    return hitShapes.toArray(new Shape[0]);
   }
 
   /**
@@ -242,10 +241,9 @@ public class CircleFitterFootprint implements Footprint, Cloneable {
   /**
    * Sets the visibility of the circle.
    *
-   * @param vis true to draw the circle
    */
-  protected void setCircleVisible(boolean vis) {
-  	drawCircle = vis;
+  protected void setCircleVisible() {
+  	drawCircle = false;
   }
 
   /**
@@ -359,7 +357,7 @@ public class CircleFitterFootprint implements Footprint, Cloneable {
    */
   public static Footprint getFootprint(String name) {
     for (CircleFitterFootprint footprint: footprints) {
-      if (name == footprint.getName()) try {
+      if (name.equals(footprint.getName())) try {
         return (CircleFitterFootprint)footprint.clone();
       } catch(CloneNotSupportedException ex) {ex.printStackTrace();}
     }
@@ -381,7 +379,7 @@ public class CircleFitterFootprint implements Footprint, Cloneable {
     
     CIRCLE_4_POINTS_ONLY = new CircleFitterFootprint("CircleFitterFootprint.Circle4.PointsOnly", 4); //$NON-NLS-1$
     CIRCLE_4_POINTS_ONLY.setStroke(stroke);
-    CIRCLE_4_POINTS_ONLY.setCircleVisible(false);
+    CIRCLE_4_POINTS_ONLY.setCircleVisible();
     footprints.add(CIRCLE_4_POINTS_ONLY);
 
   	stroke = new BasicStroke(2);

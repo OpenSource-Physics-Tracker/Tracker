@@ -43,7 +43,7 @@ public class UnitsDialog extends JDialog {
   static TFrame frame;
 
   // instance fields
-  private TrackerPanel trackerPanel;
+  private final TrackerPanel trackerPanel;
   private JLabel lengthLabel, massLabel, timeLabel;
   private ArrayList<JLabel> labels;
   private JButton closeButton;
@@ -84,7 +84,7 @@ public class UnitsDialog extends JDialog {
   	timeLabel = new JLabel();
   	timeLabel.setBorder(BorderFactory.createEmptyBorder(0,4,0,0));
   	timeLabel.setHorizontalAlignment(SwingConstants.TRAILING);
-  	labels = new ArrayList<JLabel>();
+  	labels = new ArrayList<>();
     labels.add(lengthLabel);
     labels.add(massLabel);
     labels.add(timeLabel);
@@ -126,11 +126,7 @@ public class UnitsDialog extends JDialog {
     
     // close button
     closeButton = new JButton();
-    closeButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-      }
-    });
+    closeButton.addActionListener(e -> setVisible(false));
     
     // titled borders
     unitsBorder = BorderFactory.createTitledBorder(""); //$NON-NLS-1$

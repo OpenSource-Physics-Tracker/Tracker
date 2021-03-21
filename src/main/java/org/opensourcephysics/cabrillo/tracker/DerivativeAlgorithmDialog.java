@@ -44,11 +44,10 @@ import java.util.ArrayList;
 public class DerivativeAlgorithmDialog extends JDialog {
 	
   protected TrackerPanel trackerPanel;
-  protected ArrayList<PointMass> targetMasses = new ArrayList<PointMass>();
+  protected ArrayList<PointMass> targetMasses = new ArrayList<>();
 	protected JButton okButton, cancelButton;
 	JTextPane textPane;
 	int[] types = new int[] {PointMass.FINITE_DIFF, PointMass.BOUNCE_DETECT};
-//	int[] types = new int[] {PointMass.FINITE_DIFF, PointMass.FINITE_DIFF_VSPILL2, PointMass.BOUNCE_DETECT};
   JRadioButton[] buttons = new JRadioButton[types.length];
   TitledBorder choiceBorder;
   int prevAlgorithm;
@@ -125,19 +124,13 @@ public class DerivativeAlgorithmDialog extends JDialog {
     // create OK button
     okButton = new JButton();
     okButton.setForeground(new Color(0, 0, 102));
-    okButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-      }
-    });
+    okButton.addActionListener(e -> setVisible(false));
     // create cancel button
     cancelButton = new JButton();
     cancelButton.setForeground(new Color(0, 0, 102));
-    cancelButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	revert();
-        setVisible(false);
-      }
+    cancelButton.addActionListener(e -> {
+        revert();
+      setVisible(false);
     });
     // create buttonbar at bottom
     JPanel buttonbar = new JPanel();

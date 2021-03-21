@@ -1,8 +1,6 @@
 package org.opensourcephysics.cabrillo.tracker;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,30 +9,25 @@ import java.awt.event.ActionListener;
  * A dialog to specify parameters of moving average filter
  */
 public class MovingAverageDialog extends JDialog {
-	private JButton buttonOK, buttonCancel;
-	private TallSpinner stepSpinner;
-	private JLabel stepSpinnerLabel;
+	private final TallSpinner stepSpinner;
 
 	public boolean decided = false;
 	public int result = 1;
-	private TTrack targetTrack;
-	private TrackerPanel trackerPanel;
+	private final TTrack targetTrack;
 
 	public MovingAverageDialog(TrackerPanel tp, TTrack track) {
 		super(JOptionPane.getFrameForComponent(tp), true);
 
-		trackerPanel = tp;
 		targetTrack = track;
 
 
 		JPanel contentPane = new JPanel();
 
-		stepSpinnerLabel = new JLabel(TrackerRes.getString("MovingAverageDialog.PointsToAverage"));
+		JLabel stepSpinnerLabel = new JLabel(TrackerRes.getString("MovingAverageDialog.PointsToAverage"));
 		//stepSpinnerLabel.setText("Points to average:");
 
 
-
-		buttonOK = new JButton(TrackerRes.getString("MovingAverageDialog.OK"));
+		JButton buttonOK = new JButton(TrackerRes.getString("MovingAverageDialog.OK"));
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				result = (Integer) stepSpinner.getValue();
@@ -45,12 +38,8 @@ public class MovingAverageDialog extends JDialog {
 			}
 		});
 
-		buttonCancel = new JButton(TrackerRes.getString("MovingAverageDialog.Cancel"));
-		buttonCancel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				setVisible(false);
-			}
-		});
+		JButton buttonCancel = new JButton(TrackerRes.getString("MovingAverageDialog.Cancel"));
+		buttonCancel.addActionListener(event -> setVisible(false));
 		stepSpinner = new TallSpinner(
 				new SpinnerNumberModel(2, 1, 100, 1),
 				buttonOK

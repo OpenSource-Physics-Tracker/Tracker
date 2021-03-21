@@ -57,8 +57,7 @@ import org.opensourcephysics.media.core.VideoFileFilter;
 public class FileDropHandler extends TransferHandler {
 	
   static final String URI_LIST_MIME_TYPE = "text/uri-list;class=java.lang.String"; //$NON-NLS-1$
-	
-  static FileFilter dataFilter = TrackerIO.trkFileFilter;
+
 	static FileFilter videoFilter = new VideoFileFilter();
 	static FileFilter[] imageFilters = new ImageVideoType().getFileFilters();
 	
@@ -92,7 +91,8 @@ public class FileDropHandler extends TransferHandler {
 	  			dropComponent = support.getComponent();
 	  			dropComponent.getDropTarget().addDropTargetListener(dropListener);
 				} catch (Exception ex) {
-				} 
+				ex.printStackTrace();
+			}
 	  	}
   		boolean isImport = false;
 	  	if (dropList!=null && dropComponent instanceof TrackerPanel) {
@@ -133,49 +133,46 @@ public class FileDropHandler extends TransferHandler {
 		  	}
 			}
 		  // load the files
-		  for (int j = 0; j < fileList.size(); j++) {
-		  	final File file = (File)fileList.get(j);
-		  	OSPLog.finest("dropped file: "+file.getAbsolutePath()); //$NON-NLS-1$
-		  	// if dropAction is COPY then open in new tab
-		  	if (support.getDropAction()==TransferHandler.COPY) {
-		      TrackerIO.open(file, frame);
-		  	}
-		  	// if targetPanel has image video and file is image, add after current frame
-		  	else if (targetPanel != null 
-		  			&& targetPanel.getVideo() instanceof ImageVideo 
-		  			&& isImageFile(file)) {
-		  		File[] added = TrackerIO.insertImagesIntoVideo(
-		  				new File[] {file}, targetPanel, frameNumber+1);
-		  		frameNumber += added.length;
-		  	}      		
-		  	// if targetPanel not null and file is video then import
-		  	else if (targetPanel != null && videoFilter.accept(file)) {
-		      // open in separate background thread
-		  		final TFrame frame = targetPanel.getTFrame();
-		  		final int n = frame.getTab(targetPanel);
-		      Runnable runner = new Runnable() {
-		      	public void run() {
-		      		TrackerPanel trackerPanel = frame.getTrackerPanel(n);
-		        	TrackerIO.importVideo(file, trackerPanel, null);            
-		        }
-		      };
-		      if (TrackerIO.loadInSeparateThread) {
-		        Thread opener = new Thread(runner);
-		        opener.setPriority(Thread.NORM_PRIORITY);
-		        opener.setDaemon(true);
-		        opener.start(); 
-		      }
-		      else runner.run();
-		  	}
-		  	// else inform user that file is not acceptable
-		  	else {
-					JOptionPane.showMessageDialog(frame, 
-		  				"\""+file.getName()+"\" "  //$NON-NLS-1$ //$NON-NLS-2$
-		  				+ TrackerRes.getString("FileDropHandler.Dialog.BadFile.Message"), //$NON-NLS-1$
-		  				TrackerRes.getString("FileDropHandler.Dialog.BadFile.Title"),  //$NON-NLS-1$
-		  				JOptionPane.WARNING_MESSAGE);
-		  	}
-		  }
+		for (Object o : fileList) {
+			final File file = (File) o;
+			OSPLog.finest("dropped file: " + file.getAbsolutePath()); //$NON-NLS-1$
+			// if dropAction is COPY then open in new tab
+			if (support.getDropAction() == TransferHandler.COPY) {
+				TrackerIO.open(file, frame);
+			}
+			// if targetPanel has image video and file is image, add after current frame
+			else if (targetPanel != null
+					&& targetPanel.getVideo() instanceof ImageVideo
+					&& isImageFile(file)) {
+				File[] added = TrackerIO.insertImagesIntoVideo(
+						new File[]{file}, targetPanel, frameNumber + 1);
+				frameNumber += added.length;
+			}
+			// if targetPanel not null and file is video then import
+			else if (targetPanel != null && videoFilter.accept(file)) {
+				// open in separate background thread
+				final TFrame frame = targetPanel.getTFrame();
+				final int n = frame.getTab(targetPanel);
+				Runnable runner = () -> {
+					TrackerPanel trackerPanel = frame.getTrackerPanel(n);
+					TrackerIO.importVideo(file, trackerPanel, null);
+				};
+				if (TrackerIO.loadInSeparateThread) {
+					Thread opener = new Thread(runner);
+					opener.setPriority(Thread.NORM_PRIORITY);
+					opener.setDaemon(true);
+					opener.start();
+				} else runner.run();
+			}
+			// else inform user that file is not acceptable
+			else {
+				JOptionPane.showMessageDialog(frame,
+						"\"" + file.getName() + "\" "  //$NON-NLS-1$ //$NON-NLS-2$
+								+ TrackerRes.getString("FileDropHandler.Dialog.BadFile.Message"), //$NON-NLS-1$
+						TrackerRes.getString("FileDropHandler.Dialog.BadFile.Title"),  //$NON-NLS-1$
+						JOptionPane.WARNING_MESSAGE);
+			}
+		}
 		} catch (Exception e) {
 			frame.setCursor(Cursor.getDefaultCursor());
 		  return false;
@@ -200,10 +197,11 @@ public class FileDropHandler extends TransferHandler {
     	}
     	else {
         Object data = t.getTransferData(DataFlavor.javaFileListFlavor);
-        fileList = List.class.cast(data);
+        fileList = (List) data;
     	}
     } catch (Exception ex) {
-    }
+		ex.printStackTrace();
+	}
   	return fileList;
   }
 
@@ -213,9 +211,9 @@ public class FileDropHandler extends TransferHandler {
 	 * @return true if an image
 	 */
   private boolean isImageFile(File file) {
-		for (int i = 0; i < imageFilters.length; i++) {
-			if (imageFilters[i].accept(file)) return true;
-		}
+	  for (FileFilter imageFilter : imageFilters) {
+		  if (imageFilter.accept(file)) return true;
+	  }
   	return false;
   }
   
@@ -225,23 +223,23 @@ public class FileDropHandler extends TransferHandler {
 	 * @return a List of files
 	 */
   private static List<File> uriListToFileList(String data) {
-    List<File> list = new ArrayList<File>();
+    List<File> list = new ArrayList<>();
     StringTokenizer st = new StringTokenizer(data, "\r\n"); //$NON-NLS-1$
-    for (; st.hasMoreTokens();) {
-      String s = st.nextToken();
-      if (s.startsWith("#")) { //$NON-NLS-1$
-        // skip comments
-        continue;
-      }
-      try {
-        URI uri = new URI(s);
-        File file = new File(uri);
-        list.add(file);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    return list;
+	  while (st.hasMoreTokens()) {
+		String s = st.nextToken();
+		if (s.startsWith("#")) { //$NON-NLS-1$
+		  // skip comments
+		  continue;
+		}
+		try {
+		  URI uri = new URI(s);
+		  File file = new File(uri);
+		  list.add(file);
+		} catch (Exception e) {
+		  e.printStackTrace();
+		}
+	  }
+	  return list;
   }
   
 	/**

@@ -41,56 +41,56 @@ public interface TView extends PropertyChangeListener {
   /**
    * Initializes the view
    */
-  public void init();
+  void init();
 
   /**
    * Refreshes the view
    */
-  public void refresh();
+  void refresh();
 
   /**
    * Cleans up the view
    */
-  public void cleanup();
+  void cleanup();
 
   /**
    * Disposes of the view
    */
-  public void dispose();
+  void dispose();
 
   /**
    * Gets the TrackerPanel containing the track data
    *
    * @return the tracker panel containing the data to be viewed
    */
-  public TrackerPanel getTrackerPanel();
+  TrackerPanel getTrackerPanel();
 
   /**
    * Gets the name of the view
    *
    * @return the name of the view
    */
-  public String getViewName();
+  String getViewName();
 
   /**
    * Gets the icon for this view
    *
    * @return the icon for the view
    */
-  public Icon getViewIcon();
+  Icon getViewIcon();
 
   /**
    * Gets the toolbar components for this view
    *
    * @return an ArrayList of components to be added to a toolbar
    */
-  public ArrayList<Component> getToolBarComponents();
+  ArrayList<Component> getToolBarComponents();
 
   /**
    * Returns true if this view is in a custom state.
    *
    * @return true if in a custom state, false if in the default state
    */
-  public boolean isCustomState();
+  boolean isCustomState();
 
 }

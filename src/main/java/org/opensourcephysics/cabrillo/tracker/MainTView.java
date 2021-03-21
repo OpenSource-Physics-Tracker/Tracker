@@ -49,9 +49,9 @@ public class MainTView extends JPanel implements TView {
   private TrackerPanel trackerPanel;
   public JScrollPane scrollPane;
   Rectangle scrollRect = new Rectangle();
-  private Point zoomCenter = new Point();
+  private final Point zoomCenter = new Point();
   private JToolBar playerBar;
-  private MouseAdapter mouseAdapter;
+  private final MouseAdapter mouseAdapter;
   KeyAdapter keyAdapter;
 
   /**
@@ -242,12 +242,11 @@ public class MainTView extends JPanel implements TView {
       TPoint p = (TPoint)iad;
       TTrack track = null;
       Step step = null;
-      Iterator<TTrack> it = trackerPanel.getTracks().iterator();
-      while(it.hasNext()) {
-        track = it.next();
-        step = track.getStep(p, trackerPanel);
-        if (step != null) break;
-      }
+		for (TTrack tTrack : trackerPanel.getTracks()) {
+			track = tTrack;
+			step = track.getStep(p, trackerPanel);
+			if (step != null) break;
+		}
       if (step != null) { // found clicked track
       	trackClicked = true;
         Step prev = trackerPanel.selectedStep;
@@ -281,45 +280,27 @@ public class MainTView extends JPanel implements TView {
       // add zoom menus
       JMenuItem item = new JMenuItem(TrackerRes.getString("MainTView.Popup.MenuItem.ZoomIn")); //$NON-NLS-1$
       popup.add(item);
-      item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-        	zoomIn(false);
-        }
-      });
+      item.addActionListener(e -> zoomIn(false));
       item = new JMenuItem(TrackerRes.getString("MainTView.Popup.MenuItem.ZoomOut")); //$NON-NLS-1$
       popup.add(item);
-      item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-        	zoomOut(false);
-        }
-      });
+      item.addActionListener(e -> zoomOut(false));
       item = new JMenuItem(TrackerRes.getString("MainTView.Popup.MenuItem.ZoomToFit")); //$NON-NLS-1$
       popup.add(item);
-      item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-        	trackerPanel.setMagnification(-1);
-      		TToolBar toolbar = TToolBar.getToolbar(trackerPanel);
-      		toolbar.refreshZoomButton();
-        }
-      });
+      item.addActionListener(e -> {
+		  trackerPanel.setMagnification(-1);
+			TToolBar toolbar = TToolBar.getToolbar(trackerPanel);
+			toolbar.refreshZoomButton();
+	  });
       
       // selection items
     	DrawingPanel.ZoomBox zoomBox = trackerPanel.getZoomBox();
     	if (zoomBox.isDragged() && isStepsInZoomBox()) {
 	      popup.addSeparator();
 	      item = new JMenuItem(TrackerRes.getString("MainTView.Popup.MenuItem.Select"));  //$NON-NLS-1$
-	      item.addActionListener(new ActionListener() {
-	        public void actionPerformed(ActionEvent e) {
-	        	handleStepsInZoomBox(true);
-	        }
-	      });
+	      item.addActionListener(e -> handleStepsInZoomBox(true));
 	      popup.add(item);     
 	      item = new JMenuItem(TrackerRes.getString("MainTView.Popup.MenuItem.Deselect"));  //$NON-NLS-1$ 
-	      item.addActionListener(new ActionListener() {
-	        public void actionPerformed(ActionEvent e) {
-	        	handleStepsInZoomBox(false);
-	        }
-	      });
+	      item.addActionListener(e -> handleStepsInZoomBox(false));
 	      popup.add(item); 
     	}
     		
@@ -328,32 +309,30 @@ public class MainTView extends JPanel implements TView {
 	      if (popup.getComponentCount() > 0)
 	        popup.addSeparator();
 	      item = new JMenuItem(MediaRes.getString("ClipInspector.Title")+"...");  //$NON-NLS-1$ //$NON-NLS-2$ 
-	      item.addActionListener(new ActionListener() {
-	        public void actionPerformed(ActionEvent e) {
-	        	VideoClip clip = trackerPanel.getPlayer().getVideoClip();
-	        	ClipControl clipControl = trackerPanel.getPlayer().getClipControl();
-	          TFrame frame = trackerPanel.getTFrame();
-	          ClipInspector inspector = clip.getClipInspector(clipControl, frame);
-	          if(inspector.isVisible()) {
-	            return;
-	          }
-	          FontSizer.setFonts(inspector, FontSizer.getLevel());	          
-	          inspector.pack();
-	          Point p0 = new Frame().getLocation();
-	          Point loc = inspector.getLocation();
-	          if((loc.x==p0.x)&&(loc.y==p0.y)) {
-	            // center inspector on the main view
-	          	Rectangle rect = trackerPanel.getVisibleRect();
-	            Point p = frame.getMainView(trackerPanel).scrollPane.getLocationOnScreen();
-	            int x = p.x+(rect.width-inspector.getBounds().width)/2;
-	            int y = p.y+(rect.height-inspector.getBounds().height)/2;
-	            inspector.setLocation(x, y);
-	          }
-	          inspector.initialize();
-	          inspector.setVisible(true);
-	          refresh();
-	        }
-	      });
+	      item.addActionListener(e -> {
+			  VideoClip clip = trackerPanel.getPlayer().getVideoClip();
+			  ClipControl clipControl = trackerPanel.getPlayer().getClipControl();
+			TFrame frame = trackerPanel.getTFrame();
+			ClipInspector inspector = clip.getClipInspector(clipControl, frame);
+			if(inspector.isVisible()) {
+			  return;
+			}
+			FontSizer.setFonts(inspector, FontSizer.getLevel());
+			inspector.pack();
+			Point p0 = new Frame().getLocation();
+			Point loc = inspector.getLocation();
+			if((loc.x==p0.x)&&(loc.y==p0.y)) {
+			  // center inspector on the main view
+				Rectangle rect = trackerPanel.getVisibleRect();
+			  Point p = frame.getMainView(trackerPanel).scrollPane.getLocationOnScreen();
+			  int x = p.x+(rect.width-inspector.getBounds().width)/2;
+			  int y = p.y+(rect.height-inspector.getBounds().height)/2;
+			  inspector.setLocation(x, y);
+			}
+			inspector.initialize();
+			inspector.setVisible(true);
+			refresh();
+		  });
 	      popup.add(item);
       }
       if (trackerPanel.isEnabled("edit.copyImage")) { //$NON-NLS-1$
@@ -406,17 +385,16 @@ public class MainTView extends JPanel implements TView {
       		&& trackerPanel.isEnabled("new.clone")) //$NON-NLS-1$
       	tracksMenu.add(menubar.cloneMenu);
       // get list of tracks for track menus
-      TTrack track = null;
+      TTrack track;
       CoordAxes axes = trackerPanel.getAxes();
       ArrayList<TTrack> tracks = trackerPanel.getUserTracks();
       // add track items
       if (!tracks.isEmpty()) {
         if (tracksMenu.getItemCount() > 0)
           tracksMenu.addSeparator();
-        Iterator<TTrack> it = tracks.iterator();
-        while (it.hasNext()) {
-          tracksMenu.add(menubar.getMenu(it.next()));
-        }
+		  for (TTrack tTrack : tracks) {
+			  tracksMenu.add(menubar.getMenu(tTrack));
+		  }
       }
       // add axes and calibration tool items
       if (trackerPanel.isEnabled("button.axes") //$NON-NLS-1$
@@ -476,14 +454,12 @@ public class MainTView extends JPanel implements TView {
       if (popup.getComponentCount() > 0)
         popup.addSeparator();
       JMenuItem helpItem = new JMenuItem(TrackerRes.getString("Tracker.Popup.MenuItem.Help")); //$NON-NLS-1$
-      helpItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          TFrame frame = trackerPanel.getTFrame();
-          if (frame != null) {
-  	        frame.showHelp("GUI", 0); //$NON-NLS-1$
-          }
-        }
-      });
+      helpItem.addActionListener(e -> {
+		TFrame frame = trackerPanel.getTFrame();
+		if (frame != null) {
+			frame.showHelp("GUI", 0); //$NON-NLS-1$
+		}
+	  });
       popup.add(helpItem);
     }
     FontSizer.setFonts(popup, FontSizer.getLevel());
@@ -493,8 +469,8 @@ public class MainTView extends JPanel implements TView {
   /**
    * Sets the position of the zoom center point in image coordinates.
    *
-   * @param x
-   * @param y
+   * @param x - x
+   * @param y - y
    */
   public void setZoomCenter(int x, int y) {
   	zoomCenter.setLocation(x, y);
@@ -523,16 +499,14 @@ public class MainTView extends JPanel implements TView {
     rect.setLocation((int)x, (int)y);
 		scrollRect.setBounds(rect);
 		trackerPanel.scrollRectToVisible(scrollRect);
-    Runnable runner = new Runnable() {
-			public void run() {
-				Rectangle rect = scrollPane.getViewport().getViewRect();
-				if (!rect.equals(scrollRect)) {
-					trackerPanel.scrollRectToVisible(scrollRect);
-				}
-		    trackerPanel.eraseAll();
-		    trackerPanel.repaint();    
-			}
-		};
+    Runnable runner = () -> {
+		Rectangle rect1 = scrollPane.getViewport().getViewRect();
+		if (!rect1.equals(scrollRect)) {
+			trackerPanel.scrollRectToVisible(scrollRect);
+		}
+trackerPanel.eraseAll();
+trackerPanel.repaint();
+	};
     SwingUtilities.invokeLater(runner);
   }  
 
@@ -645,7 +619,7 @@ public class MainTView extends JPanel implements TView {
    * @return an ArrayList of components to be added to a toolbar
    */
   public ArrayList<Component> getToolBarComponents() {
-    return new ArrayList<Component>();
+    return new ArrayList<>();
   }
 
   /**
@@ -828,7 +802,7 @@ public class MainTView extends JPanel implements TView {
   	DrawingPanel.ZoomBox zoomBox = trackerPanel.getZoomBox();
   	Rectangle zRect = zoomBox.reportZoom();
   	ArrayList<TTrack> tracks = trackerPanel.getTracks();
-  	HashSet<TTrack> changedTracks = new HashSet<TTrack>();
+  	HashSet<TTrack> changedTracks = new HashSet<>();
   	for (TTrack track: tracks) {
   		// search only visible PointMass tracks for now
   		if (!track.isVisible() || track.getClass()!=PointMass.class) continue;

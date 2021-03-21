@@ -24,17 +24,16 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.beans.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
+import org.opensourcephysics.controls.OSPLog;
+import org.opensourcephysics.tools.FontSizer;
+import org.opensourcephysics.tools.FunctionPanel;
+import org.opensourcephysics.tools.FunctionTool;
+import org.opensourcephysics.tools.ToolsRes;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.opensourcephysics.controls.OSPLog;
-import org.opensourcephysics.tools.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
 
 /**
  * A FunctionTool for building particle models.
@@ -82,33 +81,31 @@ public class ModelBuilder extends FunctionTool {
     boosterLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 2));
     boosterDropdown = new JComboBox();
     boosterDropdown.setBorder(BorderFactory.createEmptyBorder(0, 0, 1, 0));
-    boosterDropdown.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	if (!boosterDropdown.isEnabled()) return;
-    	  FunctionPanel panel = getSelectedPanel();
-    	  if (panel!=null) {
-    	  	ParticleModel part = ((ModelFunctionPanel)panel).model;
-    	  	if (!(part instanceof DynamicParticle)) return;
-    	  	DynamicParticle model = (DynamicParticle)part;
-    	  	
-    	  	Object item = boosterDropdown.getSelectedItem();
-          if(item!=null) {
-          	Object[] array = (Object[])item;
-          	PointMass target = (PointMass)array[1]; // null if "none" selected
-	      		model.setBooster(target);
-	      		if (target!=null) {
-		      		Step step = trackerPanel.getSelectedStep();
-		      		if (step!=null && step instanceof PositionStep) {
-		      			PointMass pm = (PointMass)step.getTrack();
-		      			if (pm==target) {
-		      				model.setStartFrame(step.getFrameNumber());
-		      			}
-		      		}
-	      		}
-          }
-    	  }
-      }
-    });
+    boosterDropdown.addActionListener(e -> {
+		if (!boosterDropdown.isEnabled()) return;
+		FunctionPanel panel = getSelectedPanel();
+		if (panel!=null) {
+			ParticleModel part = ((ModelFunctionPanel)panel).model;
+			if (!(part instanceof DynamicParticle)) return;
+			DynamicParticle model1 = (DynamicParticle)part;
+
+			Object item = boosterDropdown.getSelectedItem();
+		if(item!=null) {
+			Object[] array = (Object[])item;
+			PointMass target = (PointMass)array[1]; // null if "none" selected
+				model1.setBooster(target);
+				if (target!=null) {
+					Step step = trackerPanel.getSelectedStep();
+					if (step instanceof PositionStep) {
+						PointMass pm = (PointMass)step.getTrack();
+						if (pm==target) {
+							model1.setStartFrame(step.getFrameNumber());
+						}
+					}
+				}
+		}
+		}
+	});
     
     DropdownRenderer renderer= new DropdownRenderer();
     boosterDropdown.setRenderer(renderer);
@@ -116,23 +113,21 @@ public class ModelBuilder extends FunctionTool {
 
     trackerPanel.addPropertyChangeListener("track", this); //$NON-NLS-1$
 
-    setHelpAction(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        TFrame frame = trackerPanel.getTFrame();
-        if (frame != null) {
-        	ModelFunctionPanel panel = (ModelFunctionPanel)getSelectedPanel();
-        	if (panel instanceof ParticleDataTrackFunctionPanel) {
-        		frame.showHelp("datatrack", 0); //$NON-NLS-1$
-        	}
-        	else if (panel.model instanceof DynamicSystem) {
-        		frame.showHelp("system", 0); //$NON-NLS-1$
-        	}
-        	else {
-        		frame.showHelp("particle", 0); //$NON-NLS-1$
-        	}
-        }
-      }
-    });
+    setHelpAction(e -> {
+	  TFrame frame = trackerPanel.getTFrame();
+	  if (frame != null) {
+		  ModelFunctionPanel panel = (ModelFunctionPanel)getSelectedPanel();
+		  if (panel instanceof ParticleDataTrackFunctionPanel) {
+			  frame.showHelp("datatrack", 0); //$NON-NLS-1$
+		  }
+		  else if (panel.model instanceof DynamicSystem) {
+			  frame.showHelp("system", 0); //$NON-NLS-1$
+		  }
+		  else {
+			  frame.showHelp("particle", 0); //$NON-NLS-1$
+		  }
+	  }
+	});
 	}
 	
 	/**
@@ -230,18 +225,16 @@ public class ModelBuilder extends FunctionTool {
    * Refreshes the layout to ensure the booster dropdown is fully displayed.
    */
 	protected void refreshLayout() {
-  	SwingUtilities.invokeLater(new Runnable() {
-  		public void run() {
-    		validate();
-    		refreshGUI();
-    		Dimension dim = getSize();
-  			int height = Toolkit.getDefaultToolkit().getScreenSize().height;
-  			height = Math.min((int)(0.95*height), (int)(550*(1+fontLevel/4.0)));
-  			dim.height = height;
-  			setSize(dim); 
-    		repaint();
-  		}
-  	});
+  	SwingUtilities.invokeLater(() -> {
+		validate();
+		refreshGUI();
+		Dimension dim = getSize();
+		  int height = Toolkit.getDefaultToolkit().getScreenSize().height;
+		  height = Math.min((int)(0.95*height), (int)(550*(1+fontLevel/4.0)));
+		  dim.height = height;
+		  setSize(dim);
+		repaint();
+	  });
 
 	}
 
@@ -322,7 +315,7 @@ public class ModelBuilder extends FunctionTool {
   	    		if (dynamicModel.system!=null && next instanceof DynamicParticle) {
   	  	  		DynamicParticle dynamicNext = (DynamicParticle)next;
   	  	  		if (dynamicNext.system==dynamicModel.system) {
-  	  	  			continue outer;
+  	  	  			continue;
   	  	  		}
   	    		}
   	    		// check if next is selected model's booster
@@ -392,24 +385,22 @@ public class ModelBuilder extends FunctionTool {
 			super(model);
 			spinModel = model;
     	prevMax = (Integer)spinModel.getMaximum();
-  		addChangeListener(new ChangeListener() {
-        public void stateChanged(ChangeEvent e) {
-        	ModelFunctionPanel panel = (ModelFunctionPanel)getSelectedPanel();
-        	if (panel==null || panel.model==null || panel.model.refreshing)
-        		return;
-        	// do nothing if max has changed
-        	if (prevMax!=spinModel.getMaximum()) {
-        		prevMax = (Integer)spinModel.getMaximum();
-        		return;
-        	}
-        	// otherwise set model start or end frame
-      		int n = (Integer)getValue();
-        	if (ModelFrameSpinner.this==startFrameSpinner)
-        		panel.model.setStartFrame(n);
-        	else
-        		panel.model.setEndFrame(n);
-        }
-      });
+  		addChangeListener(e -> {
+			  ModelFunctionPanel panel = (ModelFunctionPanel)getSelectedPanel();
+			  if (panel==null || panel.model==null || panel.model.refreshing)
+				  return;
+			  // do nothing if max has changed
+			  if (prevMax!=spinModel.getMaximum()) {
+				  prevMax = (Integer)spinModel.getMaximum();
+				  return;
+			  }
+			  // otherwise set model start or end frame
+				int n = (Integer)getValue();
+			  if (ModelFrameSpinner.this==startFrameSpinner)
+				  panel.model.setStartFrame(n);
+			  else
+				  panel.model.setEndFrame(n);
+		  });
 		}
 		
 		public Dimension getMinimumSize() {

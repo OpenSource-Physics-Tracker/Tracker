@@ -24,16 +24,17 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.*;
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.opensourcephysics.tools.FontSizer;
+
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * A CircleFootprint returns a circle for a Point[] of length 1.
@@ -96,14 +97,14 @@ public class CircleFootprint implements Footprint, Cloneable {
    * @return the footprint
    */
   public static Footprint getFootprint(String name) {
-    Iterator<Footprint> it = footprints.iterator();
-    while(it.hasNext()) {
-    	CircleFootprint footprint = (CircleFootprint)it.next();
-      if (name == footprint.getName()) try {
-      	Footprint fp = (CircleFootprint)footprint.clone();
-        return fp;
-      } catch(CloneNotSupportedException ex) {ex.printStackTrace();}
-    }
+      for (Footprint value : footprints) {
+          CircleFootprint footprint = (CircleFootprint) value;
+          if (name.equals(footprint.getName())) try {
+              return (Footprint) footprint.clone();
+          } catch (CloneNotSupportedException ex) {
+              ex.printStackTrace();
+          }
+      }
     return null;
   }
 
@@ -316,10 +317,11 @@ public class CircleFootprint implements Footprint, Cloneable {
     try {
 			setRadius(Integer.parseInt(radius));
 		} catch (NumberFormatException e) {
-		}
-    setOutlined(props.indexOf("outline")>-1); //$NON-NLS-1$
-    setSpotShown(props.indexOf("spot")>-1); //$NON-NLS-1$
-    float f = props.indexOf("bold")>-1? boldStrokeSize: plainStrokeSize; //$NON-NLS-1$
+        e.printStackTrace();
+    }
+    setOutlined(props.contains("outline")); //$NON-NLS-1$
+    setSpotShown(props.contains("spot")); //$NON-NLS-1$
+    float f = props.contains("bold") ? boldStrokeSize: plainStrokeSize; //$NON-NLS-1$
     setStroke(new BasicStroke(f));
   }
 
@@ -448,94 +450,84 @@ public class CircleFootprint implements Footprint, Cloneable {
       JFormattedTextField tf = ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField();
     	tf.setEnabled(false);
     	tf.setDisabledTextColor(Color.BLACK);
-      ChangeListener listener = new ChangeListener() {
-        public void stateChanged(ChangeEvent e) {
-          int radius = (Integer)spinner.getValue();
-          if (radius==r) return;
-          setRadius(radius);
-  		  	if (trackerPanel!=null) {
-	          trackerPanel.changed = true;
-	          TTrack track = TTrack.getTrack(trackID);
-	          track.repaint();
-  		  	}
-  		  	else if (actionListener!=null) {
-  		  		actionListener.actionPerformed(null);
-  		  	}
-        }
-    	};
+      ChangeListener listener = e -> {
+        int radius = (Integer)spinner.getValue();
+        if (radius==r) return;
+        setRadius(radius);
+              if (trackerPanel!=null) {
+            trackerPanel.changed = true;
+            TTrack track = TTrack.getTrack(trackID);
+            track.repaint();
+              }
+              else if (actionListener!=null) {
+                  actionListener.actionPerformed(null);
+              }
+      };
       spinner.addChangeListener(listener);
       upper.add(spinner);
       // add bold label and checkbox
       boldCheckbox = new JCheckBox(TrackerRes.getString("CircleFootprint.Dialog.Checkbox.Bold")); //$NON-NLS-1$
       boldCheckbox.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
       boldCheckbox.setOpaque(false);
-      boldCheckbox.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-  		  	float f = boldCheckbox.isSelected()? boldStrokeSize: plainStrokeSize;
-  		  	setStroke(new BasicStroke(f));
-  		  	if (trackerPanel!=null) {
-	          trackerPanel.changed = true;
-	          TTrack track = TTrack.getTrack(trackID);
-	          track.repaint();
-  		  	}
-  		  	else if (actionListener!=null) {
-  		  		actionListener.actionPerformed(null);
-  		  	}
-        }
+      boldCheckbox.addActionListener(e -> {
+              float f = boldCheckbox.isSelected()? boldStrokeSize: plainStrokeSize;
+              setStroke(new BasicStroke(f));
+              if (trackerPanel!=null) {
+            trackerPanel.changed = true;
+            TTrack track = TTrack.getTrack(trackID);
+            track.repaint();
+              }
+              else if (actionListener!=null) {
+                  actionListener.actionPerformed(null);
+              }
       });
       upper.add(boldCheckbox);
       spotCheckbox = new JCheckBox(TrackerRes.getString("CircleFootprint.Dialog.Checkbox.CenterSpot")); //$NON-NLS-1$
       spotCheckbox.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-      spotCheckbox.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-  		  	setSpotShown(spotCheckbox.isSelected());
-  		  	if (trackerPanel!=null) {
-	          trackerPanel.changed = true;
-	          TTrack track = TTrack.getTrack(trackID);
-	          track.repaint();
-  		  	}
-  		  	else if (actionListener!=null) {
-  		  		actionListener.actionPerformed(null);
-  		  	}
-        }
+      spotCheckbox.addActionListener(e -> {
+              setSpotShown(spotCheckbox.isSelected());
+              if (trackerPanel!=null) {
+            trackerPanel.changed = true;
+            TTrack track = TTrack.getTrack(trackID);
+            track.repaint();
+              }
+              else if (actionListener!=null) {
+                  actionListener.actionPerformed(null);
+              }
       });
       upper.add(spotCheckbox);
       // add close button
       JPanel lower = new JPanel();
       contentPane.add(lower, BorderLayout.SOUTH);
       okButton = new JButton(TrackerRes.getString("Dialog.Button.OK")); //$NON-NLS-1$
-      okButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-  		  	setVisible(false);
-  		  	if (trackerPanel!=null) {
-            TTrack track = TTrack.getTrack(trackID);
-    		  	track.setFootprint(CircleFootprint.this.getName());
-  		  	}
-        }
+      okButton.addActionListener(e -> {
+              setVisible(false);
+              if (trackerPanel!=null) {
+          TTrack track = TTrack.getTrack(trackID);
+                track.setFootprint(CircleFootprint.this.getName());
+              }
       });
       lower.add(okButton);
       cancelButton = new JButton(TrackerRes.getString("Dialog.Button.Cancel")); //$NON-NLS-1$
-      cancelButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-	        setSpotShown(prevSpot);
-	        setStroke(new BasicStroke(prevStrokeSize));
-	        setRadius(prevRadius);
-  		  	if (trackerPanel!=null) {
-            TTrack track = TTrack.getTrack(trackID);
-            track.repaint();
-  		  	}
-  		  	else if (actionListener!=null) {
-  		  		actionListener.actionPerformed(null);
-  		  	}
-  		  	setVisible(false);
-        }
+      cancelButton.addActionListener(e -> {
+          setSpotShown(prevSpot);
+          setStroke(new BasicStroke(prevStrokeSize));
+          setRadius(prevRadius);
+              if (trackerPanel!=null) {
+          TTrack track = TTrack.getTrack(trackID);
+          track.repaint();
+              }
+              else if (actionListener!=null) {
+                  actionListener.actionPerformed(null);
+              }
+              setVisible(false);
       });
       lower.add(cancelButton);
     }
   }
 
   // static fields
-  private static Collection<Footprint> footprints = new HashSet<Footprint>();
+  private static final Collection<Footprint> footprints = new HashSet<>();
 
   // static constants
   private static final CircleFootprint CIRCLE;

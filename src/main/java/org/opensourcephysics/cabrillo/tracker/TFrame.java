@@ -54,17 +54,16 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
 
   // static fields
   protected static String helpPath = "/help/"; //$NON-NLS-1$
-  protected static String helpPathWeb = "http://physlets.org/tracker/help/"; //$NON-NLS-1$
   static Color yellow = new Color(255, 255, 105);
 
   // instance fields
   private JToolBar playerBar;
-  private JPopupMenu popup = new JPopupMenu();
+  private final JPopupMenu popup = new JPopupMenu();
   private JMenuItem closeItem;
   private JMenuBar defaultMenuBar;
   private JMenu recentMenu;
   // maps tab panel->Object[5] {main view, views, split panes, toolbar, menubar}
-  private Map<JPanel, Object[]> tabs = new HashMap<JPanel, Object[]>();
+  private final Map<JPanel, Object[]> tabs = new HashMap<>();
   protected JTabbedPane tabbedPane;
   protected JTextPane notesTextPane;
   protected Action saveNotesAction;
@@ -74,18 +73,17 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
   protected JDialog helpDialog;
   protected LibraryBrowser libraryBrowser;
   protected Launcher helpLauncher;
-  protected JDialog dataToolDialog;
   protected TrackerPanel prevPanel;
   protected double defaultRightDivider = 0.7;
   protected double defaultBottomDivider = 0.5;
   protected FileDropHandler fileDropHandler;
   protected Action openRecentAction;
   protected boolean splashing=true;
-  protected ArrayList<String> loadedFiles = new ArrayList<String>();
+  protected ArrayList<String> loadedFiles = new ArrayList<>();
   protected boolean anglesInRadians = Tracker.isRadians;
   protected File tabsetFile; // used when saving tabsets
-  protected int framesLoaded, prevFramesLoaded; // used when loading ffmpeg videos
-//  protected JProgressBar monitor;
+  protected int framesLoaded;
+  //  protected JProgressBar monitor;
   protected PrefsDialog prefsDialog;
   protected ClipboardListener clipboardListener;
   protected boolean alwaysListenToClipboard;
@@ -96,8 +94,7 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
   public TFrame() {
     super("Tracker"); //$NON-NLS-1$
     setName("Tracker"); //$NON-NLS-1$
-    if (Tracker.TRACKER_ICON != null) 
-    	setIconImage(Tracker.TRACKER_ICON.getImage());
+    setIconImage(Tracker.TRACKER_ICON.getImage());
     // set default close operation
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     createGUI();    
@@ -195,7 +192,7 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     	else { // has custom views
     		Iterator<Object> it = trackerPanel.selectedViewsProperty.getPropertyContent().iterator();
     		int i = -1;
-    		while (it.hasNext() && i < views.length) {
+    		while (it.hasNext()) {
     			i++;
           if (views[i] instanceof TViewChooser) {
             TViewChooser chooser = (TViewChooser)views[i];
@@ -211,25 +208,24 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     // load the views
     if (hasViews) {
     	java.util.List<Object> arrayItems = trackerPanel.viewsProperty.getPropertyContent();
-    	Iterator<Object> it = arrayItems.iterator();
-    	while (it.hasNext()) {
-    		XMLProperty next = (XMLProperty)it.next();
-    		if (next==null) continue;
-    		String index = next.getPropertyName().substring(1);
-    		index = index.substring(0, index.length()-1);
-    		int i = Integer.parseInt(index);
-        if (i<views.length && views[i] instanceof TViewChooser) {
+      for (Object arrayItem : arrayItems) {
+        XMLProperty next = (XMLProperty) arrayItem;
+        if (next == null) continue;
+        String index = next.getPropertyName().substring(1);
+        index = index.substring(0, index.length() - 1);
+        int i = Integer.parseInt(index);
+        if (i < views.length && views[i] instanceof TViewChooser) {
           XMLControl[] elements = next.getChildControls();
-          TViewChooser chooser = (TViewChooser)views[i];
-          for (int j = 0; j < elements.length; j++) {
-            Class<?> viewType = elements[j].getObjectClass();
+          TViewChooser chooser = (TViewChooser) views[i];
+          for (XMLControl element : elements) {
+            Class<?> viewType = element.getObjectClass();
             TView view = chooser.getView(viewType);
-            if (view != null) { 
-              elements[j].loadObject(view);
+            if (view != null) {
+              element.loadObject(view);
             }
           }
         }
-    	}
+      }
       trackerPanel.viewsProperty = null;
     }
     setViews(trackerPanel, views);
@@ -242,40 +238,21 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     setIgnoreRepaint(false);
     trackerPanel.changed = false;
 
-    Timer timer = new Timer(500, new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-		    // close blank tab at position 0, if any
-		    if (getTabCount()>1) {
-			  	TrackerPanel existingPanel = getTrackerPanel(0);
-			    if (tabbedPane.getTitleAt(0).equals(
-			        TrackerRes.getString("TrackerPanel.NewTab.Name")) //$NON-NLS-1$
-			        && !existingPanel.changed) {
-			      removeTab(existingPanel);
-			    }
-		    }
-        trackerPanel.refreshTrackData();
-        refresh();
-      }
+    Timer timer = new Timer(500, e -> {
+          // close blank tab at position 0, if any
+          if (getTabCount()>1) {
+                TrackerPanel existingPanel = getTrackerPanel(0);
+              if (tabbedPane.getTitleAt(0).equals(
+                  TrackerRes.getString("TrackerPanel.NewTab.Name")) //$NON-NLS-1$
+                  && !existingPanel.changed) {
+                removeTab(existingPanel);
+              }
+          }
+      trackerPanel.refreshTrackData();
+      refresh();
     });
 		timer.setRepeats(false);
 		timer.start();
-
-//    Runnable runner = new Runnable() {
-//    	public void run() {
-//		    // close blank tab at position 0, if any
-//		    if (getTabCount()>1) {
-//			  	TrackerPanel existingPanel = getTrackerPanel(0);
-//			    if (tabbedPane.getTitleAt(0).equals(
-//			        TrackerRes.getString("TrackerPanel.NewTab.Name")) //$NON-NLS-1$
-//			        && !existingPanel.changed) {
-//			      removeTab(existingPanel);
-//			    }
-//		    }
-//        trackerPanel.refreshTrackData();
-//        refresh();
-//    	}
-//    };
-//    SwingUtilities.invokeLater(runner);
   }
   
   /**
@@ -292,7 +269,8 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
 				}
 				removeTab(getTrackerPanel(i));
 			} catch (Exception ex) {
-			}
+        ex.printStackTrace();
+      }
     }
   }
 
@@ -345,10 +323,10 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     
     // dispose of TViewChoosers and TViews
     Container[] views = getViews(trackerPanel);
-    for (int i = 0; i < views.length; i++) {
-      if (views[i] instanceof TViewChooser) {
-      	TViewChooser chooser = (TViewChooser)views[i];
-      	chooser.dispose();
+    for (Container view : views) {
+      if (view instanceof TViewChooser) {
+        TViewChooser chooser = (TViewChooser) view;
+        chooser.dispose();
       }
     }
 
@@ -381,21 +359,16 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     TTrackBar trackbar = getTrackBar(trackerPanel);
     trackbar.dispose();
     JSplitPane[] panes = getSplitPanes(trackerPanel);
-    for (int i=0; i<panes.length; i++) {
-    	JSplitPane pane = panes[i];
-    	pane.removeAll();
+    for (JSplitPane pane : panes) {
+      pane.removeAll();
     }
-    for (int i=0; i<panes.length; i++) {
-    	panes[i] = null;
-    }
+    Arrays.fill(panes, null);
     
     // remove the components from the tabs map
     Object[] array = tabs.get(tabPanel);
 //  array is {mainView, views, panes, toolbar, menubar, trackbar};
     if (array != null) {
-      for (int i=0; i< array.length; i++) {
-      	array[i] = null;
-      }
+      Arrays.fill(array, null);
     }    
     tabs.remove(tabPanel);
     
@@ -465,7 +438,8 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
 			  }
 			}
 		} catch (IOException e) {
-		}
+      e.printStackTrace();
+    }
     return -1;
   }
 
@@ -583,7 +557,6 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     for (int i = 0; i < Math.min(newViews.length, views.length); i++) {
       if (newViews[i] != null) views[i] = newViews[i];
     }
-    array[1] = views;
     MainTView mainView = (MainTView)array[0];
     JSplitPane[] panes = (JSplitPane[])array[2];
     panel.add(panes[0], BorderLayout.CENTER);
@@ -922,11 +895,7 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     if (!Tracker.splash.isVisible()) return;
 //    Tracker.setProgress(100);
     // dispose of splash automatically after short time
-    Timer timer = new Timer(1500, new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	Tracker.splash.dispose();
-      }
-    });
+    Timer timer = new Timer(1500, e -> Tracker.splash.dispose());
 		timer.setRepeats(false);
 		timer.start();
   }
@@ -971,13 +940,11 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
    * Shows the preferences dialog.
    */
   public void showPrefsDialog() {
-  	Runnable runner = new Runnable() {
-  		public void run() {
-  	  	PrefsDialog prefsDialog = getPrefsDialog();
-  			prefsDialog.setVisible(true);
-  			prefsDialog.requestFocus();
-  		}
-  	};
+  	Runnable runner = () -> {
+        PrefsDialog prefsDialog = getPrefsDialog();
+          prefsDialog.setVisible(true);
+          prefsDialog.requestFocus();
+      };
   	new Thread(runner).start();
   }
   
@@ -987,24 +954,22 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
    * @param tabName the name of the tab: config, runtime, video, general, display
    */
   public void showPrefsDialog(final String tabName) {
-  	Runnable runner = new Runnable() {
-  		public void run() {
-				// show prefs dialog and select video tab
-  	  	PrefsDialog prefsDialog = getPrefsDialog();
-  	  	if (tabName!=null) {
-  	  		if (tabName.contains("runtime")) //$NON-NLS-1$
-  	  			prefsDialog.tabbedPane.setSelectedComponent(prefsDialog.runtimePanel);
-  	  		else if (tabName.contains("video")) //$NON-NLS-1$
-  	  			prefsDialog.tabbedPane.setSelectedComponent(prefsDialog.videoPanel);
-  	  		else if (tabName.contains("general")) //$NON-NLS-1$
-  	  			prefsDialog.tabbedPane.setSelectedComponent(prefsDialog.generalPanel);
-  	  		else if (tabName.contains("display")) //$NON-NLS-1$
-  	  			prefsDialog.tabbedPane.setSelectedComponent(prefsDialog.displayPanel);
-  	  	}
-  			prefsDialog.setVisible(true);
-  			prefsDialog.requestFocus();
-  		}
-  	};
+  	Runnable runner = () -> {
+            // show prefs dialog and select video tab
+        PrefsDialog prefsDialog = getPrefsDialog();
+        if (tabName!=null) {
+            if (tabName.contains("runtime")) //$NON-NLS-1$
+                prefsDialog.tabbedPane.setSelectedComponent(prefsDialog.runtimePanel);
+            else if (tabName.contains("video")) //$NON-NLS-1$
+                prefsDialog.tabbedPane.setSelectedComponent(prefsDialog.videoPanel);
+            else if (tabName.contains("general")) //$NON-NLS-1$
+                prefsDialog.tabbedPane.setSelectedComponent(prefsDialog.generalPanel);
+            else if (tabName.contains("display")) //$NON-NLS-1$
+                prefsDialog.tabbedPane.setSelectedComponent(prefsDialog.displayPanel);
+        }
+          prefsDialog.setVisible(true);
+          prefsDialog.requestFocus();
+      };
   	new Thread(runner).start();
   }
   
@@ -1174,7 +1139,8 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
 		        	try {
 								url = new URL(e.getActionCommand());
 							} catch (MalformedURLException e1) {
-							}
+                      e1.printStackTrace();
+                    }
 		        }
 		        if (!file.exists() && url==null) {
 		        	Tracker.recentFiles.remove(e.getActionCommand());
@@ -1198,10 +1164,6 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
 	        		selected.setMouseCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	        	}
         		TrackerIO.open(path, TFrame.this);
-//	        	if (url!=null)
-//	        		TrackerIO.open(url, TFrame.this);
-//	        	else 
-//	        		TrackerIO.open(file, TFrame.this);
 	        	setCursor(Cursor.getDefaultCursor());
 		  		}
 		  	};
@@ -1269,15 +1231,15 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     menubar.windowMenu.removeAll();
     boolean maximized = false;
   	Container[] views = getViews(trackerPanel);
-  	for (int i = 0; i<views.length; i++) {
-    	if (views[i] instanceof TViewChooser) {
-    		TViewChooser chooser = (TViewChooser)views[i];
-    		if (chooser.maximized) {
-    			maximized = true;
-    			break;
-    		}
-    	}
-  	}
+    for (Container view : views) {
+      if (view instanceof TViewChooser) {
+        TViewChooser chooser = (TViewChooser) view;
+        if (chooser.maximized) {
+          maximized = true;
+          break;
+        }
+      }
+    }
   	if (maximized) {
       menubar.windowMenu.add(menubar.restoreItem);
   	}
@@ -1301,12 +1263,10 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     	JMenuItem tabItem = new JRadioButtonMenuItem(getTabTitle(i));   	
     	tabItem.setActionCommand(String.valueOf(i));
   		tabItem.setSelected(i==getSelectedTab());
-  		tabItem.addActionListener(new ActionListener() {
-  	    public void actionPerformed(ActionEvent e) {
-  	    	int j = Integer.parseInt(e.getActionCommand());
-  	    	setSelectedTab(j);
-  	    }
-  		});
+  		tabItem.addActionListener(e -> {
+              int j = Integer.parseInt(e.getActionCommand());
+              setSelectedTab(j);
+          });
   		menubar.windowMenu.add(tabItem);
     }
     menubar.windowMenu.revalidate();
@@ -1320,7 +1280,9 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
   public void setFontLevel(int level) {
   	try {
 			super.setFontLevel(level);
-		} catch (Exception e) {}  	
+		} catch (Exception e) {
+      e.printStackTrace();
+    }
   	if (tabbedPane==null) return;
 		FontSizer.setFonts(tabbedPane, level);
   	
@@ -1391,64 +1353,62 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     	libraryBrowser.addOSPLibrary(LibraryBrowser.SHARED_LIBRARY);
     	libraryBrowser.addComPADRECollection(LibraryComPADRE.TRACKER_SERVER_TREE+LibraryComPADRE.PRIMARY_ONLY);
 	    libraryBrowser.refreshCollectionsMenu();
-    	libraryBrowser.addPropertyChangeListener("target", new PropertyChangeListener() { //$NON-NLS-1$
-	  		public void propertyChange(PropertyChangeEvent e) {
-	  			libraryBrowser.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	  			LibraryResource record = (LibraryResource)e.getNewValue();
-  				String target = XML.getResolvedPath(record.getTarget(), record.getBasePath());
-    			target = ResourceLoader.getURIPath(target);
-    			
-					// download comPADRE targets to osp cache
-					if (target.indexOf("document/ServeFile.cfm?")>-1) { //$NON-NLS-1$
-						String fileName = record.getProperty("download_filename"); //$NON-NLS-1$  					
-						try {
-							File file = ResourceLoader.downloadToOSPCache(target, fileName, false);
-							target = file.toURI().toString();
-						} catch (Exception ex) {
-							String s = TrackerRes.getString("TFrame.Dialog.LibraryError.Message"); //$NON-NLS-1$
-	        		JOptionPane.showMessageDialog(libraryBrowser, 
-	        				s+" \""+record.getName()+"\"", //$NON-NLS-1$ //$NON-NLS-2$
-	        				TrackerRes.getString("TFrame.Dialog.LibraryError.Title"), //$NON-NLS-1$
-	        				JOptionPane.WARNING_MESSAGE);
-							return;
-						}
-					}
-					
-    			String lcTarget = target.toLowerCase();
-    			boolean accept = lcTarget.endsWith(".trk"); //$NON-NLS-1$
-					accept = accept || lcTarget.endsWith(".zip"); //$NON-NLS-1$
-					accept = accept || lcTarget.endsWith(".trz"); //$NON-NLS-1$
-  				for (String ext: VideoIO.getVideoExtensions()) {
-  					accept = accept || lcTarget.endsWith("."+ext); //$NON-NLS-1$
-    			}
-  				if (accept) {
-		  			libraryBrowser.setVisible(false);
-		        Resource res = ResourceLoader.getResourceZipURLsOK(target);
-  					if (res!=null) {
-  						ArrayList<String> urlPaths = new ArrayList<String>();
-  						urlPaths.add(target);
-  						TrackerIO.open(urlPaths, TFrame.this, null);
-  					}
-  					else {
-							String s = TrackerRes.getString("TFrame.Dialog.LibraryError.FileNotFound.Message"); //$NON-NLS-1$
-	        		JOptionPane.showMessageDialog(libraryBrowser, 
-	        				s+" \""+XML.getName(target)+"\"", //$NON-NLS-1$ //$NON-NLS-2$
-	        				TrackerRes.getString("TFrame.Dialog.LibraryError.FileNotFound.Title"), //$NON-NLS-1$
-	        				JOptionPane.WARNING_MESSAGE);
-			  			libraryBrowser.setVisible(true);
-  					}
-  				}
+      //$NON-NLS-1$
+      libraryBrowser.addPropertyChangeListener("target", e -> {
+          libraryBrowser.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          LibraryResource record = (LibraryResource)e.getNewValue();
+          String target = XML.getResolvedPath(record.getTarget(), record.getBasePath());
+        target = ResourceLoader.getURIPath(target);
 
-	  			libraryBrowser.setCursor(Cursor.getDefaultCursor());
-					TFrame.this.requestFocus();
-	  		}
-	  	});
+            // download comPADRE targets to osp cache
+            if (target.contains("document/ServeFile.cfm?")) { //$NON-NLS-1$
+                String fileName = record.getProperty("download_filename"); //$NON-NLS-1$
+                try {
+                    File file = ResourceLoader.downloadToOSPCache(target, fileName, false);
+                    target = file.toURI().toString();
+                } catch (Exception ex) {
+                    String s = TrackerRes.getString("TFrame.Dialog.LibraryError.Message"); //$NON-NLS-1$
+            JOptionPane.showMessageDialog(libraryBrowser,
+                    s+" \""+record.getName()+"\"", //$NON-NLS-1$ //$NON-NLS-2$
+                    TrackerRes.getString("TFrame.Dialog.LibraryError.Title"), //$NON-NLS-1$
+                    JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            }
+
+        String lcTarget = target.toLowerCase();
+        boolean accept = lcTarget.endsWith(".trk"); //$NON-NLS-1$
+            accept = accept || lcTarget.endsWith(".zip"); //$NON-NLS-1$
+            accept = accept || lcTarget.endsWith(".trz"); //$NON-NLS-1$
+          for (String ext: VideoIO.getVideoExtensions()) {
+              accept = accept || lcTarget.endsWith("."+ext); //$NON-NLS-1$
+        }
+          if (accept) {
+              libraryBrowser.setVisible(false);
+Resource res = ResourceLoader.getResourceZipURLsOK(target);
+              if (res!=null) {
+                  ArrayList<String> urlPaths = new ArrayList<>();
+                  urlPaths.add(target);
+                  TrackerIO.open(urlPaths, TFrame.this, null);
+              }
+              else {
+                    String s = TrackerRes.getString("TFrame.Dialog.LibraryError.FileNotFound.Message"); //$NON-NLS-1$
+            JOptionPane.showMessageDialog(libraryBrowser,
+                    s+" \""+XML.getName(target)+"\"", //$NON-NLS-1$ //$NON-NLS-2$
+                    TrackerRes.getString("TFrame.Dialog.LibraryError.FileNotFound.Title"), //$NON-NLS-1$
+                    JOptionPane.WARNING_MESSAGE);
+                  libraryBrowser.setVisible(true);
+              }
+          }
+
+          libraryBrowser.setCursor(Cursor.getDefaultCursor());
+            TFrame.this.requestFocus();
+      });
     	LibraryBrowser.fireHelpEvent = true;
-    	libraryBrowser.addPropertyChangeListener("help", new PropertyChangeListener() { //$NON-NLS-1$
-	  		public void propertyChange(PropertyChangeEvent e) {
-	  			showHelp("library", 0); //$NON-NLS-1$
-	  		}
-	  	});
+      //$NON-NLS-1$
+      libraryBrowser.addPropertyChangeListener("help", e -> {
+          showHelp("library", 0); //$NON-NLS-1$
+      });
   		libraryBrowser.setFontLevel(FontSizer.getLevel());
       Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
       int x = (dim.width - dialog.getBounds().width) / 2;
@@ -1461,7 +1421,7 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
   /**
    * Gets the properties dialog for a specified TrackerPanel.
    *
-   * @param trackerPanel 
+   * @param trackerPanel -
    * @return the properties dialog
    */
   protected PropertiesDialog getPropertiesDialog(TrackerPanel trackerPanel) {
@@ -1477,19 +1437,11 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
   /**
    * Gets the help dialog.
    *
-   * @return the help dialog
    */
-  protected Component getHelpDialog() {
+  protected void getHelpDialog() {
     if (helpDialog == null) {
       helpDialog = new JDialog(this, TrackerRes.getString("TFrame.Dialog.Help.Title"), false); //$NON-NLS-1$
       String help_path = helpPath + "help_set.xml"; //$NON-NLS-1$
-//      String lang = TrackerRes.locale.getLanguage();
-//      String webHelp = helpPathWeb+"help_"+lang+"/help_set.xml"; //$NON-NLS-1$ //$NON-NLS-2$
-//      Resource res = ResourceLoader.getResource(webHelp);
-//      if (res!=null) { 
-//      	help_path = res.getString(); // open launcher with xml string
-//      }
-//      System.out.println(help_path);
       helpLauncher = new Launcher(help_path, false);
       helpLauncher.popupEnabled = false;
       int level = FontSizer.getLevel();
@@ -1530,7 +1482,6 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     comps[comps.length-2] = Tracker.pdfHelpButton;
     comps[comps.length-1] = Box.createHorizontalStrut(4);
     helpLauncher.setNavbarRightEndComponents(comps);
-    return helpDialog;
   }
   
   /**
@@ -1571,14 +1522,12 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
    */
   protected void showTrackControl(final TrackerPanel panel) {
     if (panel.getUserTracks().size() > 0) {
-	    Runnable runner = new Runnable() {
-	      public void run() {
-	      	TrackControl tc = TrackControl.getControl(panel);
-	        if (tc.positioned && !tc.isEmpty()) {
-	        	tc.setVisible(true);
-	        }
-	      }
-	    };
+	    Runnable runner = () -> {
+            TrackControl tc = TrackControl.getControl(panel);
+          if (tc.positioned && !tc.isEmpty()) {
+              tc.setVisible(true);
+          }
+        };
 	    EventQueue.invokeLater(runner);
     }
   }
@@ -1590,94 +1539,19 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
    */
   protected void showNotes(final TrackerPanel panel) {
     final JButton button = getToolBar(panel).notesButton;
-    Runnable runner = new Runnable() {
-      public void run() {
-      	TTrack track = panel.getSelectedTrack();
-      	if (!panel.hideDescriptionWhenLoaded &&
-      			((track != null && track.getDescription()!= null &&
-                !track.getDescription().trim().equals("")) || //$NON-NLS-1$
-            (track == null && panel.getDescription() != null &&
-                !panel.getDescription().trim().equals("")))) { //$NON-NLS-1$
-          if (!button.isSelected()) button.doClick();
-        }
-        else if (button.isSelected()) button.doClick();
+    Runnable runner = () -> {
+        TTrack track = panel.getSelectedTrack();
+        if (!panel.hideDescriptionWhenLoaded &&
+                ((track != null && track.getDescription()!= null &&
+              !track.getDescription().trim().equals("")) || //$NON-NLS-1$
+          (track == null && panel.getDescription() != null &&
+              !panel.getDescription().trim().equals("")))) { //$NON-NLS-1$
+        if (!button.isSelected()) button.doClick();
       }
+      else if (button.isSelected()) button.doClick();
     };
     EventQueue.invokeLater(runner);
   }
-
-//  /**
-//   * Checks the current memory usage. If the total memory being used approaches 
-//   * the max available, this reopens Tracker in a new larger java vm.
-//   */
-//  public void checkMemory() {
-//  	System.gc();
-//  	Runtime runtime = Runtime.getRuntime();
-//  	double total = runtime.totalMemory();
-//  	double max = runtime.maxMemory();
-//  	JOptionPane.showMessageDialog(this, "memory "+total+" of "+max); //$NON-NLS-1$ //$NON-NLS-2$
-//  	if (total/max > 0.6 && OSPRuntime.getLaunchJarPath() != null) {
-//  		int result = JOptionPane.showConfirmDialog(this, "Resize memory to "+2*max+"?"); //$NON-NLS-1$ //$NON-NLS-2$
-//      if (result != JOptionPane.YES_OPTION) return;
-//  		// save trackerPanel fileNames
-//  		ArrayList<File> files = new ArrayList<File>();
-//  		for (int i = 0; i < getTabCount(); i++) {
-//  			File file = getTrackerPanel(i).getDataFile();
-//  			if (file != null) files.add(file);
-//  		}
-//  		// dispose of this frame 
-//  		this.dispose();
-//  		// launch Tracker in new vm
-//      // construct the command to execute
-//      final java.util.Vector<String> cmd = new java.util.Vector<String>();
-//      cmd.add("java"); //$NON-NLS-1$
-//      String classPath = OSPRuntime.getLaunchJarPath();
-//      // convert colons to semicolons
-//      classPath = classPath.replace(':', ';');
-//      // replace semicolons with platform-dependent path separator
-//      char pathSeparator = System.getProperty("path.separator").charAt(0);   //$NON-NLS-1$
-//      classPath = classPath.replace(';', pathSeparator);
-//      cmd.add("-classpath");                                                 //$NON-NLS-1$
-//      cmd.add(classPath);
-//      cmd.add(Tracker.class.getName());
-//      String memoryArg = "-Xmx"+2*max; //$NON-NLS-1$
-//      cmd.add(memoryArg);
-//      memoryArg = "-Xms"+2*max; //$NON-NLS-1$
-//      cmd.add(memoryArg);
-//      Iterator<File> it = files.iterator();
-//      while (it.hasNext()) {
-//      	String arg = it.next().getPath();
-//        cmd.add(arg);
-//      }
-//      // launch thread for new VM
-//      Runnable launchRunner = new Runnable() {
-//         public void run() {
-//            OSPLog.finer(cmd.toString());
-//            String[] cmdarray = cmd.toArray(new String[0]);
-//            try {
-//               Process proc = Runtime.getRuntime().exec(cmdarray);
-//               BufferedInputStream errStream=new BufferedInputStream(proc.getErrorStream());
-//               StringBuffer buff= new StringBuffer();
-//               while(true){
-//                 int datum=errStream.read();
-//                 if(datum==-1) break;
-//                 buff.append((char)datum);
-//               }
-//               errStream.close();
-//               String msg=buff.toString().trim();
-//               if(msg.length()>0){
-//                 OSPLog.info("error buffer: " + buff.toString()); //$NON-NLS-1$
-//               }
-//            } catch(Exception ex) {
-//               ex.printStackTrace();
-//            }
-//         }
-//      };
-//      Thread relauncher = new Thread(launchRunner);
-//      relauncher.setPriority(Thread.NORM_PRIORITY);
-//      relauncher.start();           
-//  	}
-//  }
 
   /**
    * Gets the object array for the specified tracker panel.
@@ -1709,39 +1583,38 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
    */
   protected void checkClipboardListener() {
   	// do we need clipboard listener?
-  	Runnable runner = new Runnable() {
-  		public void run() {
-  	  	boolean needListener = alwaysListenToClipboard;
-  	  	if (!needListener) {
-  		  	// do any pasted data tracks exist?
-  		    try {
-  					for (int i = 0; i < getTabCount(); i++) {
-  						TrackerPanel trackerPanel = getTrackerPanel(i);
-  						ArrayList<DataTrack> dataTracks = trackerPanel.getDrawables(DataTrack.class);
-  						// do any tracks have null source?
-  						for (DataTrack next: dataTracks) {
-  							if (next.getSource()==null) {
-  								// null source, so data is pasted
-  								needListener = true;
-  								break;
-  							}
-  						}
-  					}
-  				} catch (Exception ex) {
-  				}
-  	  	}
-  	    
-  	    if (needListener) {
-  	    	getClipboardListener();
-  	    }
-  	  	else {
-  	  		if (clipboardListener==null) return;
-  	    	// end existing listener
-  	    	clipboardListener.end();
-  	    	clipboardListener = null;
-  	  	}  			
-  		}
-  	};
+  	Runnable runner = () -> {
+        boolean needListener = alwaysListenToClipboard;
+        if (!needListener) {
+            // do any pasted data tracks exist?
+          try {
+                  for (int i = 0; i < getTabCount(); i++) {
+                      TrackerPanel trackerPanel = getTrackerPanel(i);
+                      ArrayList<DataTrack> dataTracks = trackerPanel.getDrawables(DataTrack.class);
+                      // do any tracks have null source?
+                      for (DataTrack next: dataTracks) {
+                          if (next.getSource()==null) {
+                              // null source, so data is pasted
+                              needListener = true;
+                              break;
+                          }
+                      }
+                  }
+              } catch (Exception ex) {
+ex.printStackTrace();
+}
+        }
+
+      if (needListener) {
+          getClipboardListener();
+      }
+        else {
+            if (clipboardListener==null) return;
+          // end existing listener
+          clipboardListener.end();
+          clipboardListener = null;
+        }
+      };
 //  	new Thread(runner).start();
   	SwingUtilities.invokeLater(runner);
 
@@ -1763,7 +1636,7 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
       public void actionPerformed(ActionEvent e) {
       	if (notesTextPane.getBackground() == Color.WHITE) return;
       	String desc = notesTextPane.getText();
-        if (getSelectedTab() > -1 && notesDialog.getName() != "canceled") { //$NON-NLS-1$
+        if (getSelectedTab() > -1 && !notesDialog.getName().equals("canceled")) { //$NON-NLS-1$
           TrackerPanel trackerPanel = getTrackerPanel(getSelectedTab());
           trackerPanel.changed = true;
           TTrack track = trackerPanel.getTrack(notesDialog.getName());
@@ -1796,12 +1669,10 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     notesDialog.setContentPane(infoContentPane);
     notesTextPane = new JTextPane();
     notesTextPane.setBackground(Color.WHITE);
-    notesTextPane.addHyperlinkListener(new HyperlinkListener() {
-      public void hyperlinkUpdate(HyperlinkEvent e) {
-        if(e.getEventType()==HyperlinkEvent.EventType.ACTIVATED) {
-        	String url = e.getURL().toString();
-        	org.opensourcephysics.desktop.OSPDesktop.displayURL(url);
-        }
+    notesTextPane.addHyperlinkListener(e -> {
+      if(e.getEventType()==HyperlinkEvent.EventType.ACTIVATED) {
+          String url = e.getURL().toString();
+          org.opensourcephysics.desktop.OSPDesktop.displayURL(url);
       }
     });
     notesTextPane.setPreferredSize(new Dimension(420, 200));
@@ -1845,11 +1716,7 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     });
     buttonbar.add(cancelNotesDialogButton);    
     closeNotesDialogButton = new JButton(TrackerRes.getString("Dialog.Button.Close")); //$NON-NLS-1$
-    closeNotesDialogButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	notesDialog.setVisible(false);
-      }
-    });
+    closeNotesDialogButton.addActionListener(e -> notesDialog.setVisible(false));
     buttonbar.add(closeNotesDialogButton);
     notesDialog.pack();
     // create the tabbed pane
@@ -1859,97 +1726,91 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     // create the default menubar
     createDefaultMenuBar();
     // add listener to change menubar, toolbar, track control when tab changes
-    tabbedPane.addChangeListener(new ChangeListener() {
-      public void stateChanged(ChangeEvent e) {
-        TrackerPanel newPanel = null;
-        TrackerPanel oldPanel = prevPanel;
-        
-        // hide exportZipDialog
-        if (ExportZipDialog.zipExporter!=null) {
-        	ExportZipDialog.zipExporter.setVisible(false);
-        	ExportZipDialog.zipExporter.trackerPanel = null;
-        }        
-      	if (ExportVideoDialog.videoExporter!=null) {
-      		ExportVideoDialog.videoExporter.trackerPanel = null;
-      	}
-      	if (ThumbnailDialog.thumbnailDialog!=null) {
-      		ThumbnailDialog.thumbnailDialog.trackerPanel = null;
-      	}
+    tabbedPane.addChangeListener(e -> {
+      TrackerPanel newPanel = null;
+      TrackerPanel oldPanel = prevPanel;
+
+      // hide exportZipDialog
+      if (ExportZipDialog.zipExporter!=null) {
+          ExportZipDialog.zipExporter.setVisible(false);
+          ExportZipDialog.zipExporter.trackerPanel = null;
+      }
+        if (ExportVideoDialog.videoExporter!=null) {
+            ExportVideoDialog.videoExporter.trackerPanel = null;
+        }
+        if (ThumbnailDialog.thumbnailDialog!=null) {
+            ThumbnailDialog.thumbnailDialog.trackerPanel = null;
+        }
+      // update prefsDialog
+      if (prefsDialog!=null) {
+          prefsDialog.trackerPanel = null;
+      }
+      // clean up items associated with old panel
+      if (playerBar != null) {
+        Container frame = playerBar.getTopLevelAncestor();
+        if (frame != null && frame != TFrame.this) frame.setVisible(false);
+      }
+      if (prevPanel != null) {
+        if (prevPanel.dataBuilder != null) {
+            boolean vis = prevPanel.dataToolVisible;
+            prevPanel.dataBuilder.setVisible(false);
+            prevPanel.dataToolVisible = vis;
+        }
+        if (prevPanel.getPlayer()!=null) {
+            ClipInspector ci = prevPanel.getPlayer().getVideoClip().getClipInspector();
+            if (ci != null) ci.setVisible(false);
+        }
+        Video vid = prevPanel.getVideo();
+        if (vid != null) {
+          vid.getFilterStack().setInspectorsVisible(false);
+        }
+      }
+      // refresh current tab items
+      Object[] array = tabs.get(tabbedPane.getSelectedComponent());
+      if (array != null) {
+        MainTView mainView = (MainTView)array[0];
+        newPanel = mainView.getTrackerPanel();
+        prevPanel = newPanel;
         // update prefsDialog
         if (prefsDialog!=null) {
-        	prefsDialog.trackerPanel = null;
+            prefsDialog.trackerPanel = newPanel;
         }
-        // clean up items associated with old panel
-        if (playerBar != null) {
-          Container frame = playerBar.getTopLevelAncestor();
-          if (frame != null && frame != TFrame.this) frame.setVisible(false);
-        }
-        if (prevPanel != null) {
-          if (prevPanel.dataBuilder != null) {
-          	boolean vis = prevPanel.dataToolVisible;
-          	prevPanel.dataBuilder.setVisible(false);
-          	prevPanel.dataToolVisible = vis;
-          }
-          if (prevPanel.getPlayer()!=null) {
-	          ClipInspector ci = prevPanel.getPlayer().getVideoClip().getClipInspector();
-	          if (ci != null) ci.setVisible(false);
-          }
-          Video vid = prevPanel.getVideo();
-          if (vid != null) {
-            vid.getFilterStack().setInspectorsVisible(false);
-          }
-        }
-        // refresh current tab items
-        Object[] array = tabs.get(tabbedPane.getSelectedComponent());
-        if (array != null) {
-          MainTView mainView = (MainTView)array[0];
-          newPanel = mainView.getTrackerPanel();
-          prevPanel = newPanel;
-          // update prefsDialog
-          if (prefsDialog!=null) {
-          	prefsDialog.trackerPanel = newPanel;
-          }
-          // refresh the notes dialog and button
-          newPanel.refreshNotesDialog();
-          JButton notesButton = getToolBar(newPanel).notesButton;
-          notesButton.setSelected(notesDialog.isVisible());
-          // refresh trackbar
-          ((TTrackBar)array[5]).refresh();
-          // refresh and replace menu bar
-          TMenuBar menubar = (TMenuBar)array[4];
-          refreshOpenRecentMenu(menubar.openRecentMenu);
+        // refresh the notes dialog and button
+        newPanel.refreshNotesDialog();
+        JButton notesButton = getToolBar(newPanel).notesButton;
+        notesButton.setSelected(notesDialog.isVisible());
+        // refresh trackbar
+        ((TTrackBar)array[5]).refresh();
+        // refresh and replace menu bar
+        TMenuBar menubar = (TMenuBar)array[4];
+        refreshOpenRecentMenu(menubar.openRecentMenu);
 //          menubar.refresh();
-          setJMenuBar(menubar);
-          // show floating player
-          playerBar = mainView.getPlayerBar();
-          Container frame = playerBar.getTopLevelAncestor();
-          if (frame != null && frame != TFrame.this)
-            frame.setVisible(true);
-          if (newPanel.dataBuilder != null) 
-          	newPanel.dataBuilder.setVisible(newPanel.dataToolVisible);
-          Video vid = newPanel.getVideo();
-          if (vid != null) {
-            vid.getFilterStack().setInspectorsVisible(true);
-          }
+        setJMenuBar(menubar);
+        // show floating player
+        playerBar = mainView.getPlayerBar();
+        Container frame = playerBar.getTopLevelAncestor();
+        if (frame != null && frame != TFrame.this)
+          frame.setVisible(true);
+        if (newPanel.dataBuilder != null)
+            newPanel.dataBuilder.setVisible(newPanel.dataToolVisible);
+        Video vid = newPanel.getVideo();
+        if (vid != null) {
+          vid.getFilterStack().setInspectorsVisible(true);
         }
-        else {
-        	// show defaultMenuBar
-        	refreshOpenRecentMenu(recentMenu);
-          setJMenuBar(defaultMenuBar);
-        }
-        // update prefsDialog
-        if (prefsDialog!=null && prefsDialog.isVisible()) {
-        	prefsDialog.refreshGUI();
-        }
-        firePropertyChange("tab", oldPanel, newPanel); //$NON-NLS-1$
       }
+      else {
+          // show defaultMenuBar
+          refreshOpenRecentMenu(recentMenu);
+        setJMenuBar(defaultMenuBar);
+      }
+      // update prefsDialog
+      if (prefsDialog!=null && prefsDialog.isVisible()) {
+          prefsDialog.refreshGUI();
+      }
+      firePropertyChange("tab", oldPanel, newPanel); //$NON-NLS-1$
     });
     closeItem = new JMenuItem();
-    closeItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        removeTab(getTrackerPanel(getSelectedTab()));
-      }
-    });
+    closeItem.addActionListener(e -> removeTab(getTrackerPanel(getSelectedTab())));
     popup.add(closeItem);
     tabbedPane.addMouseListener(new MouseAdapter() {
       public void mousePressed(MouseEvent e) {
@@ -1969,7 +1830,7 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
   
   private void createDefaultMenuBar() {
     // create the default (empty) menubar
-    int keyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    int keyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
     defaultMenuBar = new JMenuBar();
     setJMenuBar(defaultMenuBar);
     // file menu
@@ -1978,16 +1839,14 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     // new tab item
     JMenuItem newItem = new JMenuItem(TrackerRes.getString("TActions.Action.NewTab")); //$NON-NLS-1$
     newItem.setAccelerator(KeyStroke.getKeyStroke('N', keyMask));
-    newItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        TrackerPanel newPanel = new TrackerPanel();
-        newPanel.changed = false;
-        addTab(newPanel);
-        setSelectedTab(newPanel);
-        JSplitPane pane = getSplitPane(newPanel, 0);
-        pane.setDividerLocation(defaultRightDivider);
-        refresh();
-      }
+    newItem.addActionListener(e -> {
+      TrackerPanel newPanel = new TrackerPanel();
+      newPanel.changed = false;
+      addTab(newPanel);
+      setSelectedTab(newPanel);
+      JSplitPane pane = getSplitPane(newPanel, 0);
+      pane.setDividerLocation(defaultRightDivider);
+      refresh();
     });
     fileMenu.add(newItem);
     if( org.opensourcephysics.display.OSPRuntime.applet == null) {
@@ -1996,33 +1855,29 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
       Icon icon = new ImageIcon(getClass().getResource("/images/open.gif")); //$NON-NLS-1$
       JMenuItem openItem = new JMenuItem(TrackerRes.getString("TActions.Action.Open"), icon); //$NON-NLS-1$
       openItem.setAccelerator(KeyStroke.getKeyStroke('O', keyMask));
-      openItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          TFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          TrackerIO.open((File)null, TFrame.this);
-          TFrame.this.setCursor(Cursor.getDefaultCursor());
-        }
+      openItem.addActionListener(e -> {
+        TFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        TrackerIO.open((File)null, TFrame.this);
+        TFrame.this.setCursor(Cursor.getDefaultCursor());
       });
       fileMenu.add(openItem);
       // open url item
       JMenuItem openURLItem = new JMenuItem(TrackerRes.getString("TActions.Action.OpenURL")); //$NON-NLS-1$
-      openURLItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          Object input = JOptionPane.showInputDialog(TFrame.this, 
-          		TrackerRes.getString("TActions.Dialog.OpenURL.Message") //$NON-NLS-1$
-          		+":                             ", //$NON-NLS-1$
-          		TrackerRes.getString("TActions.Dialog.OpenURL.Title"),   //$NON-NLS-1$
-              JOptionPane.PLAIN_MESSAGE, null, null, null);
-          if(input==null || input.toString().trim().equals("")) { //$NON-NLS-1$
-            return;
-          }
-          Resource res = ResourceLoader.getResource(input.toString().trim());
-          URL url = res.getURL();
-          if (url==null) return;
-          TFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-          TrackerIO.open(url, TFrame.this);
-          TFrame.this.setCursor(Cursor.getDefaultCursor());
+      openURLItem.addActionListener(e -> {
+        Object input = JOptionPane.showInputDialog(TFrame.this,
+                TrackerRes.getString("TActions.Dialog.OpenURL.Message") //$NON-NLS-1$
+                +":                             ", //$NON-NLS-1$
+                TrackerRes.getString("TActions.Dialog.OpenURL.Title"),   //$NON-NLS-1$
+            JOptionPane.PLAIN_MESSAGE, null, null, null);
+        if(input==null || input.toString().trim().equals("")) { //$NON-NLS-1$
+          return;
         }
+        Resource res = ResourceLoader.getResource(input.toString().trim());
+        URL url = res.getURL();
+        if (url==null) return;
+        TFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        TrackerIO.open(url, TFrame.this);
+        TFrame.this.setCursor(Cursor.getDefaultCursor());
       });
       fileMenu.add(openURLItem);
       // open recent menu
@@ -2033,19 +1888,13 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
       // openBrowser item
       icon = new ImageIcon(getClass().getResource("/images/open_catalog.gif")); //$NON-NLS-1$
       JMenuItem openBrowserItem = new JMenuItem(TrackerRes.getString("TActions.Action.OpenBrowser"), icon); //$NON-NLS-1$
-      openBrowserItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-  	      getLibraryBrowser().setVisible(true);
-        }
-      });
+      openBrowserItem.addActionListener(e -> getLibraryBrowser().setVisible(true));
       fileMenu.add(openBrowserItem);
       fileMenu.addSeparator();
       // exit item
       JMenuItem exitItem = new JMenuItem(TrackerRes.getString("TActions.Action.Exit")); //$NON-NLS-1$
       exitItem.setAccelerator(KeyStroke.getKeyStroke('Q', keyMask));
-      exitItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {System.exit(0);}
-      });
+      exitItem.addActionListener(e -> System.exit(0));
       fileMenu.add(exitItem);
     }
     // edit menu
@@ -2099,23 +1948,15 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     JMenuItem otherLanguageItem = new JMenuItem("Other"); //$NON-NLS-1$
     languageMenu.addSeparator();
     languageMenu.add(otherLanguageItem);
-    otherLanguageItem.addActionListener(new ActionListener() {
-    	public void actionPerformed(ActionEvent e) {
-        JOptionPane.showMessageDialog(TFrame.this, 
-	    			"Do you speak a language not yet available in Tracker?" //$NON-NLS-1$
-	    			+"\nTo learn more about translating Tracker into your language" //$NON-NLS-1$ 
-	    			+"\nplease contact Douglas Brown at dobrown@cabrillo.edu.",  //$NON-NLS-1$
-	    			"New Translation",  //$NON-NLS-1$
-	    			JOptionPane.INFORMATION_MESSAGE);
-    	}
-    });
+    otherLanguageItem.addActionListener(e -> JOptionPane.showMessageDialog(TFrame.this,
+                "Do you speak a language not yet available in Tracker?" //$NON-NLS-1$
+                +"\nTo learn more about translating Tracker into your language" //$NON-NLS-1$
+                +"\nplease contact Douglas Brown at dobrown@cabrillo.edu.",  //$NON-NLS-1$
+                "New Translation",  //$NON-NLS-1$
+                JOptionPane.INFORMATION_MESSAGE));
     // preferences item
     JMenuItem prefsItem = new JMenuItem(TrackerRes.getString("TActions.Action.Config")); //$NON-NLS-1$
-    prefsItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	showPrefsDialog();
-      }
-    });
+    prefsItem.addActionListener(e -> showPrefsDialog());
     editMenu.addSeparator();
     editMenu.add(prefsItem);
 
@@ -2245,7 +2086,7 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
       		XML.getDirectoryPath(XML.getAbsolutePath(frame.tabsetFile)): 
       		XML.getUserDirectory();
       		relativeTo = XML.forwardSlash(relativeTo);
-      ArrayList<String[]> pathList = new ArrayList<String[]>();
+      ArrayList<String[]> pathList = new ArrayList<>();
       for (int i = 0; i < frame.getTabCount(); i++) {
       	TrackerPanel trackerPanel = frame.getTrackerPanel(i);
       	File file = trackerPanel.getDataFile();

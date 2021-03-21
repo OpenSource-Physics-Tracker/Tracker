@@ -48,7 +48,7 @@ public class PlotGuestDialog extends JDialog {
   protected JPanel checkboxPanel;
   protected ActionListener listener;
   protected TitledBorder instructions;
-  protected TreeSet<Integer> allTracks = new TreeSet<Integer>();
+  protected TreeSet<Integer> allTracks = new TreeSet<>();
   protected boolean allTracksSelected;
 
   /**
@@ -60,15 +60,13 @@ public class PlotGuestDialog extends JDialog {
     super(JOptionPane.getFrameForComponent(panel), true);
     trackerPanel = panel;
     // listener for the checkboxes
-    listener = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	JCheckBoxMenuItem checkbox = (JCheckBoxMenuItem)e.getSource();
-      	int id = Integer.parseInt(checkbox.getActionCommand());
-	      TTrack track = TTrack.getTrack(id);
-      	if (checkbox.isSelected()) plot.addGuest(track);
-				else plot.removeGuest(track);
-      	plot.plotData();
-      }
+    listener = e -> {
+        JCheckBoxMenuItem checkbox = (JCheckBoxMenuItem)e.getSource();
+        int id = Integer.parseInt(checkbox.getActionCommand());
+        TTrack track = TTrack.getTrack(id);
+        if (checkbox.isSelected()) plot.addGuest(track);
+              else plot.removeGuest(track);
+        plot.plotData();
     };
     setResizable(false);
     createGUI();
@@ -97,37 +95,27 @@ public class PlotGuestDialog extends JDialog {
     // create ok button
     okButton = new JButton(TrackerRes.getString("Dialog.Button.OK")); //$NON-NLS-1$
     okButton.setForeground(new Color(0, 0, 102));
-    okButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-      }
-    });
+    okButton.addActionListener(e -> setVisible(false));
     // create compareAllButton
     selectAllButton = new JButton(TrackerRes.getString("PlotGuestDialog.Button.SelectAll.Text")); //$NON-NLS-1$
     selectAllButton.setForeground(new Color(0, 0, 102));
-    selectAllButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	for (Integer id: allTracks) {
-		      TTrack track = TTrack.getTrack(id);
-		      if (allTracksSelected) {
-		      	plot.removeGuest(track);
-		      }
-		      else plot.addGuest(track);
-      	}
-      	plot.plotData();
-      	updateDisplay();
-      }
+    selectAllButton.addActionListener(e -> {
+        for (Integer id: allTracks) {
+            TTrack track = TTrack.getTrack(id);
+            if (allTracksSelected) {
+                plot.removeGuest(track);
+            }
+            else plot.addGuest(track);
+        }
+        plot.plotData();
+        updateDisplay();
     });
     // create buttonbar at bottom
     JPanel buttonbar = new JPanel();
     buttonbar.setBorder(BorderFactory.createEmptyBorder(1, 0, 3, 0));
     inspectorPanel.add(buttonbar, BorderLayout.SOUTH);
-//    Box box = Box.createHorizontalBox();
-//    buttonbar.add(box);
     buttonbar.add(selectAllButton);
     buttonbar.add(okButton);
-//    box = Box.createHorizontalBox();
-//    buttonbar.add(box);
   }
 
   /**
@@ -182,10 +170,7 @@ public class PlotGuestDialog extends JDialog {
     	}
       checkboxPanel.add(box);
     }
-    if (allTracksSelected) {
-    	
-    }
-    selectAllButton.setText(allTracksSelected? 
+      selectAllButton.setText(allTracksSelected?
     		TrackerRes.getString("PlotGuestDialog.Button.SelectNone.Text"): //$NON-NLS-1$
     		TrackerRes.getString("PlotGuestDialog.Button.SelectAll.Text")); //$NON-NLS-1$
   	FontSizer.setFonts(checkboxPanel, FontSizer.getLevel());

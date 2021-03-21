@@ -18,7 +18,10 @@ import java.beans.PropertyChangeSupport;
  * @author Nikolai Avdeev aka NickKolok
  */
 public class AutoTrackerOptions implements Cloneable {
-	private int goodMatch=4, possibleMatch=1, evolveAlpha=63, autoskipCount=2;
+	private int goodMatch=4;
+	private final int possibleMatch=1;
+	private int evolveAlpha=63;
+	private int autoskipCount=2;
 	private int lineSpread = -1;  // positive for 1D, negative for 2D tracking
 	private double maskWidth=16.0, maskHeight=16.0;
 	private boolean lookAhead=true;
@@ -45,12 +48,6 @@ public class AutoTrackerOptions implements Cloneable {
 	}
 	public int getPossibleMatch() {
 		return possibleMatch;
-	}
-
-	public void setPossibleMatch(int possibleMatch) {
-		int oldMatch = this.possibleMatch;
-		this.possibleMatch = possibleMatch;
-		changes.firePropertyChange("possibleMatch", oldMatch, possibleMatch);
 	}
 
 	public boolean isMatchPossible(double match){
@@ -132,15 +129,6 @@ public class AutoTrackerOptions implements Cloneable {
 
 	public int getPredictionLookback() {
 		return predictionLookback;
-	}
-
-	public void setPredictionLookback(int predictionLookback) {
-		if(this.predictionLookback == predictionLookback){
-			return;
-		}
-		this.predictionLookback = predictionLookback;
-		int old = this.predictionLookback;
-		changes.firePropertyChange("predictionLookback", old, predictionLookback);
 	}
 
 	public int getMaskShapeType() {

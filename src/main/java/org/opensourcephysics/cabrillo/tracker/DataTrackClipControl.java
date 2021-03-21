@@ -1,38 +1,19 @@
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.event.MouseListener;
-import java.awt.geom.GeneralPath;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.opensourcephysics.display.DataClip;
 import org.opensourcephysics.display.DrawingPanel;
 import org.opensourcephysics.display.Interactive;
 import org.opensourcephysics.media.core.DataTrack;
 import org.opensourcephysics.media.core.VideoClip;
 import org.opensourcephysics.media.core.VideoPanel;
+
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
+import java.awt.event.MouseListener;
+import java.awt.geom.GeneralPath;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 public class DataTrackClipControl extends JPanel implements PropertyChangeListener {
 	
@@ -82,71 +63,63 @@ public class DataTrackClipControl extends JPanel implements PropertyChangeListen
   	// create spinners
     SpinnerModel spinModel = new SpinnerNumberModel(0, 0, 20, 1);
     videoInSpinner = new MySpinner(spinModel);
-    ChangeListener listener = new ChangeListener() {
-      public void stateChanged(ChangeEvent e) {
-      	if (refreshing) return;
-        int in = (Integer)videoInSpinner.getValue();
-        if (in==dataTrack.getStartFrame()) {
-        	return;
-        }
-        dataTrack.setStartFrame(in);
-        videoInSpinner.setValue(dataTrack.getStartFrame());
-        repaint();
-        videoInSpinner.requestFocusInWindow();
-      }
-  	};
+    ChangeListener listener = e -> {
+		if (refreshing) return;
+	  int in = (Integer)videoInSpinner.getValue();
+	  if (in==dataTrack.getStartFrame()) {
+		  return;
+	  }
+	  dataTrack.setStartFrame(in);
+	  videoInSpinner.setValue(dataTrack.getStartFrame());
+	  repaint();
+	  videoInSpinner.requestFocusInWindow();
+	};
   	videoInSpinner.addChangeListener(listener);
   	
     spinModel = new SpinnerNumberModel(0, 0, 20, 1);
     dataInSpinner = new MySpinner(spinModel);
-    listener = new ChangeListener() {
-      public void stateChanged(ChangeEvent e) {
-      	if (refreshing) return;
-        int in = (Integer)dataInSpinner.getValue();
-        if (in==dataTrack.getDataClip().getStartIndex()) {
-        	return;
-        }
-        dataTrack.getDataClip().setStartIndex(in);
-        dataInSpinner.setValue(dataTrack.getDataClip().getStartIndex());
-        repaint();
-        dataInSpinner.requestFocusInWindow();
-      }
-  	};
+    listener = e -> {
+		if (refreshing) return;
+	  int in = (Integer)dataInSpinner.getValue();
+	  if (in==dataTrack.getDataClip().getStartIndex()) {
+		  return;
+	  }
+	  dataTrack.getDataClip().setStartIndex(in);
+	  dataInSpinner.setValue(dataTrack.getDataClip().getStartIndex());
+	  repaint();
+	  dataInSpinner.requestFocusInWindow();
+	};
   	dataInSpinner.addChangeListener(listener);
 
   	
     spinModel = new SpinnerNumberModel(1, 1, 20, 1);
     dataClipLengthSpinner = new MySpinner(spinModel);
-    listener = new ChangeListener() {
-      public void stateChanged(ChangeEvent e) {
-      	if (refreshing) return;
-        int length = (Integer)dataClipLengthSpinner.getValue();
-        if (length==dataTrack.getDataClip().getClipLength()) {
-        	return;
-        }
-        dataTrack.getDataClip().setClipLength(length);
-        dataClipLengthSpinner.setValue(dataTrack.getDataClip().getClipLength());
-        repaint();
-        dataClipLengthSpinner.requestFocusInWindow();
-      }
-  	};
+    listener = e -> {
+		if (refreshing) return;
+	  int length = (Integer)dataClipLengthSpinner.getValue();
+	  if (length==dataTrack.getDataClip().getClipLength()) {
+		  return;
+	  }
+	  dataTrack.getDataClip().setClipLength(length);
+	  dataClipLengthSpinner.setValue(dataTrack.getDataClip().getClipLength());
+	  repaint();
+	  dataClipLengthSpinner.requestFocusInWindow();
+	};
   	dataClipLengthSpinner.addChangeListener(listener);
 
     spinModel = new SpinnerNumberModel(1, 1, 10, 1);
     dataStrideSpinner = new MySpinner(spinModel);
-    listener = new ChangeListener() {
-      public void stateChanged(ChangeEvent e) {
-      	if (refreshing) return;
-        int n = (Integer)dataStrideSpinner.getValue();
-        if (n==dataTrack.getDataClip().getStride()) {
-        	return;
-        }
-        dataTrack.getDataClip().setStride(n);
-        dataStrideSpinner.setValue(dataTrack.getDataClip().getStride());
-        repaint();
-        dataStrideSpinner.requestFocusInWindow();
-      }
-  	};
+    listener = e -> {
+		if (refreshing) return;
+	  int n = (Integer)dataStrideSpinner.getValue();
+	  if (n==dataTrack.getDataClip().getStride()) {
+		  return;
+	  }
+	  dataTrack.getDataClip().setStride(n);
+	  dataStrideSpinner.setValue(dataTrack.getDataClip().getStride());
+	  repaint();
+	  dataStrideSpinner.requestFocusInWindow();
+	};
   	dataStrideSpinner.addChangeListener(listener);
 
   	// assemble
@@ -511,10 +484,9 @@ public class DataTrackClipControl extends JPanel implements PropertyChangeListen
 	  /**
 	   * Gets the sliders mark.
 	   *
-	   * @param points a Point array
 	   * @return the mark
 	   */
-	  public Mark getMark(Point[] points) {
+	  public Mark getMark() {
 	  	return new Mark() {
 
 				public void draw(Graphics2D g, boolean highlighted) {
@@ -593,7 +565,7 @@ public class DataTrackClipControl extends JPanel implements PropertyChangeListen
   	}
   }
   
-  class GraphicPanel extends DrawingPanel {
+  static class GraphicPanel extends DrawingPanel {
   	GraphicPanel() {
       // remove the interactive panel mouse controller
       removeMouseListener(mouseController);

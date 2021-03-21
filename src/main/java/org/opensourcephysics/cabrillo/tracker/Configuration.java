@@ -36,13 +36,13 @@ import org.opensourcephysics.controls.*;
  */
 public class Configuration {
 
-  Set<String> enabled = new TreeSet<String>();
+  Set<String> enabled;
 
   /**
    * Creates an empty Configuration.
    */
   public Configuration() {
-    enabled = new TreeSet<String>();
+    enabled = new TreeSet<>();
   }
 
   /**
@@ -111,8 +111,8 @@ public class Configuration {
       // load the configuration
       Object set = control.getObject("enabled"); //$NON-NLS-1$
       if (set != null) {
-      	TreeSet<String> enabled = new TreeSet<String>();
-      	for (Object next: Collection.class.cast(set)) {
+      	TreeSet<String> enabled = new TreeSet<>();
+      	for (Object next: (Collection) set) {
       		enabled.add((String)next);
       	}
         config.enabled = enabled;

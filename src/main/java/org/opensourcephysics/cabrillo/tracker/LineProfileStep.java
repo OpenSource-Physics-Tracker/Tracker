@@ -48,25 +48,24 @@ public class LineProfileStep extends Step {
   protected TPoint lineEnd1;
   protected Handle handle;
   protected boolean endsEnabled = true;
-  protected Map<TrackerPanel, Shape> end0Shapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, Shape> end1Shapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, Shape> shaftShapes = new HashMap<TrackerPanel, Shape>();
+  protected Map<TrackerPanel, Shape> end0Shapes = new HashMap<>();
+  protected Map<TrackerPanel, Shape> end1Shapes = new HashMap<>();
+  protected Map<TrackerPanel, Shape> shaftShapes = new HashMap<>();
   protected LineProfile line;
   protected Corner[][] corners; // corners at ends 0,1 of sweep lines 0,1
   protected GridIntersection[] endX; // end 0,1 x-intersections
   protected GridIntersection[] endY; // end 0,1 y-intersections
   protected GridIntersection[][] sweepX; // x-intersections along sweep line 0,1
   protected GridIntersection[][] sweepY; // y-intersections along sweep line 0,1
-  protected TreeSet<Intersection> sorter = new TreeSet<Intersection>(); // used to sort Intersections
-  protected ArrayList<GridVertex> vertices = new ArrayList<GridVertex>(); // GridVertex collection
+  protected TreeSet<Intersection> sorter = new TreeSet<>(); // used to sort Intersections
+  protected ArrayList<GridVertex> vertices = new ArrayList<>(); // GridVertex collection
   private double sin, cos; // sine and cosine of line profile angle
-  private double xMin, xMax, yMin, yMax; // borders of the current probe
-  private TreeSet<GridSegment> xSegments = new TreeSet<GridSegment>(); // vertical GridSegments
-  private TreeSet<GridSegment> ySegments = new TreeSet<GridSegment>(); // horizontal GridSegments
+    private final TreeSet<GridSegment> xSegments; // vertical GridSegments
+  private final TreeSet<GridSegment> ySegments; // horizontal GridSegments
   private int leadingIndex; // toggles between 0,1 to leapfrog 
-  private Intersection[] polygon = new Intersection[8]; // polygon shape vertices
-  private Point polyLoc = new Point();
-  private double[] quadAreas = new double[4]; // used for GridVertex quadrant areas
+  private final Intersection[] polygon = new Intersection[8]; // polygon shape vertices
+  private final Point polyLoc = new Point();
+  private final double[] quadAreas = new double[4]; // used for GridVertex quadrant areas
 
   /**
    * Constructs a LineProfileStep with specified end point coordinates in image
@@ -89,18 +88,14 @@ public class LineProfileStep extends Step {
     handle = new Handle((x1+x2)/2, (y1+y2)/2);
     points = new TPoint[] {lineEnd0, lineEnd1, handle};
     screenPoints = new Point[getLength()];
-    xSegments = new TreeSet<GridSegment>();
-    ySegments = new TreeSet<GridSegment>();
+    xSegments = new TreeSet<>();
+    ySegments = new TreeSet<>();
     corners = new Corner[2][2];
-//    leadingCorners = new Corner[2];
-//    trailingCorners = new Corner[2];
     endX = new GridIntersection[2];
     endY = new GridIntersection[2];
     for (int i = 0; i < 2; i++) {
     	corners[0][i] = new Corner();
     	corners[1][i] = new Corner();
-//      leadingCorners[i] = new Corner();
-//      trailingCorners[i] = new Corner();
     	endX[i] = new GridIntersection(0, 0, true); // vertical
     	endY[i] = new GridIntersection(0, 0, false); // horizontal
     }
@@ -208,7 +203,7 @@ public class LineProfileStep extends Step {
    */
   protected Mark getMark(TrackerPanel trackerPanel) {
     Mark mark = marks.get(trackerPanel);
-    TPoint selection = null;
+    TPoint selection;
     if (mark == null) {
       if (footprint instanceof OutlineFootprint) {
         OutlineFootprint outline = (OutlineFootprint)footprint;
@@ -283,8 +278,7 @@ public class LineProfileStep extends Step {
    * @return the bounding rectangle
    */
   public Rectangle getBounds(TrackerPanel trackerPanel) {
-    Rectangle bounds = getMark(trackerPanel).getBounds(false);
-    return bounds;
+      return getMark(trackerPanel).getBounds(false);
   }
 
   /**
@@ -298,9 +292,9 @@ public class LineProfileStep extends Step {
       step.points[0] = step.lineEnd0 = step.new LineEnd(lineEnd0.getX(), lineEnd0.getY());
       step.points[1] = step.lineEnd1 = step.new LineEnd(lineEnd1.getX(), lineEnd1.getY());
       step.points[2] = step.handle = step.new Handle(handle.getX(), handle.getY());
-      step.end0Shapes = new HashMap<TrackerPanel, Shape>();
-      step.end1Shapes = new HashMap<TrackerPanel, Shape>();
-      step.shaftShapes = new HashMap<TrackerPanel, Shape>();
+      step.end0Shapes = new HashMap<>();
+      step.end1Shapes = new HashMap<>();
+      step.shaftShapes = new HashMap<>();
       step.endX = new GridIntersection[2];
       step.endY = new GridIntersection[2];
       for (int i = 0; i < 2; i++) {
@@ -411,8 +405,11 @@ public class LineProfileStep extends Step {
       }
       if (len < 1) return null;
       // get the min and max bounds
-      xMin = xMax = corners[0][0].x;
-      yMin = yMax = corners[0][0].y;
+        double xMax;
+        double xMin = xMax = corners[0][0].x;
+        // borders of the current probe
+        double yMax;
+        double yMin = yMax = corners[0][0].y;
       for (int i = 0; i < 2; i++) {
       	for (int j = 0; j < 2; j++) {
 	      	xMin = Math.min(xMin, corners[i][j].x);
@@ -476,7 +473,7 @@ public class LineProfileStep extends Step {
           	}
           }
           // get position data at center of bounds
-          imagePixel.setLocation((xMax+xMin)/2, (yMax+yMin)/2);
+          imagePixel.setLocation((xMax + xMin)/2, (yMax + yMin)/2);
           at.transform(imagePixel, worldPixel);
           values[0][i] = worldPixel.getX();
           values[1][i] = worldPixel.getY();
@@ -499,25 +496,23 @@ public class LineProfileStep extends Step {
           int column, row;
         	// step through vertices, if any  
           if (!vertices.isEmpty()) {
-	          Iterator<GridVertex> it = vertices.iterator();
-	          while (it.hasNext()) {
-	          	// fill areas array from quadrant areas  
-	          	GridVertex next = it.next();
-	          	column = (int)next.x - minCol;
-	          	row = (int)next.y - minRow;
-	            // set initial quadrant areas
-	            quadAreas[0] = areas[column][row];
-	            quadAreas[1] = column > 0? areas[column-1][row]: 1;
-	            quadAreas[2] = row > 0 && column > 0? areas[column-1][row-1]: 1;
-	            quadAreas[3] = row > 0? areas[column][row-1]: 1;
-	            getAreas(next, quadAreas);
-	          	areas[column][row] = quadAreas[0];
-	          	if (column > 0) areas[column-1][row] = quadAreas[1];
-	          	if (row > 0) {
-	          		areas[column][row-1] = quadAreas[3];
-	            	if (column > 0) areas[column-1][row-1] = quadAreas[2];
-	          	}
-	          }
+              for (GridVertex next : vertices) {
+                  // fill areas array from quadrant areas
+                  column = (int) next.x - minCol;
+                  row = (int) next.y - minRow;
+                  // set initial quadrant areas
+                  quadAreas[0] = areas[column][row];
+                  quadAreas[1] = column > 0 ? areas[column - 1][row] : 1;
+                  quadAreas[2] = row > 0 && column > 0 ? areas[column - 1][row - 1] : 1;
+                  quadAreas[3] = row > 0 ? areas[column][row - 1] : 1;
+                  getAreas(next, quadAreas);
+                  areas[column][row] = quadAreas[0];
+                  if (column > 0) areas[column - 1][row] = quadAreas[1];
+                  if (row > 0) {
+                      areas[column][row - 1] = quadAreas[3];
+                      if (column > 0) areas[column - 1][row - 1] = quadAreas[2];
+                  }
+              }
           }
           else { // no vertices found: single pixel case
           	// pick any grid segment and find areas on both sides
@@ -647,14 +642,14 @@ public class LineProfileStep extends Step {
     }
   	// iterate and pair off
   	GridIntersection end0 = null; // one end of a grid segment
-  	for (Iterator<Intersection> it = sorter.iterator(); it.hasNext();) {
-  		GridIntersection next = (GridIntersection)it.next();
-			if (end0 == null) end0 = next;
-			else {
-				xSegments.add(new GridSegment(next, end0));
-				end0 = null;
-			}
-  	}
+      for (Intersection intersection : sorter) {
+          GridIntersection next = (GridIntersection) intersection;
+          if (end0 == null) end0 = next;
+          else {
+              xSegments.add(new GridSegment(next, end0));
+              end0 = null;
+          }
+      }
   	// y-grid (horizontal) segments
   	ySegments.clear();
     sorter.clear();
@@ -677,18 +672,17 @@ public class LineProfileStep extends Step {
     }
   	// iterate and pair off
   	end0 = null;
-  	for (Iterator<Intersection> it = sorter.iterator(); it.hasNext();) {
-  		GridIntersection next = (GridIntersection)it.next();
-			double val = next.y;
-    	next.setLocation(val, next.x);
-			if (end0 == null) {
-				end0 = next;
-			}
-			else {
-				ySegments.add(new GridSegment(next, end0));
-				end0 = null;
-			}
-  	}
+      for (Intersection intersection : sorter) {
+          GridIntersection next = (GridIntersection) intersection;
+          double val = next.y;
+          next.setLocation(val, next.x);
+          if (end0 == null) {
+              end0 = next;
+          } else {
+              ySegments.add(new GridSegment(next, end0));
+              end0 = null;
+          }
+      }
   }
   
   /**
@@ -697,22 +691,18 @@ public class LineProfileStep extends Step {
   private void findGridVertices() {
   	vertices.clear();
    	// for each x-segment, find all intersecting y-segments
-  	Iterator<GridSegment> xIt = xSegments.iterator();
-  	while (xIt.hasNext()) {
-  		GridSegment nextX = xIt.next();
-  		Iterator<GridSegment> yIt = ySegments.iterator();
-  		while (yIt.hasNext()) {
-  			GridSegment nextY = yIt.next();
-  			if (nextY.higher.x < nextX.value) // y segment's max x is too small
-  				continue;  			
-  			if (nextY.lower.x > nextX.value) // y segment's min x is too big
-  				break;  
-  			// only need to check x segment
-  			if (nextX.lower.y < nextY.value && nextX.higher.y > nextY.value) {
-  				vertices.add(new GridVertex(nextX, nextY));
-  			}
-  		}
-  	}
+      for (GridSegment nextX : xSegments) {
+          for (GridSegment nextY : ySegments) {
+              if (nextY.higher.x < nextX.value) // y segment's max x is too small
+                  continue;
+              if (nextY.lower.x > nextX.value) // y segment's min x is too big
+                  break;
+              // only need to check x segment
+              if (nextX.lower.y < nextY.value && nextX.higher.y > nextY.value) {
+                  vertices.add(new GridVertex(nextX, nextY));
+              }
+          }
+      }
   	// sort the vertices
   	Collections.sort(vertices);
   	// trim vertex segments longer than 1 pixel
@@ -886,17 +876,15 @@ public class LineProfileStep extends Step {
   /**
    * Finds the areas in each quadrant of the specified GridVertex.
    * Skips areas that have already been determined.
-   * 
+   *
    * @param vertex the GridVertex
-   * @param knowns double[4] array with zero or positive values
    */
-  private double[] getAreas(GridVertex vertex, double[] knownValues) {
+  private void getAreas(GridVertex vertex, double[] knownValues) {
   	// get area in each zero-valued index (quadrant)
   	for (int i = 0; i < 4; i++) {
   		double area = knownValues[i];
   		if (area == 0) knownValues[i] = getArea(vertex, i);
   	}
-  	return knownValues;
   }
   
   /**
@@ -1197,27 +1185,27 @@ public class LineProfileStep extends Step {
   }
   
   //______________________ Intersection classes ______________________________
-  
-  /** 
-   * The classes below help measure the tilted line profile. How they work:
-   * 
-   * 1. A line profile generates data for regions that are 1 pixel apart along the line
-   * 2. Region dimensions are 1 pixel by (2s + 1) pixels where s is the spread
-   * 3. Regions are measured in a probe of width 1.0 pixel and length (2s+1) pixels
-   * 4. The probe has a position (image position of center) and tilt angle
-   * 5. The probe has a leading edge, trailing edge and two 1-pixel-long ends
-   * 6. Measured rgb values depend on overlapping areas between probe and image pixel grid
-   * 7. Every area is a polygon made of pixel grid lines and probe perimeter lines
-   * 8. Every point on a polygon is an Intersection of type: 
-   *    (a) intersection of a probe edge or end with the grid (GridIntersection)
-   *    (b) grid vertex located inside the probe (GridVertex)
-   *    (c) probe corner (Corner)
-   * 9. Every GridVertex consists of an x and y GridSegment. 
-   * 10. Every GridSegment has a lower and higher Intersection.  
-   * 11. Every polygon (except corner orphan) includes one or more grid vertices
-   * 12. Find pixel areas by stepping thru grid vertices and finding quadrant areas
-   * 13. Find quadrant areas by stepping ccw along linked intersections back to start
-   * 14. Ignore corner orphans for now--not significant since rgb are area-weighted
+
+  /*
+    The classes below help measure the tilted line profile. How they work:
+
+    1. A line profile generates data for regions that are 1 pixel apart along the line
+    2. Region dimensions are 1 pixel by (2s + 1) pixels where s is the spread
+    3. Regions are measured in a probe of width 1.0 pixel and length (2s+1) pixels
+    4. The probe has a position (image position of center) and tilt angle
+    5. The probe has a leading edge, trailing edge and two 1-pixel-long ends
+    6. Measured rgb values depend on overlapping areas between probe and image pixel grid
+    7. Every area is a polygon made of pixel grid lines and probe perimeter lines
+    8. Every point on a polygon is an Intersection of type:
+       (a) intersection of a probe edge or end with the grid (GridIntersection)
+       (b) grid vertex located inside the probe (GridVertex)
+       (c) probe corner (Corner)
+    9. Every GridVertex consists of an x and y GridSegment.
+    10. Every GridSegment has a lower and higher Intersection.
+    11. Every polygon (except corner orphan) includes one or more grid vertices
+    12. Find pixel areas by stepping thru grid vertices and finding quadrant areas
+    13. Find quadrant areas by stepping ccw along linked intersections back to start
+    14. Ignore corner orphans for now--not significant since rgb are area-weighted
    */
 
     /**

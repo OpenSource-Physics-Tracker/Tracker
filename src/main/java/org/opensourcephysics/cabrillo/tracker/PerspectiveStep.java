@@ -40,10 +40,8 @@ public class PerspectiveStep extends Step {
    *
    * @param track the PerspectiveTrack track
    * @param n the frame number
-   * @param x the x coordinate
-   * @param y the y coordinate
    */
-  public PerspectiveStep(PerspectiveTrack track, int n, double x, double y) {
+  public PerspectiveStep(PerspectiveTrack track, int n) {
     super(track, n);
     points = new TPoint[] {new Corner(), new Corner(), new Corner(), new Corner()};
     screenPoints = new Point[getLength()];

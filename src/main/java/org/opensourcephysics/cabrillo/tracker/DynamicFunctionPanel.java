@@ -27,15 +27,6 @@ public class DynamicFunctionPanel extends ModelFunctionPanel {
   }
 
   /**
-   * Returns the forcce functions.
-   *
-   * @return the x and y UserFunctions
-   */
-  public UserFunction[] getForceFunctions() {
-    return ((UserFunctionEditor)functionEditor).getMainFunctions();
-  }
-
-  /**
 	 * Refreshes the GUI.
 	 */
   protected void refreshGUI() {

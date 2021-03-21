@@ -50,7 +50,7 @@ public class VectorStep extends Step
   protected static boolean vectorSnapEnabled = true;
   protected static double snapDistance = 8;
   protected static Map<TrackerPanel, Set<VectorStep>> vectors
-  		= new HashMap<TrackerPanel, Set<VectorStep>>();
+  		= new HashMap<>();
   protected static TPoint tipPoint = new TPoint(); // used for layout position
   protected static TPoint tailPoint = new TPoint(); // used for layout position
 
@@ -62,8 +62,8 @@ public class VectorStep extends Step
   protected VisibleTip visibleTip;
   protected int dx, dy; // used when snapped to origin
   protected boolean tipEnabled = true;
-  protected Map<TrackerPanel, Shape> tipShapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, Shape> shaftShapes = new HashMap<TrackerPanel, Shape>();
+  protected Map<TrackerPanel, Shape> tipShapes = new HashMap<>();
+  protected Map<TrackerPanel, Shape> shaftShapes = new HashMap<>();
   protected TPoint attachmentPoint; // tail is attached to this pt
   public VectorChain chain;
   protected boolean brandNew = true;
@@ -71,8 +71,8 @@ public class VectorStep extends Step
   protected boolean labelVisible = true;
   protected boolean rolloverVisible = false;
   protected boolean valid;
-  protected Map<TrackerPanel, TextLayout> textLayouts = new HashMap<TrackerPanel, TextLayout>();
-  protected Map<TrackerPanel, Rectangle> layoutBounds = new HashMap<TrackerPanel, Rectangle>();
+  protected Map<TrackerPanel, TextLayout> textLayouts = new HashMap<>();
+  protected Map<TrackerPanel, Rectangle> layoutBounds = new HashMap<>();
 
   /**
    * Constructs a VectorStep with specified imagespace tail
@@ -141,15 +141,6 @@ public class VectorStep extends Step
   }
 
   /**
-   * Sets the x component.
-   *
-   * @param x the x component
-   */
-  public void setXComponent(double x) {
-    tip.setX(tail.getX() + x);
-  }
-
-  /**
    * Sets the y component.
    *
    * @param y the y component
@@ -187,30 +178,12 @@ public class VectorStep extends Step
   }
 
   /**
-   * Gets the vector label visibility.
-   *
-   * @return <code>true</code> if label is visible
-   */
-  public boolean isLabelVisible() {
-    return labelVisible;
-  }
-
-  /**
    * Sets the vector label visibility.
    *
    * @param visible <code>true</code> to make label visible
    */
   public void setLabelVisible(boolean visible) {
     labelVisible = visible;
-  }
-
-  /**
-   * Gets the rollover visibility.
-   *
-   * @return <code>true</code> if labels are visible on rollover only
-   */
-  public boolean isRolloverVisible() {
-    return rolloverVisible;
   }
 
   /**
@@ -223,48 +196,12 @@ public class VectorStep extends Step
   }
 
   /**
-   * Enables and disables snap-to-point.
-   *
-   * @param enabled <code>true</code> to enable snap-to-point
-   */
-  public static void setPointSnapEnabled(boolean enabled) {
-    pointSnapEnabled = enabled;
-  }
-
-  /**
-   * Gets whether snap-to-point is enabled.
-   *
-   * @return <code>true</code> if snap-to-point is enabled
-   */
-  public static boolean isPointSnapEnabled() {
-    return pointSnapEnabled;
-  }
-
-  /**
-   * Enables and disables snap-to-vector.
-   *
-   * @param enabled <code>true</code> to enable snap-to-vector
-   */
-  public static void setVectorSnapEnabled(boolean enabled) {
-    vectorSnapEnabled = enabled;
-  }
-
-  /**
-   * Gets whether snap-to-vector is enabled.
-   *
-   * @return <code>true</code> if snap-to-vector is enabled
-   */
-  public static boolean isVectorSnapEnabled() {
-    return vectorSnapEnabled;
-  }
-
-  /**
    * Snaps to point or vector within snapDistance of tail.
    *
    * @param trackerPanel the tracker panel drawing this
    */
   public void snap(TrackerPanel trackerPanel) {
-    TPoint p = null;
+    TPoint p;
     if (pointSnapEnabled) {
       // snap to position
     	TTrack track = getTrack();
@@ -291,9 +228,7 @@ public class VectorStep extends Step
       // try to link to other vectors
       Set<VectorStep> c = vectors.get(trackerPanel);
       if (c != null) {
-        Iterator<VectorStep> it = c.iterator();
-        while(it.hasNext()) {
-          VectorStep vec = it.next();
+        for (VectorStep vec : c) {
           if (!vec.valid) continue;
           if (!getTrack().isStepVisible(vec, trackerPanel)) continue;
           p = vec.getVisibleTip();
@@ -304,8 +239,7 @@ public class VectorStep extends Step
             chain = new VectorChain(vec);
             chain.add(this);
             break;
-          }
-          else if (chain.getEnd() == vec) {
+          } else if (chain.getEnd() == vec) {
             chain.add(this);
             break;
           }
@@ -392,11 +326,7 @@ public class VectorStep extends Step
         brandNew = false;
       }
       super.draw(trackerPanel, g);
-      Set<VectorStep> c = vectors.get(trackerPanel);
-      if (c == null) {
-        c = new HashSet<VectorStep>();
-        vectors.put(trackerPanel, c);
-      }
+      Set<VectorStep> c = vectors.computeIfAbsent(trackerPanel, k -> new HashSet<>());
       c.add(this);
       if (labelVisible) {
         TextLayout layout = textLayouts.get(trackerPanel);
@@ -460,7 +390,7 @@ public class VectorStep extends Step
    */
   protected Mark getMark(TrackerPanel trackerPanel) {
     Mark mark = marks.get(trackerPanel);
-    TPoint selection = null;
+    TPoint selection;
     if (mark == null) {
       tip.setLocation(tip.getX(), tip.getY()); // sets visible tip position
       middle.center(visibleTip, tail);
@@ -481,10 +411,10 @@ public class VectorStep extends Step
     			Point origin = view.getSnapPoint().getScreenPosition(view);
     			dx = origin.x - screenPoints[1].x;
     			dy = origin.y - screenPoints[1].y;
-          for (int n = 0; n < screenPoints.length; n++) {
-            screenPoints[n].x += dx;
-            screenPoints[n].y += dy;
-          }    			
+              for (Point screenPoint : screenPoints) {
+                screenPoint.x += dx;
+                screenPoint.y += dy;
+              }
           if (p != null) {
           	p.x += dx;
           	p.y += dy;
@@ -629,10 +559,10 @@ public class VectorStep extends Step
           return VectorStep.this.n;
         }
       };
-      step.tipShapes = new HashMap<TrackerPanel, Shape>();
-      step.shaftShapes = new HashMap<TrackerPanel, Shape>();
-      step.textLayouts = new HashMap<TrackerPanel, TextLayout>();
-      step.layoutBounds = new HashMap<TrackerPanel, Rectangle>();
+      step.tipShapes = new HashMap<>();
+      step.shaftShapes = new HashMap<>();
+      step.textLayouts = new HashMap<>();
+      step.layoutBounds = new HashMap<>();
       step.setFirePropertyChangeEvents(firePropertyChangeEvents);
     }
     return step;
@@ -663,7 +593,7 @@ public class VectorStep extends Step
     Point p = middle.getScreenPosition(trackerPanel);
     // move p on WorldTView if snapped to origin
   	if (trackerPanel instanceof WorldTView &&
-  			attachmentPoint == ((WorldTView)trackerPanel).getSnapPoint()) {
+  			attachmentPoint == trackerPanel.getSnapPoint()) {
   		p.x += dx;
       p.y += dy;
     }
@@ -736,7 +666,7 @@ public class VectorStep extends Step
         else attach(null);
       }
       if (firePropertyChangeEvents)
-        getTrack().support.firePropertyChange("step", null, new Integer(n)); //$NON-NLS-1$
+        getTrack().support.firePropertyChange("step", null, n); //$NON-NLS-1$
       repaint();
     }
 
@@ -836,7 +766,7 @@ public class VectorStep extends Step
         return;
       super.setXY(x, y);
       if (firePropertyChangeEvents)
-        track.support.firePropertyChange("step", null, new Integer(n)); //$NON-NLS-1$
+        track.support.firePropertyChange("step", null, n); //$NON-NLS-1$
       repaint();
     }
 
@@ -973,7 +903,6 @@ public class VectorStep extends Step
         if (i < chain.size() - 1) {
           VectorStep vec = chain.get(i + 1);
           vec.getTail().setXY(x, y);
-          return;
         }
       }
     }
@@ -1014,7 +943,7 @@ public class VectorStep extends Step
     public void saveObject(XMLControl control, Object obj) {
       VectorStep step = (VectorStep) obj;
       boolean snap = (step.attachmentPoint != null);
-      if (snap) control.setValue("snap", snap); //$NON-NLS-1$
+      if (snap) control.setValue("snap", true); //$NON-NLS-1$
       control.setValue("xtail", step.getTail().x); //$NON-NLS-1$
       control.setValue("ytail", step.getTail().y); //$NON-NLS-1$
       if (!step.getTrack().isDependent() && 

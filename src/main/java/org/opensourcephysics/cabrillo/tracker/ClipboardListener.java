@@ -42,8 +42,8 @@ import org.opensourcephysics.tools.DataTool;
  */
 class ClipboardListener extends Thread implements ClipboardOwner {
 	
-  private Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
-  private TFrame frame;
+  private final Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
+  private final TFrame frame;
   private boolean running = true;
   private TrackerPanel targetPanel;
   
@@ -72,7 +72,8 @@ class ClipboardListener extends Thread implements ClipboardOwner {
       try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {
-			}
+		  e.printStackTrace();
+	  }
     }
   }
   
@@ -84,14 +85,16 @@ class ClipboardListener extends Thread implements ClipboardOwner {
 	    try {
 	      Thread.sleep(200);
 	    } catch(Exception e) {
-	    }    
+			e.printStackTrace();
+		}
 	    try {
 				Transferable contents = sysClip.getContents(this);
 				processContents(contents);
 				success = true;
 				takeOwnership(contents);
 			} catch (Exception e) {
-			}
+			e.printStackTrace();
+		}
   	}
   }
   
@@ -123,57 +126,56 @@ class ClipboardListener extends Thread implements ClipboardOwner {
     }
   	try {
 			String dataString = (String)t.getTransferData(DataFlavor.stringFlavor);
-			if (dataString!=null) {
-				TrackerPanel trackerPanel = frame.getTrackerPanel(frame.getSelectedTab());
-				if (targetPanel!=null) {
-					trackerPanel = targetPanel;
-					targetPanel = null;
-				}
-				if (trackerPanel==null) return;
-				DataTrack dt = ParticleDataTrack.getTrackForDataString(dataString, trackerPanel);
-				// if track exists with the same data string, return
-				if (dt!=null) {
-					// clipboard data has already been pasted
-					return;
-				}
-				// parse the data and find data track
-				DatasetManager data = DataTool.parseData(dataString, null);
-				if (data!=null) {
-					String dataName = data.getName().replaceAll("_", " "); //$NON-NLS-1$ //$NON-NLS-2$;
-					boolean foundMatch = false;
-					ArrayList<DataTrack> dataTracks = trackerPanel.getDrawables(DataTrack.class);
-					for (DataTrack next: dataTracks) {
-						if (!(next instanceof ParticleDataTrack)) continue;
-						ParticleDataTrack track = (ParticleDataTrack)next;
-						String trackName = track.getName("model"); //$NON-NLS-1$
-						if (trackName.equals(dataName) || ("".equals(dataName) &&  //$NON-NLS-1$
-								trackName.equals(TrackerRes.getString("ParticleDataTrack.New.Name")))) { //$NON-NLS-1$
-							// found the data track
-							foundMatch = true;
-							if (track.isAutoPasteEnabled()) {
-								// set new data immediately
-				  			track.setData(data);
-				  			track.prevDataString = dataString;
-							}
-							else {
-								// set pending data
-								track.setPendingDataString(dataString);
-							}
-							break;
-						}
-					}
-					// if no matching track was found then create new track
-					if (!foundMatch && frame.alwaysListenToClipboard) {
-						dt = trackerPanel.importData(data, null);	
-						if (dt!=null && dt instanceof ParticleDataTrack) {
-							ParticleDataTrack track = (ParticleDataTrack)dt;
-							track.prevDataString = track.pendingDataString = dataString;
-						}
-					}
-		    }
-			}
-		} catch (Exception ex) {
+		TrackerPanel trackerPanel = frame.getTrackerPanel(frame.getSelectedTab());
+		if (targetPanel!=null) {
+			trackerPanel = targetPanel;
+			targetPanel = null;
 		}
+		if (trackerPanel==null) return;
+		DataTrack dt = ParticleDataTrack.getTrackForDataString(dataString, trackerPanel);
+		// if track exists with the same data string, return
+		if (dt!=null) {
+			// clipboard data has already been pasted
+			return;
+		}
+		// parse the data and find data track
+		DatasetManager data = DataTool.parseData(dataString, null);
+		if (data!=null) {
+			String dataName = data.getName().replaceAll("_", " "); //$NON-NLS-1$ //$NON-NLS-2$;
+			boolean foundMatch = false;
+			ArrayList<DataTrack> dataTracks = trackerPanel.getDrawables(DataTrack.class);
+			for (DataTrack next: dataTracks) {
+				if (!(next instanceof ParticleDataTrack)) continue;
+				ParticleDataTrack track = (ParticleDataTrack)next;
+				String trackName = track.getName("model"); //$NON-NLS-1$
+				if (trackName.equals(dataName) || ("".equals(dataName) &&  //$NON-NLS-1$
+						trackName.equals(TrackerRes.getString("ParticleDataTrack.New.Name")))) { //$NON-NLS-1$
+					// found the data track
+					foundMatch = true;
+					if (track.isAutoPasteEnabled()) {
+						// set new data immediately
+					  track.setData(data);
+					  track.prevDataString = dataString;
+					}
+					else {
+						// set pending data
+						track.setPendingDataString(dataString);
+					}
+					break;
+				}
+			}
+			// if no matching track was found then create new track
+			if (!foundMatch && frame.alwaysListenToClipboard) {
+				dt = trackerPanel.importData(data, null);
+				if (dt instanceof ParticleDataTrack) {
+					ParticleDataTrack track = (ParticleDataTrack)dt;
+					track.prevDataString = track.pendingDataString = dataString;
+				}
+			}
+	}
+	} catch (Exception ex) {
+		ex.printStackTrace();
+	}
   }
   
   /**

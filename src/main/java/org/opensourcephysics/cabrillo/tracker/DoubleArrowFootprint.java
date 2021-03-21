@@ -41,8 +41,7 @@ public class DoubleArrowFootprint extends LineFootprint {
 
   // instance fields
   protected int tipLength = 16;
-  protected int tipWidth = 4;
-  boolean openHead = true;
+	boolean openHead = true;
   protected BasicStroke headStroke = new BasicStroke();
 
   /**
@@ -70,17 +69,6 @@ public class DoubleArrowFootprint extends LineFootprint {
     ShapeIcon icon = new ShapeIcon(shape, w, h);
     icon.setColor(color);
     return icon;
-  }
-
-  /**
-   * Sets the length of the arrow tip.
-   *
-   * @param tipLength the desired tip length in pixels
-   */
-  public void setTipLength(int tipLength) {
-    tipLength = Math.max(8, tipLength);
-    tipWidth = tipLength / 4;
-    this.tipLength = 4 * tipWidth;
   }
 
   /**
@@ -134,8 +122,6 @@ public class DoubleArrowFootprint extends LineFootprint {
     transform.translate(p2.x, p2.y);
     float d = (float) p1.distance(p2); // length of the line
     // set arrowhead dimensions and stroke
-//    int tiplen = tipLength*scale;
-//    int tipL = Math.min(tiplen, Math.round(d-4));
     int scale = FontSizer.getIntegerFactor();
     int tipL = tipLength*scale;
     if (bothEnds) 
@@ -159,7 +145,7 @@ public class DoubleArrowFootprint extends LineFootprint {
           stroke.getDashPhase());
   	}    
     // set up tip hitShape using full length
-		Area area = null;
+		Area area;
   	synchronized(path) {
 	    path.reset();
 	    path.moveTo(d - 4, 0);

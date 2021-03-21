@@ -5,8 +5,6 @@ import org.opensourcephysics.tools.FontSizer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -33,12 +31,10 @@ public class TrackNameDialog extends JDialog {
 			}
 		});
 		nameField = new JTextField(20);
-		nameField.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String newName = nameField.getText();
-				if (target != null)
-					trackerPanel.setTrackName(target, newName, true);
-			}
+		nameField.addActionListener(e -> {
+			String newName = nameField.getText();
+			if (target != null)
+				trackerPanel.setTrackName(target, newName, true);
 		});
 		nameLabel = new JLabel();
 		JToolBar bar = new JToolBar();

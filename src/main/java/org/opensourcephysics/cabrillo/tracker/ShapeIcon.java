@@ -36,14 +36,14 @@ import javax.swing.*;
 public class ShapeIcon implements Icon {
 
   // instance fields
-  private int w;
-  private int h;
-  private Shape shape;
-  private Shape decoration;
+  private final int w;
+  private final int h;
+  private final Shape shape;
+  private final Shape decoration;
   private Color color = Color.black;
   private Color decoColor = Color.black;
-  private double offsetX;	// centers the shape horizontally
-  private double offsetY;	// centers the shape vertically
+  private final double offsetX;	// centers the shape horizontally
+  private final double offsetY;	// centers the shape vertically
 
   /**
    * Constructs a ShapeIcon.

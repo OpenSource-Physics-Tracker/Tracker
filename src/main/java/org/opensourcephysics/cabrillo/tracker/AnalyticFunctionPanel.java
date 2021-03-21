@@ -27,15 +27,6 @@ public class AnalyticFunctionPanel extends ModelFunctionPanel {
   }
 
   /**
-   * Returns the position functions.
-   *
-   * @return the x and y UserFunctions
-   */
-  public UserFunction[] getPositionFunctions() {
-    return ((UserFunctionEditor)functionEditor).getMainFunctions();
-  }
-
-  /**
 	 * Refreshes the GUI.
 	 */
   protected void refreshGUI() {

@@ -59,7 +59,9 @@ public class AttachmentDialog extends JDialog
   protected ArrayList<PointMass> masses;
   protected JTable table;
 	protected int cellheight = 28; // depends on font level
-  protected JComboBox rendererDropdown, editorDropdown, measuringToolDropdown;
+  protected JComboBox rendererDropdown;
+    protected JComboBox editorDropdown;
+    protected JComboBox<TTrack> measuringToolDropdown;
   protected PointMass dummyMass;
   protected Icon dummyIcon = new ShapeIcon(null, 21, 16);
   protected JScrollPane scrollPane;
@@ -119,7 +121,7 @@ public class AttachmentDialog extends JDialog
     			if (measuringTool!=deleted) {
 		    		TTrack[] attachments = measuringTool.getAttachments();
 			     	for (int i = 0; i < attachments.length; i++) {
-					  	if (deleted==attachments[i] || deleted==measuringTool) {
+					  	if (deleted == attachments[i]) {
 					  		attachments[i] = null;	  		
 					  	}
 			    	}
@@ -224,15 +226,13 @@ public class AttachmentDialog extends JDialog
     // put measuring tool dropdown in attachments panel NORTH
     JPanel north = new JPanel();
     north.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
-    measuringToolDropdown = new JComboBox();
+    measuringToolDropdown = new JComboBox<>();
     measuringToolDropdown.setRenderer(trackRenderer);
-    measuringToolDropdown.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        TTrack tool = (TTrack)measuringToolDropdown.getSelectedItem();
-    		TTrack measuringTool = TTrack.getTrack(trackID);
-      	if (tool==measuringTool) return;
-        setMeasuringTool(tool);
-      }
+    measuringToolDropdown.addActionListener(e -> {
+      TTrack tool = (TTrack)measuringToolDropdown.getSelectedItem();
+          TTrack measuringTool = TTrack.getTrack(trackID);
+        if (tool==measuringTool) return;
+      setMeasuringTool(tool);
     });
     north.add(measuringToolDropdown);
     attachmentsPanel.add(north, BorderLayout.NORTH);
@@ -304,15 +304,13 @@ public class AttachmentDialog extends JDialog
     // relative button
     relativeCheckbox = new JCheckBox();
     relativeCheckbox.setSelected(false);
-    relativeCheckbox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-      	if (refreshing) return;
-      	CircleFitter fitter = (CircleFitter)TTrack.getTrack(trackID);
-      	fitter.isRelativeFrameNumbers = relativeCheckbox.isSelected();
-      	refreshFieldsAndButtons(fitter);
-	    	fitter.refreshAttachments();
-				refreshGUI();				
-			}   	
+    relativeCheckbox.addActionListener(e -> {
+if (refreshing) return;
+CircleFitter fitter = (CircleFitter)TTrack.getTrack(trackID);
+fitter.isRelativeFrameNumbers = relativeCheckbox.isSelected();
+refreshFieldsAndButtons(fitter);
+fitter.refreshAttachments();
+        refreshGUI();
     });
     
     // range action, listener and fields
@@ -384,22 +382,16 @@ public class AttachmentDialog extends JDialog
     // help and close buttons
     helpButton = new JButton();
     helpButton.setForeground(new Color(0, 0, 102));
-    helpButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-    		TTrack measuringTool = TTrack.getTrack(trackID);
-      	String keyword = measuringTool==null? "circle":  //$NON-NLS-1$
-      		measuringTool instanceof Protractor? "protractor":  //$NON-NLS-1$
-      		measuringTool instanceof TapeMeasure? "tape": "circle"; //$NON-NLS-1$ //$NON-NLS-2$
-        trackerPanel.getTFrame().showHelp(keyword+"#attach", 0); //$NON-NLS-1$
-      }
+    helpButton.addActionListener(e -> {
+          TTrack measuringTool = TTrack.getTrack(trackID);
+        String keyword = measuringTool==null? "circle":  //$NON-NLS-1$
+            measuringTool instanceof Protractor? "protractor":  //$NON-NLS-1$
+            measuringTool instanceof TapeMeasure? "tape": "circle"; //$NON-NLS-1$ //$NON-NLS-2$
+      trackerPanel.getTFrame().showHelp(keyword+"#attach", 0); //$NON-NLS-1$
     });
     closeButton = new JButton();
     closeButton.setForeground(new Color(0, 0, 102));
-    closeButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-      }
-    });
+    closeButton.addActionListener(e -> setVisible(false));
     
     // put help and close button in content pane SOUTH
     buttonbar = new JPanel();
@@ -443,7 +435,7 @@ public class AttachmentDialog extends JDialog
       p.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
     }
 		TTrack measuringTool = TTrack.getTrack(trackID);
-		if (measuringTool!=null && measuringTool instanceof TapeMeasure) {
+		if (measuringTool instanceof TapeMeasure) {
 			// can't attach calibration stick to models--creates circular dependency
 			TapeMeasure tape = (TapeMeasure)measuringTool;
 			if (tape.isStickMode()) {
@@ -461,7 +453,7 @@ public class AttachmentDialog extends JDialog
 		editorDropdown.setModel(new AttachmentComboBoxModel());
     
 		FontSizer.setFonts(measuringToolDropdown, FontSizer.getLevel());
-		java.util.Vector<TTrack> tools = new java.util.Vector<TTrack>();
+		java.util.Vector<TTrack> tools = new java.util.Vector<>();
     for (TTrack track: trackerPanel.getTracks()) {
     	if (track instanceof TapeMeasure
     			|| track instanceof Protractor
@@ -477,7 +469,7 @@ public class AttachmentDialog extends JDialog
       p.addPropertyChangeListener("color", this); //$NON-NLS-1$
       p.addPropertyChangeListener("footprint", this); //$NON-NLS-1$    	
     }
-    measuringToolDropdown.setModel(new DefaultComboBoxModel(tools));
+    measuringToolDropdown.setModel(new DefaultComboBoxModel<>(tools));
     if (!tools.isEmpty() && measuringTool!=null) {
     	measuringToolDropdown.setSelectedItem(measuringTool);
     }
@@ -542,7 +534,7 @@ public class AttachmentDialog extends JDialog
   	// refresh layout to include/exclude circle fitter items
   	boolean hasCircleFitterPanel = attachmentsPanel.getComponentCount()>2;
   	boolean hasStartStopPanel = circleFitterPanel.getComponentCount()>1;
-  	boolean changedLayout = false;
+  	boolean changedLayout;
 		TTrack measuringTool = TTrack.getTrack(trackID);
   	if (measuringTool instanceof CircleFitter) {
       // put circleFitter panel in attachments panel SOUTH
@@ -555,10 +547,7 @@ public class AttachmentDialog extends JDialog
         circleFitterPanel.remove(circleFitterStartStopPanel);      	
       }
       else {
-      	if (fitter.isRelativeFrameNumbers) {
-//      		startLabel.setText(TrackerRes.getString("AttachmentInspector.Label.Offset")); //$NON-NLS-1$
-      	}
-        changedLayout = changedLayout || !hasStartStopPanel;
+          changedLayout = changedLayout || !hasStartStopPanel;
         circleFitterPanel.add(circleFitterStartStopPanel, BorderLayout.CENTER);      	
       }
   	}

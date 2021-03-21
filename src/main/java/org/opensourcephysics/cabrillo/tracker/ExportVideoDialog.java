@@ -30,7 +30,6 @@ import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -60,9 +59,9 @@ public class ExportVideoDialog extends JDialog {
 	
 	protected static ExportVideoDialog videoExporter; // singleton
   protected static HashMap<Object, VideoType> formats // name to VideoType
-  		= new HashMap<Object, VideoType>();
+  		= new HashMap<>();
   protected static TreeSet<String> formatDescriptions // alphabetical
-  		= new TreeSet<String>();
+  		= new TreeSet<>();
 
   // instance fields
   protected TrackerPanel trackerPanel;
@@ -112,7 +111,7 @@ public class ExportVideoDialog extends JDialog {
 		formats.clear(); 
 		formatDescriptions.clear();  
 		// eliminate ffmpeg types if VideoIO engine is NONE
-  	ArrayList<VideoType> unwanted = new ArrayList<VideoType>();
+  	ArrayList<VideoType> unwanted = new ArrayList<>();
   	boolean skipFFMPeg = VideoIO.getEngine().equals(VideoIO.ENGINE_NONE);
   	for (String ext: VideoIO.VIDEO_EXTENSIONS) {
     	if (skipFFMPeg)
@@ -143,9 +142,9 @@ public class ExportVideoDialog extends JDialog {
   	return formatDropdown.getSelectedItem();
   }
   
-  protected String exportFullSizeVideo(String filePath) {
+  protected void exportFullSizeVideo(String filePath) {
   	if (trackerPanel.getVideo()==null) {
-  		return null;
+  		return;
   	}
   	// set dropdowns to Main View, Video only, full size
   	viewDropdown.setSelectedIndex(0);
@@ -159,7 +158,6 @@ public class ExportVideoDialog extends JDialog {
     VideoType format = formats.get(formatDropdown.getSelectedItem());
     Dimension size = sizes.get(sizeDropdown.getSelectedItem());
     render(format, size, false, filePath);
-  	return savedFilePath;
   }
 
   /**
@@ -194,67 +192,63 @@ public class ExportVideoDialog extends JDialog {
     JPanel lower = new JPanel(new GridLayout(1, 2));
     
     // size panel
-    sizes = new HashMap<Object, Dimension>();
+    sizes = new HashMap<>();
     sizePanel = Box.createVerticalBox();
     sizeDropdown = new JComboBox();
   	sizePanel.add(sizeDropdown);
     
     // view panel
-    views = new HashMap<Object, JComponent>();
+    views = new HashMap<>();
     viewPanel = new JPanel(new GridLayout(0, 1));
     viewDropdown = new JComboBox();
     viewPanel.add(viewDropdown);
-    viewDropdown.addItemListener(new ItemListener() {
-    	public void itemStateChanged(ItemEvent e) {
-    		if (e.getStateChange()==ItemEvent.SELECTED) {
-    			if (!isRefreshing)
-    				refreshDropdowns();
-    		}
-    	}
-    });
+    viewDropdown.addItemListener(e -> {
+		if (e.getStateChange()==ItemEvent.SELECTED) {
+			if (!isRefreshing)
+				refreshDropdowns();
+		}
+	});
     
     // content panel
     contentPanel = new JPanel(new GridLayout(0, 1));
     contentDropdown = new JComboBox();
   	contentPanel.add(contentDropdown);
-  	contentDropdown.addItemListener(new ItemListener() {
-    	public void itemStateChanged(ItemEvent e) {
-    		if (isRefreshing) return;
-    		if (e.getStateChange()==ItemEvent.DESELECTED) {
-    			prevContentItem = e.getItem();
-    		}
-    		if (e.getStateChange()==ItemEvent.SELECTED) {
-  				JComponent view = views.get(viewDropdown.getSelectedItem());
-  				if (view==trackerPanel)
-  					mainViewContentIndex = contentDropdown.getSelectedIndex();
-  				else if (view instanceof WorldTView)
-  					worldViewContentIndex = contentDropdown.getSelectedIndex();
-  				if (contentDropdown.getSelectedIndex()==3) {
-  					JRadioButton odd = new JRadioButton(TrackerRes.getString("ExportVideoDialog.Deinterlace.OddFirst")); //$NON-NLS-1$
-  					odd.setSelected(oddFirst);
-  					JRadioButton even = new JRadioButton(TrackerRes.getString("ExportVideoDialog.Deinterlace.EvenFirst")); //$NON-NLS-1$
-  					even.setSelected(!oddFirst);
-  					ButtonGroup group = new ButtonGroup();
-  					group.add(odd);
-  					group.add(even);
-  					JPanel panel = new JPanel();
-  					panel.add(odd);
-  					panel.add(even);
-  					int result = JOptionPane.showConfirmDialog(ExportVideoDialog.this, 
-  							panel, 
-  							TrackerRes.getString("ExportVideoDialog.Deinterlace.Dialog.Title"),  //$NON-NLS-1$
-  							JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-  					if (result==JOptionPane.CANCEL_OPTION && prevContentItem!=null) {
-  						contentDropdown.setSelectedItem(prevContentItem);
-  						prevContentItem = null;
-  						return;
-  					}
-  					oddFirst = odd.isSelected();
-  				}
-  				refreshDropdowns();
-    		}
-    	}
-    });
+  	contentDropdown.addItemListener(e -> {
+		  if (isRefreshing) return;
+		  if (e.getStateChange()==ItemEvent.DESELECTED) {
+			  prevContentItem = e.getItem();
+		  }
+		  if (e.getStateChange()==ItemEvent.SELECTED) {
+				JComponent view = views.get(viewDropdown.getSelectedItem());
+				if (view==trackerPanel)
+					mainViewContentIndex = contentDropdown.getSelectedIndex();
+				else if (view instanceof WorldTView)
+					worldViewContentIndex = contentDropdown.getSelectedIndex();
+				if (contentDropdown.getSelectedIndex()==3) {
+					JRadioButton odd = new JRadioButton(TrackerRes.getString("ExportVideoDialog.Deinterlace.OddFirst")); //$NON-NLS-1$
+					odd.setSelected(oddFirst);
+					JRadioButton even = new JRadioButton(TrackerRes.getString("ExportVideoDialog.Deinterlace.EvenFirst")); //$NON-NLS-1$
+					even.setSelected(!oddFirst);
+					ButtonGroup group = new ButtonGroup();
+					group.add(odd);
+					group.add(even);
+					JPanel panel = new JPanel();
+					panel.add(odd);
+					panel.add(even);
+					int result = JOptionPane.showConfirmDialog(ExportVideoDialog.this,
+							panel,
+							TrackerRes.getString("ExportVideoDialog.Deinterlace.Dialog.Title"),  //$NON-NLS-1$
+							JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+					if (result==JOptionPane.CANCEL_OPTION && prevContentItem!=null) {
+						contentDropdown.setSelectedItem(prevContentItem);
+						prevContentItem = null;
+						return;
+					}
+					oddFirst = odd.isSelected();
+				}
+				refreshDropdowns();
+		  }
+	  });
     
     // format panel
     formatPanel = new JPanel(new GridLayout(0, 1));
@@ -272,20 +266,14 @@ public class ExportVideoDialog extends JDialog {
     // buttons
     saveAsButton = new JButton();
     saveAsButton.setForeground(new Color(0, 0, 102));
-    saveAsButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        VideoType format = formats.get(formatDropdown.getSelectedItem());
-        Dimension size = sizes.get(sizeDropdown.getSelectedItem());
-        render(format, size, true, null);
-      }
-    });
+    saveAsButton.addActionListener(e -> {
+	  VideoType format = formats.get(formatDropdown.getSelectedItem());
+	  Dimension size = sizes.get(sizeDropdown.getSelectedItem());
+	  render(format, size, true, null);
+	});
     closeButton = new JButton();
     closeButton.setForeground(new Color(0, 0, 102));
-    closeButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-      }
-    });
+    closeButton.addActionListener(e -> setVisible(false));
     // buttonbar
     JPanel buttonbar = new JPanel();
     contentPane.add(buttonbar, BorderLayout.SOUTH);
@@ -405,7 +393,7 @@ public class ExportVideoDialog extends JDialog {
 		
     // refresh content dropdown
 		Video video = trackerPanel.getVideo();
-		String s = null;
+		String s;
     contentDropdown.removeAllItems();
     if (view==trackerPanel) {
     	if (video!=null) {
@@ -532,7 +520,7 @@ public class ExportVideoDialog extends JDialog {
   		sizeDropdown.addItem(s);
   		sizes.put(s, fullSize);
 		}
-		if (sizes.keySet().contains(selectedItem))
+		if (sizes.containsKey(selectedItem))
 			sizeDropdown.setSelectedItem(selectedItem);
   	isRefreshing = false;
   }
@@ -613,8 +601,7 @@ public class ExportVideoDialog extends JDialog {
   	if (1.0*h/w==.75) return true; // 4:3 aspect ratio
   	if (1.0*w/h==1.5) return true; // 3:2 aspect ratio
   	if (16.0*h/w==9.0) return true; // 16:9 aspect ratio
-  	if (w%16==0 && h%16==0) return true; // any dimensions that are mod 16
-  	return false;
+	  return w % 16 == 0 && h % 16 == 0; // any dimensions that are mod 16
   }
   
   /**
@@ -694,7 +681,7 @@ public class ExportVideoDialog extends JDialog {
 		if (recorder instanceof ScratchVideoRecorder) {
 			ScratchVideoRecorder svr = (ScratchVideoRecorder)recorder;
 			String tabName = XML.stripExtension(trackerPanel.getTitle()).trim();
-			String viewName = viewDropdown.getSelectedItem().toString().trim().toLowerCase();
+			String viewName = Objects.requireNonNull(viewDropdown.getSelectedItem()).toString().trim().toLowerCase();
 			int n = viewName.indexOf(" "); //$NON-NLS-1$
 			if (n>-1)
 				viewName = viewName.substring(0, n);
@@ -749,91 +736,82 @@ public class ExportVideoDialog extends JDialog {
 //			final JComponent theView = view;
 			
 	  	// create "stepnumber" PropertyChangeListener to add frames
-	  	listener = new PropertyChangeListener() {
-	  		public void propertyChange(PropertyChangeEvent e) {
-	  			final int progress = ((Integer)e.getNewValue()).intValue()+1;
-	      	Runnable runner = new Runnable() {
-	      		public void run() {
-	  					if (monitor.isCanceled()) {
-	  		    		firePropertyChange("video_cancelled", null, null); //$NON-NLS-1$
-	  				    monitor.close();
-	  						playControl.removePropertyChangeListener("stepnumber", listener); //$NON-NLS-1$
-	  				    // restore original magnification and video visibility
-	  						trackerPanel.setMagnification(magnification);
-	  		  			setVideoVisible(videoIsVisible);
-	  						player.setEnabled(true);
-	  						recorder.reset();
-	  						return;
-	  					}
-	  					if (playControl.getStepNumber()==clip.getStepCount()-1) 
-	  						playControl.removePropertyChangeListener("stepnumber", listener); //$NON-NLS-1$
-	  	  			monitor.setProgress(progress);
-	  					String message = String.format(TrackerRes.getString("TActions.SaveClipAs.ProgressMonitor.Progress") //$NON-NLS-1$
-	  							+" %d%%.\n", progress*100/taskLength); //$NON-NLS-1$
-	  					monitor.setNote(message);
-	  					// paint the view and add frame
+	  	listener = e -> {
+			  final int progress = (Integer) e.getNewValue() +1;
+		  Runnable runner = () -> {
+				  if (monitor.isCanceled()) {
+				  firePropertyChange("video_cancelled", null, null); //$NON-NLS-1$
+				  monitor.close();
+					  playControl.removePropertyChangeListener("stepnumber", listener); //$NON-NLS-1$
+				  // restore original magnification and video visibility
+					  trackerPanel.setMagnification(magnification);
+					setVideoVisible(videoIsVisible);
+					  player.setEnabled(true);
+					  recorder.reset();
+					  return;
+				  }
+				  if (playControl.getStepNumber()==clip.getStepCount()-1)
+					  playControl.removePropertyChangeListener("stepnumber", listener); //$NON-NLS-1$
+				monitor.setProgress(progress);
+				  String message = String.format(TrackerRes.getString("TActions.SaveClipAs.ProgressMonitor.Progress") //$NON-NLS-1$
+						  +" %d%%.\n", progress*100/taskLength); //$NON-NLS-1$
+				  monitor.setNote(message);
+				  // paint the view and add frame
 //	          	theView.paintImmediately(theView.getBounds());
-	   	  			try {
-		   	 	  		for (BufferedImage image: getNextImages(size)) {
-		   		  			recorder.addFrame(image);
-		   		  		}
-	    					System.gc();
-	          	  // if done, save video
-	  						if (playControl.getStepNumber() == clip.getStepCount()-1) {
-	  							savedFilePath = recorder.saveVideo();
-	  							monitor.setProgress(progress+1);
-	  							recorder.reset();
-	  					    // restore original magnification and video visibility
-	  							trackerPanel.setMagnification(magnification);
-	  			  			setVideoVisible(videoIsVisible);
-	  							player.setEnabled(true);
-	  							// set VideoIO preferred export format to this one (ie most recent)
-	  							String extension = XML.getExtension(savedFilePath);
-	  							VideoIO.setPreferredExportExtension(extension);
-	  			    		final TFrame frame = trackerPanel.getTFrame();
-	  			    		if (showOpenDialog) {
-	  					    	int response = javax.swing.JOptionPane.showConfirmDialog(
-	  					    			frame,	    			
-	  					    			TrackerRes.getString("ExportVideoDialog.Complete.Message1") //$NON-NLS-1$ 
-	  					    			+" "+XML.getName(savedFilePath)+XML.NEW_LINE //$NON-NLS-1$
-	  					    			+TrackerRes.getString("ExportVideoDialog.Complete.Message2"), //$NON-NLS-1$ 
-	  					    			TrackerRes.getString("ExportVideoDialog.Complete.Title"), //$NON-NLS-1$ 
-	  					    			javax.swing.JOptionPane.YES_NO_OPTION, 
-	  					    			javax.swing.JOptionPane.QUESTION_MESSAGE);
-	  					    	if (response == javax.swing.JOptionPane.YES_OPTION) {
-	  					    		frame.loadedFiles.remove(savedFilePath);
-	  					    		final File file = new File(savedFilePath);
-	  					        Runnable runner = new Runnable() {
-	  					        	public void run() {
-	  							    		TrackerIO.open(file, frame);
-	  					        	}
-	  					        };
-	  					        SwingUtilities.invokeLater(runner);
-	  					    	}
-	  			    		}
-	  			    		firePropertyChange("video_saved", null, savedFilePath); //$NON-NLS-1$
-	  						}
-	  						// else step to next frame
-	  						else {
-	  							playControl.step();
-	  						}
-	        		} catch (Exception ex) {
-	        			JOptionPane.showMessageDialog(trackerPanel, ex.getMessage(),
-	                	"Error", JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
-	  				    monitor.close();
-	  						playControl.removePropertyChangeListener("stepnumber", listener); //$NON-NLS-1$
-	  				    // restore original magnification and video visibility
-	  						trackerPanel.setMagnification(magnification);
-	  		  			setVideoVisible(videoIsVisible);
-	  						player.setEnabled(true);
-	  						recorder.reset();
-	  						return;
-	        		}
-	      		}
-	      	};
-	      	EventQueue.invokeLater(runner);
-	  		}
-	  	};
+				 try {
+					  for (BufferedImage image: getNextImages(size)) {
+						 recorder.addFrame(image);
+					 }
+					System.gc();
+			// if done, save video
+					  if (playControl.getStepNumber() == clip.getStepCount()-1) {
+						  savedFilePath = recorder.saveVideo();
+						  monitor.setProgress(progress+1);
+						  recorder.reset();
+					  // restore original magnification and video visibility
+						  trackerPanel.setMagnification(magnification);
+						setVideoVisible(videoIsVisible);
+						  player.setEnabled(true);
+						  // set VideoIO preferred export format to this one (ie most recent)
+						  String extension = XML.getExtension(savedFilePath);
+						  VideoIO.setPreferredExportExtension(extension);
+					  final TFrame frame = trackerPanel.getTFrame();
+					  if (showOpenDialog) {
+						  int response = JOptionPane.showConfirmDialog(
+								  frame,
+								  TrackerRes.getString("ExportVideoDialog.Complete.Message1") //$NON-NLS-1$
+								  +" "+XML.getName(savedFilePath)+XML.NEW_LINE //$NON-NLS-1$
+								  +TrackerRes.getString("ExportVideoDialog.Complete.Message2"), //$NON-NLS-1$
+								  TrackerRes.getString("ExportVideoDialog.Complete.Title"), //$NON-NLS-1$
+								  JOptionPane.YES_NO_OPTION,
+								  JOptionPane.QUESTION_MESSAGE);
+						  if (response == JOptionPane.YES_OPTION) {
+							  frame.loadedFiles.remove(savedFilePath);
+							  final File file = new File(savedFilePath);
+						  Runnable runner1 = () -> TrackerIO.open(file, frame);
+						  SwingUtilities.invokeLater(runner1);
+						  }
+					  }
+					  firePropertyChange("video_saved", null, savedFilePath); //$NON-NLS-1$
+					  }
+					  // else step to next frame
+					  else {
+						  playControl.step();
+					  }
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(trackerPanel, ex.getMessage(),
+				"Error", JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+				  monitor.close();
+					  playControl.removePropertyChangeListener("stepnumber", listener); //$NON-NLS-1$
+				  // restore original magnification and video visibility
+					  trackerPanel.setMagnification(magnification);
+					setVideoVisible(videoIsVisible);
+					  player.setEnabled(true);
+					  recorder.reset();
+			}
+		  };
+		  EventQueue.invokeLater(runner);
+		  };
 
 	  	playControl.addPropertyChangeListener("stepnumber", listener); //$NON-NLS-1$
 	  	// if video is at step 0, add first image and step forward 
@@ -856,8 +834,7 @@ public class ExportVideoDialog extends JDialog {
 	  			setVideoVisible(videoIsVisible);
 					player.setEnabled(true);
 					recorder.reset();
-					return;
-    		}
+		}
 			}
 	  	// if video is not at step 0, set step number to 0
 	  	else playControl.setStepNumber(0);

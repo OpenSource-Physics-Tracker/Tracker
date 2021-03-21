@@ -24,59 +24,17 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import org.opensourcephysics.cabrillo.tracker.TableTrackView.TrackDataTable;
 import org.opensourcephysics.cabrillo.tracker.vector.Vector;
-import org.opensourcephysics.display.DataFunction;
-import org.opensourcephysics.display.DataTable;
-import org.opensourcephysics.display.Dataset;
-import org.opensourcephysics.display.DatasetManager;
-import org.opensourcephysics.display.DisplayRes;
-import org.opensourcephysics.display.OSPRuntime;
-import org.opensourcephysics.display.TeXParser;
+import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.NumberField;
 import org.opensourcephysics.tools.FontSizer;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
 
 /**
  * A Dialog for setting the format of number fields and table cells.
@@ -85,8 +43,8 @@ import org.opensourcephysics.tools.FontSizer;
  */
 public class NumberFormatDialog extends JDialog {
 
-	private static Map<TrackerPanel, NumberFormatDialog> formatSetters 
-		= new HashMap<TrackerPanel, NumberFormatDialog>();
+	private static final Map<TrackerPanel, NumberFormatDialog> formatSetters
+		= new HashMap<>();
   
 	// static fields
   protected static String noPattern = TrackerRes.getString("NumberFormatSetter.NoPattern"); //$NON-NLS-1$
@@ -94,11 +52,11 @@ public class NumberFormatDialog extends JDialog {
   protected static Map<Class<? extends TTrack>, TreeMap<String, String>> defaultFormatPatterns;
   protected static TFrame frame;
   protected static ArrayList<Class<? extends TTrack>> formattableTrackTypes;
-  private static Dimension scrollerDimension = new Dimension(200, 60);
+  private static final Dimension scrollerDimension = new Dimension(200, 60);
   
   static {
 		// create list of formattable track types
-		formattableTrackTypes = new ArrayList<Class<? extends TTrack>>();
+		formattableTrackTypes = new ArrayList<>();
 		formattableTrackTypes.add(PointMass.class);
 		formattableTrackTypes.add(Vector.class);
 		formattableTrackTypes.add(LineProfile.class);
@@ -111,9 +69,9 @@ public class NumberFormatDialog extends JDialog {
 		formattableTrackTypes.add(CoordAxes.class);
 		
 		// set default number patterns
-		defaultFormatPatterns = new HashMap<Class<? extends TTrack>, TreeMap<String,String>>();
+		defaultFormatPatterns = new HashMap<>();
 		for (Class<? extends TTrack> trackType: formattableTrackTypes) {
-			TreeMap<String, String> patterns = new TreeMap<String, String>();
+			TreeMap<String, String> patterns = new TreeMap<>();
 			boolean isLine = LineProfile.class==trackType;
 			boolean isRGB = isLine || RGBRegion.class==trackType;
 			boolean isStep = RGBRegion.class==trackType || PointMass.class==trackType
@@ -153,11 +111,13 @@ public class NumberFormatDialog extends JDialog {
   NumberField sampleField;
   java.text.DecimalFormat testFormat;
   String[] displayedNames = new String[0];
-  Map<String, String> realNames = new HashMap<String, String>();
+  Map<String, String> realNames = new HashMap<>();
   HashMap<Class<? extends TTrack>, TreeMap<String,String>> prevDefaultPatterns = new HashMap<Class<? extends TTrack>, TreeMap<String,String>>();
   Map<TTrack, TreeMap<String, String>> prevTrackPatterns 
-  	= new HashMap<TTrack, TreeMap<String, String>>();
-  JPanel variablePanel, applyToPanel, unitsPanel, decimalSeparatorPanel;
+  	= new HashMap<>();
+  JPanel variablePanel;
+	JPanel applyToPanel;
+	JPanel decimalSeparatorPanel;
   JList variableList = new JList();
   JScrollPane variableScroller;
   JRadioButton trackOnlyButton, trackTypeButton, dimensionButton;
@@ -165,7 +125,7 @@ public class NumberFormatDialog extends JDialog {
   String prevPattern, prevDecimalSeparator;
   TitledBorder variablesBorder, applyToBorder, decimalSeparatorBorder;
   boolean formatsChanged, prevAnglesInRadians;
-  Map<Integer, String[]> selectedVariables = new TreeMap<Integer, String[]>();
+  Map<Integer, String[]> selectedVariables = new TreeMap<>();
 
   /**
    * Gets the NumberFormatDialog for a TrackerPanel and sets the track and selected variables.
@@ -182,7 +142,7 @@ public class NumberFormatDialog extends JDialog {
     if(setter==null) {
     	setter = new NumberFormatDialog(trackerPanel);
     	formatSetters.put(trackerPanel, setter);
-      setter.setFontLevel(FontSizer.getLevel());
+      setter.setFontLevel();
       // center on screen
       Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
       int x = (dim.width - setter.getBounds().width) / 2;
@@ -193,7 +153,7 @@ public class NumberFormatDialog extends JDialog {
     
     if (selectedNames!=null) {
 	    // replace selectedNames with appropriate display names
-	    HashSet<String> namesToSelect = new HashSet<String>();
+	    HashSet<String> namesToSelect = new HashSet<>();
 	    ArrayList<String> displayNames = getDisplayNames(track);
 	    Map<String, ArrayList<String>> map = TTrack.getFormatterMap(getTrackType(track));
 	    for (String var: selectedNames) {
@@ -218,7 +178,7 @@ public class NumberFormatDialog extends JDialog {
 	    setter.selectedVariables.put(track.getID(), selectedNames);
     }
   	setter.setTrack(track);
-    setter.setFontLevel(FontSizer.getLevel());
+    setter.setFontLevel();
     return setter;
   }
 
@@ -258,14 +218,14 @@ public class NumberFormatDialog extends JDialog {
   private void setVariables(final Class<? extends TTrack> trackType, ArrayList<String> names, String[] selected) {
   	// substitute THETA for any selected name starting with THETA
   	if (selected!=null) {
-	  	TreeSet<String> select = new TreeSet<String>();
+	  	TreeSet<String> select = new TreeSet<>();
 	  	for (String next: selected) {
 	  		if (next!=null && next.startsWith(Tracker.THETA)) {
 	  			next = Tracker.THETA;
 	  		}
 	  		select.add(next);
 	  	}
-	  	selected = select.toArray(new String[select.size()]);
+	  	selected = select.toArray(new String[0]);
   	}
     displayedNames = new String[names.size()];
     realNames.clear();
@@ -296,17 +256,15 @@ public class NumberFormatDialog extends JDialog {
     variableList = new JList(displayedNames);
     variableList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
     variableList.setVisibleRowCount(-1);
-    variableList.addListSelectionListener(new ListSelectionListener() {
-    	public void valueChanged(ListSelectionEvent e) {
-    		if (!e.getValueIsAdjusting()) {
-    			int[] indices = variableList.getSelectedIndices();
-      		showNumberFormatAndSample(indices);
-    			String[] vars = getSelectedVariables(indices);
-      		selectedVariables.put(trackID, vars);      		
-      		refreshGUI();
-    		}
-    	}
-    });
+    variableList.addListSelectionListener(e -> {
+		if (!e.getValueIsAdjusting()) {
+			int[] indices = variableList.getSelectedIndices();
+		  showNumberFormatAndSample(indices);
+			String[] vars = getSelectedVariables(indices);
+		  selectedVariables.put(trackID, vars);
+		  refreshGUI();
+		}
+	});
     variableList.addMouseMotionListener(new MouseAdapter() {
     	@Override
     	public void mouseMoved(MouseEvent e) {
@@ -325,13 +283,12 @@ public class NumberFormatDialog extends JDialog {
       // select requested names
       indices = new int[selected.length];
       for (int j=0; j<indices.length; j++) {
-      	inner:
-	      for (int i = 0; i< displayedNames.length; i++) {
-	      	if (displayedNames[i].equals(selected[j])) {
-	      		indices[j] = i;
-	      		break inner;
-	      	}
-	      }
+		  for (int i = 0; i < displayedNames.length; i++) {
+			  if (displayedNames[i].equals(selected[j])) {
+				  indices[j] = i;
+				  break;
+			  }
+		  }
       }
     	variableList.setSelectedIndices(indices);
     }
@@ -349,7 +306,7 @@ public class NumberFormatDialog extends JDialog {
    */
   private void applyPattern(String pattern) {
     if (pattern.equals(prevPattern)) return;
-    if (pattern.indexOf(noPattern)>-1)
+    if (pattern.contains(noPattern))
     	pattern = ""; //$NON-NLS-1$
     
     // substitute period for comma
@@ -452,7 +409,7 @@ public class NumberFormatDialog extends JDialog {
     TTrack track = TTrack.getTrack(trackID);
     if (track==null) return new String[0];
     Class<? extends TTrack> trackType = getTrackType(track);
-  	TreeSet<String> dimensions = new TreeSet<String>(); 
+  	TreeSet<String> dimensions = new TreeSet<>();
 		int[] indices = variableList.getSelectedIndices();
 		Object[] selected = new Object[indices.length];
 		for (int j=0; j<indices.length; j++) {
@@ -465,7 +422,7 @@ public class NumberFormatDialog extends JDialog {
   			dimensions.add(dim);
   		}
 		}
-		return dimensions.toArray(new String[dimensions.size()]);
+		return dimensions.toArray(new String[0]);
   }
 
   /**
@@ -475,8 +432,8 @@ public class NumberFormatDialog extends JDialog {
    * @return array of names to display to the user
    */
   private static ArrayList<String> getDisplayNames(TTrack track) {
-  	if (track==null || track.trackerPanel==null) return new ArrayList<String>();
-  	ArrayList<String> names = new ArrayList<String>();  	
+  	if (track==null || track.trackerPanel==null) return new ArrayList<>();
+  	ArrayList<String> names = new ArrayList<>();
 		Class<? extends TTrack> type = getTrackType(track);
   	if (TTrack.getFormatterDisplayNames(type).length>0) {
     	// start with the formatter display names for track type
@@ -502,7 +459,7 @@ public class NumberFormatDialog extends JDialog {
   /**
    * Gets the display name for a specified variable name. 
    *
-   * @param var
+   * @param var - var
    * @param displayNames possible display names
    * @param map a Map of formatter names to variables for a given track type
    * @return the display name
@@ -574,12 +531,12 @@ public class NumberFormatDialog extends JDialog {
    * @return array with variable names and patterns
    */
   private static String[] getFormatPatterns(TTrack track) {
-  	ArrayList<String> patterns = new ArrayList<String>();
+  	ArrayList<String> patterns = new ArrayList<>();
   	for (String name: TTrack.getAllVariables(getTrackType(track))) {
   		patterns.add(name);
   		patterns.add(getFormatPattern(track, name));
   	}
-  	return patterns.toArray(new String[patterns.size()]);
+  	return patterns.toArray(new String[0]);
   }
 
   /**
@@ -669,7 +626,7 @@ public class NumberFormatDialog extends JDialog {
   	String[] patterns = getFormatPatterns(track);
   	Class<? extends TTrack> type = getTrackType(track);  	
     TreeMap<String, String> defaultPatterns = track.trackerPanel.getFormatPatterns(type);
-  	ArrayList<String> customPatterns = new ArrayList<String>();
+  	ArrayList<String> customPatterns = new ArrayList<>();
   	for (int i=0; i<patterns.length-1; i=i+2) {
   		String name = patterns[i];
   		String pattern = defaultPatterns.get(name)==null? "": defaultPatterns.get(name); //$NON-NLS-1$
@@ -678,7 +635,7 @@ public class NumberFormatDialog extends JDialog {
   			customPatterns.add(patterns[i+1]);
   		}
   	} 
-  	return customPatterns.toArray(new String[customPatterns.size()]);
+  	return customPatterns.toArray(new String[0]);
   }
 
   /**
@@ -689,12 +646,12 @@ public class NumberFormatDialog extends JDialog {
    */
   protected static String[][] getCustomFormatPatterns(TrackerPanel trackerPanel) {
     if (frame==null) frame = trackerPanel.getTFrame();
-    ArrayList<String[]> formats = new ArrayList<String[]>();
+    ArrayList<String[]> formats = new ArrayList<>();
     // look at all track types defined in defaultFormatPatterns
     for (Class<? extends TTrack> type: NumberFormatDialog.defaultFormatPatterns.keySet()) {    	
     	TreeMap<String, String> defaultPatterns = NumberFormatDialog.defaultFormatPatterns.get(type);
     	TreeMap<String, String> patterns = trackerPanel.getFormatPatterns(type);
-    	ArrayList<String> customPatterns = new ArrayList<String>();
+    	ArrayList<String> customPatterns = new ArrayList<>();
     	for (String name: defaultPatterns.keySet()) {
     		String defaultPattern = defaultPatterns.get(name);
     		String pattern = patterns.get(name);
@@ -721,7 +678,7 @@ public class NumberFormatDialog extends JDialog {
     		}
     	}
     	if (!customPatterns.isEmpty()) {
-    		formats.add(customPatterns.toArray(new String[customPatterns.size()]));
+    		formats.add(customPatterns.toArray(new String[0]));
     	}
     }
     return formats.toArray(new String[formats.size()][]);
@@ -761,7 +718,7 @@ public class NumberFormatDialog extends JDialog {
   	// save previous default patterns for all types
   	TreeMap<String, String> patterns;
   	for (Class<? extends TTrack> type: formattableTrackTypes) {
-  	  TreeMap<String, String> prevPatterns = new TreeMap<String, String>();
+  	  TreeMap<String, String> prevPatterns = new TreeMap<>();
   		patterns = trackerPanel.getFormatPatterns(type);
   		prevPatterns.putAll(patterns);
   		prevDefaultPatterns.put(type, prevPatterns);
@@ -771,7 +728,7 @@ public class NumberFormatDialog extends JDialog {
     prevTrackPatterns.clear();
 		ArrayList<TTrack> tracks = trackerPanel.getTracks();
 		for (TTrack next: tracks) {
-			patterns = new TreeMap<String, String>();			
+			patterns = new TreeMap<>();
 	    for(String name : TTrack.getAllVariables(getTrackType(next))) {
 	      patterns.put(name, getFormatPattern(next, name));
 	    }
@@ -861,7 +818,7 @@ public class NumberFormatDialog extends JDialog {
   	  	}
   		}
   		// set pattern in trackerPanel.formatPatterns
-  		TreeMap<String, String> patterns = track.trackerPanel.getFormatPatterns(trackType);
+  		TreeMap patterns = track.trackerPanel.getFormatPatterns(trackType);
   		patterns.put(displayName, pattern);
   	}
   	else if (setFormatPattern(track, displayName, pattern)) {
@@ -877,9 +834,8 @@ public class NumberFormatDialog extends JDialog {
   /**
    * Sets the font level of this dialog.
    *
-   * @param level the level
    */
-  private void setFontLevel(int level) {
+  private void setFontLevel() {
     FontSizer.setFonts(this, FontSizer.getLevel());
     double f = FontSizer.getFactor();
     Dimension dim = new Dimension((int)(scrollerDimension.width*f), (int)(scrollerDimension.height*f));
@@ -895,23 +851,23 @@ public class NumberFormatDialog extends JDialog {
    * @return ArrayList of table views
    */
   private static ArrayList<TableTrackView> getTableViews(TTrack track) {
-  	ArrayList<TableTrackView> dataViews = new ArrayList<TableTrackView>();
+  	ArrayList<TableTrackView> dataViews = new ArrayList<>();
   	if (track==null || track.trackerPanel==null || frame==null) {
   		return dataViews;
   	}
     Container[] c = frame.getViews(track.trackerPanel);
-    for (int i = 0; i < c.length; i++) {
-    	if (c[i] instanceof TViewChooser) {
-        TViewChooser chooser = (TViewChooser)c[i];
-        for (TView tview: chooser.getViews()) {
-	        if (tview instanceof TableTView) {
-	          TableTView tableView = (TableTView)tview;
-	          TableTrackView trackView = (TableTrackView)tableView.getTrackView(track);
-	    			dataViews.add(trackView);
-	        }
-        }
-      }
-    }
+	  for (Container container : c) {
+		  if (container instanceof TViewChooser) {
+			  TViewChooser chooser = (TViewChooser) container;
+			  for (TView tview : chooser.getViews()) {
+				  if (tview instanceof TableTView) {
+					  TableTView tableView = (TableTView) tview;
+					  TableTrackView trackView = (TableTrackView) tableView.getTrackView(track);
+					  dataViews.add(trackView);
+				  }
+			  }
+		  }
+	  }
     return dataViews;
   }
   
@@ -924,11 +880,7 @@ public class NumberFormatDialog extends JDialog {
     testFormat = (java.text.DecimalFormat) java.text.NumberFormat.getNumberInstance();
     // create buttons
     closeButton = new JButton(); 
-    closeButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-      }
-    });
+    closeButton.addActionListener(e -> setVisible(false));
     revertButton = new JButton();
     final Action resetAction = new AbstractAction() {
 			@Override
@@ -967,29 +919,26 @@ public class NumberFormatDialog extends JDialog {
     };
     revertButton.addActionListener(resetAction);
     helpButton = new JButton(); 
-    helpButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        String tab = "      ";                                                                                          //$NON-NLS-1$
-        String nl = System.getProperty("line.separator", "/n");                                                         //$NON-NLS-1$ //$NON-NLS-2$
-        JOptionPane.showMessageDialog(NumberFormatDialog.this, DisplayRes.getString("DataTable.NumberFormat.Help.Message1")+nl+ //$NON-NLS-1$
-          tab+DisplayRes.getString("DataTable.NumberFormat.Help.Message2")+nl+ //$NON-NLS-1$
-          tab+DisplayRes.getString("DataTable.NumberFormat.Help.Message3")+nl+ //$NON-NLS-1$
-          tab+DisplayRes.getString("DataTable.NumberFormat.Help.Message4")+nl+ //$NON-NLS-1$
-          tab+DisplayRes.getString("DataTable.NumberFormat.Help.Message5")+nl+nl+ //$NON-NLS-1$
-          DisplayRes.getString("DataTable.NumberFormat.Help.Message6")+" PI."+nl+nl+ //$NON-NLS-1$ //$NON-NLS-2$
-          TrackerRes.getString("NumberFormatSetter.Help.Dimensions.1")+nl+ //$NON-NLS-1$
-          tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.2")+nl+ //$NON-NLS-1$
-          tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.3")+nl+ //$NON-NLS-1$
-          tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.4")+nl+ //$NON-NLS-1$
-          tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.5")+nl+ //$NON-NLS-1$
-          tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.6")+nl+ //$NON-NLS-1$
-          tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.7")+nl+ //$NON-NLS-1$
-          tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.8")+nl, //$NON-NLS-1$
-          DisplayRes.getString("DataTable.NumberFormat.Help.Title"), //$NON-NLS-1$
-          JOptionPane.INFORMATION_MESSAGE);
-      }
-
-    });
+    helpButton.addActionListener(e -> {
+	  String tab = "      ";                                                                                          //$NON-NLS-1$
+	  String nl = System.getProperty("line.separator", "/n");                                                         //$NON-NLS-1$ //$NON-NLS-2$
+	  JOptionPane.showMessageDialog(NumberFormatDialog.this, DisplayRes.getString("DataTable.NumberFormat.Help.Message1")+nl+ //$NON-NLS-1$
+		tab+DisplayRes.getString("DataTable.NumberFormat.Help.Message2")+nl+ //$NON-NLS-1$
+		tab+DisplayRes.getString("DataTable.NumberFormat.Help.Message3")+nl+ //$NON-NLS-1$
+		tab+DisplayRes.getString("DataTable.NumberFormat.Help.Message4")+nl+ //$NON-NLS-1$
+		tab+DisplayRes.getString("DataTable.NumberFormat.Help.Message5")+nl+nl+ //$NON-NLS-1$
+		DisplayRes.getString("DataTable.NumberFormat.Help.Message6")+" PI."+nl+nl+ //$NON-NLS-1$ //$NON-NLS-2$
+		TrackerRes.getString("NumberFormatSetter.Help.Dimensions.1")+nl+ //$NON-NLS-1$
+		tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.2")+nl+ //$NON-NLS-1$
+		tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.3")+nl+ //$NON-NLS-1$
+		tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.4")+nl+ //$NON-NLS-1$
+		tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.5")+nl+ //$NON-NLS-1$
+		tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.6")+nl+ //$NON-NLS-1$
+		tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.7")+nl+ //$NON-NLS-1$
+		tab+TrackerRes.getString("NumberFormatSetter.Help.Dimensions.8")+nl, //$NON-NLS-1$
+		DisplayRes.getString("DataTable.NumberFormat.Help.Title"), //$NON-NLS-1$
+		JOptionPane.INFORMATION_MESSAGE);
+	});
     
     // create trackDropdown early since need it for spinners
     trackDropdown = new JComboBox() {
@@ -1000,20 +949,18 @@ public class NumberFormatDialog extends JDialog {
       }
     };
     trackDropdown.setRenderer(new TrackRenderer());
-    trackDropdown.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	if ("refresh".equals(trackDropdown.getName())) return; //$NON-NLS-1$
-        Object[] item = (Object[])trackDropdown.getSelectedItem();
-        if (item!=null) {
-        	for (TTrack next: trackerPanel.getTracks()) {
-        		if (item[1].equals(next.getName())) {
-        			setTrack(next);
-        			refreshGUI();
-        		}
-        	}
-        }
-      }
-    });
+    trackDropdown.addActionListener(e -> {
+		if ("refresh".equals(trackDropdown.getName())) return; //$NON-NLS-1$
+	  Object[] item = (Object[])trackDropdown.getSelectedItem();
+	  if (item!=null) {
+		  for (TTrack next: trackerPanel.getTracks()) {
+			  if (item[1].equals(next.getName())) {
+				  setTrack(next);
+				  refreshGUI();
+			  }
+		  }
+	  }
+	});
     
     // create labels and text fields
     patternLabel = new JLabel(); 
@@ -1048,12 +995,10 @@ public class NumberFormatDialog extends JDialog {
         else {
           patternField.setBackground(Color.yellow);
           // apply new pattern
-          Runnable runner = new Runnable() {
-            public void run() {
-          		if (revert) patternField.setText(prevPattern);
-		          applyPattern(patternField.getText());
-            }
-          };
+          Runnable runner = () -> {
+				if (revert) patternField.setText(prevPattern);
+				applyPattern(patternField.getText());
+		  };
           SwingUtilities.invokeLater(runner);
         }
       }
@@ -1209,13 +1154,13 @@ public class NumberFormatDialog extends JDialog {
 	  	dimensionButton.setText(s+" \""+dimensions[0]+"\""); //$NON-NLS-1$ //$NON-NLS-2$
 	  }
 	  else {
-	  	String dim = dimensions[0];
+	  	StringBuilder dim = new StringBuilder(dimensions[0]);
 	  	for (int i=1; i<dimensions.length; i++) {
 	  		if ((dim+", "+dimensions[i]).length()>7) { //$NON-NLS-1$
-	  			dim += ", "+TrackerRes.getString("NumberFormatSetter.DimensionList.More"); //$NON-NLS-1$ //$NON-NLS-2$
+	  			dim.append(", ").append(TrackerRes.getString("NumberFormatSetter.DimensionList.More")); //$NON-NLS-1$ //$NON-NLS-2$
 	  			break;
 	  		}
-	  		dim += ", "+ dimensions[i]; //$NON-NLS-1$
+	  		dim.append(", ").append(dimensions[i]); //$NON-NLS-1$
 	  	}
 	  	dimensionButton.setText(s+" "+dim); //$NON-NLS-1$
 	  }

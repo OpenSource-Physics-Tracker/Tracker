@@ -55,13 +55,14 @@ public class TActions {
 
   // static fields
   static Map<TrackerPanel, Map<String, AbstractAction>> actionMaps 
-  		= new HashMap<TrackerPanel, Map<String, AbstractAction>>(); // maps trackerPanel to actions map
+  		= new HashMap<>(); // maps trackerPanel to actions map
   static String newline = System.getProperty("line.separator", "\n");  
 
   /**
    * Private constructor.
    */
-  private TActions() {/** empty block */}
+  private TActions() {
+  }
 
   /**
    * Gets an action for a TrackerPanel.
@@ -91,18 +92,16 @@ public class TActions {
     Map<String, AbstractAction> actions = actionMaps.get(trackerPanel);
     if (actions != null) return actions;
     // create new actionMap
-    actions = new HashMap<String, AbstractAction>();
+    actions = new HashMap<>();
     actionMaps.put(trackerPanel, actions);
     // clear tracks
     final AbstractAction clearTracksAction = new AbstractAction(TrackerRes.getString("TActions.Action.ClearTracks"), null) { 
      public void actionPerformed(ActionEvent e) {
        // check for locked tracks and get list of xml strings for undoableEdit
-     	 ArrayList<String> xml= new ArrayList<String>();
+     	 ArrayList<String> xml= new ArrayList<>();
        boolean locked = false;
        ArrayList<org.opensourcephysics.display.Drawable> keepers = trackerPanel.getSystemDrawables();
-       Iterator<TTrack> it = trackerPanel.getTracks().iterator();
-       while(it.hasNext()) {
-         TTrack track = it.next();
+       for (TTrack track : trackerPanel.getTracks()) {
          if (keepers.contains(track)) continue;
          xml.add(new XMLControlElement(track).toXML());
          locked = locked || (track.isLocked() && !track.isDependent());
@@ -398,7 +397,8 @@ public class TActions {
 							  return;
 							}
 						} catch (Exception ex) {
-						}
+              ex.printStackTrace();
+            }
           }
         }
         System.exit(0);
@@ -622,7 +622,7 @@ public class TActions {
         String filePath = files[0].getAbsolutePath();
         String ext = XML.getExtension(filePath);
         if ("jar".equals(ext)) { 
-        	if (!DataTrackTool.isDataSource(filePath)) {
+        	if (DataTrackTool.isDataSource(filePath)) {
         		String jarName = TrackerRes.getString("TActions.Action.DataTrack.Unsupported.JarFile") 
         				+ " \""+XML.getName(filePath)+"\" ";  
       			JOptionPane.showMessageDialog(trackerPanel.getTFrame(), 
@@ -705,9 +705,11 @@ public class TActions {
       			String number = name.substring(name.length()-1);
       			n = Integer.parseInt(number)+1;
       			name = name.substring(0, name.length()-1);
-      		} catch (Exception ex) {}
+      		} catch (Exception ex) {
+              ex.printStackTrace();
+            }
       		// increment digit if necessary
-      		Set <String> names = new HashSet<String>();
+      		Set <String> names = new HashSet<>();
       		for (TTrack next: trackerPanel.getTracks()) {
       			names.add(next.getName());
       		}
@@ -715,7 +717,9 @@ public class TActions {
       			while (names.contains(name+n)) {
       				n++;
       			}
-      		} catch (Exception ex) {}
+      		} catch (Exception ex) {
+              ex.printStackTrace();
+            }
       		// create XMLControl of track, assign new name, and copy to clipboard
           XMLControl control = new XMLControlElement(track);          
           control.setValue("name", name+n); 
@@ -733,7 +737,7 @@ public class TActions {
       public void actionPerformed(ActionEvent e) {
         Video video = trackerPanel.getVideo();
         if (video != null) {
-        	ArrayList<String> xml = new ArrayList<String>();
+        	ArrayList<String> xml = new ArrayList<>();
         	FilterStack stack = video.getFilterStack();
         	for (Filter filter: stack.getFilters()) {
         		xml.add(new XMLControlElement(filter).toXML());

@@ -24,17 +24,19 @@
  */
 package org.opensourcephysics.cabrillo.tracker.vector;
 
-import java.beans.*;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
+import org.opensourcephysics.cabrillo.tracker.*;
+import org.opensourcephysics.controls.XML;
+import org.opensourcephysics.controls.XMLControl;
+import org.opensourcephysics.display.DrawingPanel;
+import org.opensourcephysics.display.Interactive;
+import org.opensourcephysics.media.core.TPoint;
 
 import javax.swing.*;
-
-import org.opensourcephysics.cabrillo.tracker.*;
-import org.opensourcephysics.display.*;
-import org.opensourcephysics.media.core.*;
-import org.opensourcephysics.controls.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A VectorSum draws a series of VectorSteps that represent a
@@ -46,9 +48,9 @@ public class VectorSum extends Vector {
 
   // instance fields
   protected Vector[] vectors;
-  protected ArrayList<String> vectorNames = new ArrayList<String>();
+  protected ArrayList<String> vectorNames = new ArrayList<>();
   protected JMenuItem inspectorItem;
-  protected Map<Integer, TPoint> tails = new HashMap<Integer, TPoint>();
+  protected Map<Integer, TPoint> tails = new HashMap<>();
   protected VectorSumInspector inspector;
 
   /**
@@ -73,16 +75,16 @@ public class VectorSum extends Vector {
     				LineFootprint.getFootprint("Footprint.BigArrow")}); //$NON-NLS-1$
     defaultFootprint = getFootprint();
     Footprint[] footprint = getFootprints();
-    for (int i = 0; i < footprint.length; i++) {
-      if (footprint[i] instanceof ArrowFootprint) {
-        ArrowFootprint arrow = (ArrowFootprint) footprint[i];
+    for (Footprint value : footprint) {
+      if (value instanceof ArrowFootprint) {
+        ArrowFootprint arrow = (ArrowFootprint) value;
         arrow.setDashArray(LineFootprint.DASHED_LINE);
       }
     }
     this.vectors = vectors;
     setColor(defaultColors[0]);
-    for (int i = 0; i < vectors.length; i++) {
-      vectors[i].addPropertyChangeListener("step", this); //$NON-NLS-1$
+    for (Vector vector : vectors) {
+      vector.addPropertyChangeListener("step", this); //$NON-NLS-1$
     }
     locked = true;
     // set initial hint
@@ -101,10 +103,8 @@ public class VectorSum extends Vector {
     // add vectors listed in vectorNames (this occurs on initial loading)
     if (!vectorNames.isEmpty() && panel.getClass().equals(TrackerPanel.class)) {
       TrackerPanel trackerPanel = (TrackerPanel) panel;
-      Iterator<String> it = vectorNames.iterator();
-      while (it.hasNext()) {
-        String name = it.next();
-        for (Vector v: trackerPanel.getDrawables(Vector.class)) {
+      for (String name : vectorNames) {
+        for (Vector v : trackerPanel.getDrawables(Vector.class)) {
           if (v.getName().equals(name))
             addVector(v);
         }
@@ -144,8 +144,8 @@ public class VectorSum extends Vector {
   public void addVector(Vector vec) {
     synchronized(vectors) {
       // don't add if already present
-      for (int i = 0; i < vectors.length; i++) {
-        if (vectors[i] == vec) return;
+      for (Vector vector : vectors) {
+        if (vector == vec) return;
       }
       Vector[] newVectors = new Vector[vectors.length + 1];
       System.arraycopy(vectors, 0, newVectors, 0, vectors.length);
@@ -195,8 +195,8 @@ public class VectorSum extends Vector {
    */
   public boolean contains(Vector vec) {
     synchronized(vectors) {
-      for (int i = 0; i < vectors.length; i++) {
-        if (vectors[i] == vec) return true;
+      for (Vector vector : vectors) {
+        if (vector == vec) return true;
       }
       return false;
     }
@@ -215,7 +215,7 @@ public class VectorSum extends Vector {
    */
   public Step createStep(int n, double x, double y, double xc, double yc) {
     if (isLocked()) {
-      tails.put(new Integer(n), new TPoint(x, y));
+      tails.put(n, new TPoint(x, y));
       update(n);
       return getStep(n);
     }
@@ -236,7 +236,8 @@ public class VectorSum extends Vector {
    *
    * @param locked ignored
    */
-  public void setLocked(boolean locked) {/** empty block */}
+  public void setLocked(boolean locked) {
+  }
 
   /**
    * Overrides TTrack isStepComplete method. Always returns true.
@@ -273,7 +274,7 @@ public class VectorSum extends Vector {
     }
     if (e.getSource() instanceof Vector) {
       if (name.equals("step")){ //$NON-NLS-1$
-        int n = ((Integer)e.getNewValue()).intValue();
+        int n = (Integer) e.getNewValue();
         update(n);
       }
     }
@@ -321,13 +322,13 @@ public class VectorSum extends Vector {
     }
     double x = 0, y = 0; // x and y components in imagespace
     // add components in imagespace
-    for (int i = 0; i < vectors.length; i++) {
-      VectorStep step = (VectorStep)vectors[i].getStep(n);
+    for (Vector vector : vectors) {
+      VectorStep step = (VectorStep) vector.getStep(n);
       if (step == null) {           // if any vector missing,
         if (getStep(n) != null) {   // delete existing step if any
           locked = false;
-          VectorStep deletedStep = (VectorStep)deleteStep(n);
-          tails.put(new Integer(n), deletedStep.getTail());
+          VectorStep deletedStep = (VectorStep) deleteStep(n);
+          tails.put(n, deletedStep.getTail());
           deletedStep.attach(null);
           repaint(deletedStep);
           locked = true;
@@ -341,10 +342,10 @@ public class VectorSum extends Vector {
 
     // create step if none exists
     VectorStep step = (VectorStep)getStep(n);
+    locked = false;
     if (step == null) {
-      locked = false;
-      VectorStep newStep = null;
-      Integer i = new Integer(n);
+      VectorStep newStep;
+      Integer i = n;
       TPoint tail = tails.get(i);
       if (tail != null) {
         newStep = (VectorStep) createStep(n, tail.getX(), tail.getY(), x, y);
@@ -352,23 +353,19 @@ public class VectorSum extends Vector {
       }
       else {
         newStep = (VectorStep) createStep(n, 0, 0, x, y);
-        Iterator<TrackerPanel> it = panels.iterator();
-        while (it.hasNext()) {
-          TrackerPanel panel = it.next();
+        for (TrackerPanel panel : panels) {
           newStep.attach(panel.getSnapPoint());
         }
       }
       newStep.setTipEnabled(false);
       newStep.setDefaultPointIndex(2); // handle
       repaint(newStep);
-      locked = true;
     }
     // or set components of existing step
     else {
-      locked = false;
       step.setXYComponents(x, y);
-      locked = true;
     }
+    locked = true;
   }
 
   /**
@@ -381,12 +378,10 @@ public class VectorSum extends Vector {
     // create a vector sum inspector item
     inspectorItem = new JMenuItem(
         TrackerRes.getString("VectorSum.MenuItem.Inspector")); //$NON-NLS-1$
-    inspectorItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        VectorSumInspector inspector = getInspector();
-        inspector.updateDisplay();
-        inspector.setVisible(true);
-      }
+    inspectorItem.addActionListener(e -> {
+      VectorSumInspector inspector = getInspector();
+      inspector.updateDisplay();
+      inspector.setVisible(true);
     });
     // assemble the menu
     JMenu menu = super.getMenu(trackerPanel);
@@ -459,10 +454,10 @@ public class VectorSum extends Vector {
     public void saveObject(XMLControl control, Object obj) {
       VectorSum sum = (VectorSum) obj;
       // save names of vectors in this sum
-      ArrayList<String> list = new ArrayList<String>();
+      ArrayList<String> list = new ArrayList<>();
       Vector[] vectors = sum.getVectors();
-      for (int i = 0; i < vectors.length; i++) {
-        list.add(vectors[i].getName());
+      for (Vector vector : vectors) {
+        list.add(vector.getName());
       }
       control.setValue("vectors", list); //$NON-NLS-1$
       // save this vector data
@@ -491,10 +486,9 @@ public class VectorSum extends Vector {
       // load this vector data
       XML.getLoader(Vector.class).loadObject(control, obj);
       // load names of vectors in this sum
-      ArrayList<?> names = ArrayList.class.cast(control.getObject("vectors")); //$NON-NLS-1$
-      Iterator<?> it = names.iterator();
-      while (it.hasNext()) {
-        sum.vectorNames.add(it.next().toString());
+      ArrayList<?> names = (ArrayList) control.getObject("vectors"); //$NON-NLS-1$
+      for (Object o : names) {
+        sum.vectorNames.add(o.toString());
       }
       return obj;
     }

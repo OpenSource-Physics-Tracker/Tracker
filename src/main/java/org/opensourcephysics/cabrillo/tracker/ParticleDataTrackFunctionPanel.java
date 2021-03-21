@@ -20,15 +20,14 @@ import org.opensourcephysics.tools.UserFunctionEditor;
  */
 public class ParticleDataTrackFunctionPanel extends ModelFunctionPanel {
 	
-	private DataTrackClipControl clipControl;
-	private DataTrackTimeControl timeControl;
+	private final DataTrackClipControl clipControl;
+	private final DataTrackTimeControl timeControl;
 	private JPanel customControl;
 	private JPanel customTitle;
 
   /**
    * Constructor.
    *
-   * @param editor the user function editor
    * @param track a ParticleDataTrack
    */
   public ParticleDataTrackFunctionPanel(ParticleDataTrack track) {
@@ -90,7 +89,7 @@ public class ParticleDataTrackFunctionPanel extends ModelFunctionPanel {
   	if (model!=null) {
 	  	ParticleDataTrack dataTrack = (ParticleDataTrack)model;
 			Object dataSource = dataTrack.getSource();
-			if (dataSource!=null && dataSource instanceof JPanel) {
+			if (dataSource instanceof JPanel) {
 				setCustomControl((JPanel)dataSource);
 			}  		
   	}

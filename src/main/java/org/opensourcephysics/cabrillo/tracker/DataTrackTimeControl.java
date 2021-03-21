@@ -1,20 +1,14 @@
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
 import org.opensourcephysics.media.core.ClipControl;
 import org.opensourcephysics.media.core.DataTrack;
 import org.opensourcephysics.media.core.VideoPlayer;
 import org.opensourcephysics.tools.FontSizer;
+
+import javax.swing.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 public class DataTrackTimeControl extends JPanel implements PropertyChangeListener {
 	
@@ -39,17 +33,9 @@ public class DataTrackTimeControl extends JPanel implements PropertyChangeListen
 	 */
 	protected void createGUI() {
 		videoButton = new JRadioButton();
-		videoButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				setTimeSourceToDataTrack(false);
-			}			
-		});
+		videoButton.addActionListener(arg0 -> setTimeSourceToDataTrack(false));
 		dataButton = new JRadioButton();
-		dataButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				setTimeSourceToDataTrack(true);
-			}			
-		});
+		dataButton.addActionListener(arg0 -> setTimeSourceToDataTrack(true));
 		ButtonGroup group = new ButtonGroup();
 		group.add(videoButton);
 		group.add(dataButton);

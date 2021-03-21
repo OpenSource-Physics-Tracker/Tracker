@@ -159,11 +159,6 @@ public class TMouseHandler implements InteractiveMouseHandler {
                             selectedTrack.autoMarkAt(frameNumber,
                                     trackerPanel.getMouseX(), trackerPanel.getMouseY());
                             step = selectedTrack.getStep(frameNumber);
-//	          	if (step!=null) {
-//	          		TPoint[] pts = step.getPoints();
-//	          		// increment target index 
-//	              if (pts.length>index+1) nextIndex = index+1;
-//	          	}
                         } else {
                             boolean newStep = step == null;
                             step = selectedTrack.createStep(frameNumber,
@@ -244,15 +239,14 @@ public class TMouseHandler implements InteractiveMouseHandler {
                             // deselect point and remove step from selectedSteps
                             p = null;
                             trackerPanel.selectedSteps.remove(step);
-                            selectedStepsChanged = true;
                         } else { // the step is not yet in selectedSteps
                             if (!trackerPanel.selectedSteps.isEmpty()) {
                                 // set selectedPoint to null if multiple steps are selected
                                 p = null;
                             }
                             trackerPanel.selectedSteps.add(step);
-                            selectedStepsChanged = true;
                         }
+                        selectedStepsChanged = true;
                     }
                     // else if not control-down, check if this step is in selectedSteps
                     else {
@@ -334,7 +328,7 @@ public class TMouseHandler implements InteractiveMouseHandler {
                 p = trackerPanel.getSelectedPoint();
                 TTrack track = trackerPanel.getSelectedTrack();
                 if (p != null) {
-                    int dx = 0, dy = 0;
+                    int dx, dy;
                     if (track != null && track.isLocked() && !(track instanceof VectorSum)) {
                         Toolkit.getDefaultToolkit().beep();
                         return;
@@ -414,8 +408,7 @@ public class TMouseHandler implements InteractiveMouseHandler {
 
     protected static boolean isAutoTrackTrigger(InputEvent e) {
         if (e.isControlDown()) return true;
-        if (e.isMetaDown() && OSPRuntime.isMac()) return true; // meta is command key on Mac
-        return false;
+        return e.isMetaDown() && OSPRuntime.isMac(); // meta is command key on Mac
     }
 
     protected KeyFrame getActiveKeyFrame(AutoTracker autoTracker) {

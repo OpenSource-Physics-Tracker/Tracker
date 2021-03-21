@@ -60,24 +60,24 @@ public class Protractor extends TTrack {
   	formatVariables = new String[] {"t", "L", Tracker.THETA}; //$NON-NLS-1$ //$NON-NLS-2$
   	
   	// assemble format map
-		formatMap = new HashMap<String, ArrayList<String>>();
+		formatMap = new HashMap<>();
 		
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list = new ArrayList<>();
 		list.add(dataVariables[0]); 
 		formatMap.put(formatVariables[0], list);
 		
-		list = new ArrayList<String>();
+		list = new ArrayList<>();
 		list.add(dataVariables[2]); 
 		list.add(dataVariables[3]); 
 		formatMap.put(formatVariables[1], list);
 		
-		list = new ArrayList<String>();
+		list = new ArrayList<>();
 		list.add(dataVariables[1]); 
 		list.add(dataVariables[6]);  
 		formatMap.put(formatVariables[2], list);
 		
 		// assemble format description map
-		formatDescriptionMap = new HashMap<String, String>();
+		formatDescriptionMap = new HashMap<>();
 		formatDescriptionMap.put(formatVariables[0], TrackerRes.getString("PointMass.Data.Description.0")); //$NON-NLS-1$ 
 		formatDescriptionMap.put(formatVariables[1], TrackerRes.getString("TapeMeasure.Label.Length")); //$NON-NLS-1$ 
 		formatDescriptionMap.put(formatVariables[2], TrackerRes.getString("Vector.Data.Description.4")); //$NON-NLS-1$ 
@@ -137,13 +137,11 @@ public class Protractor extends TTrack {
     inputPanel.setOpaque(false);
     inputPanel.add(inputField);
     // add inputField action listener to exit editing mode
-    inputField.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        if (editing) {
-          int n = trackerPanel.getFrameNumber();
-          ProtractorStep step = ((ProtractorStep)getStep(n));
-          setEditing(false, step);
-        }
+    inputField.addActionListener(e -> {
+      if (editing) {
+        int n = trackerPanel.getFrameNumber();
+        ProtractorStep step = ((ProtractorStep)getStep(n));
+        setEditing(false, step);
       }
     });
     // add inputField focus listener
@@ -193,18 +191,12 @@ public class Protractor extends TTrack {
     step.setFootprint(getFootprint());
     steps = new StepArray(step); // autofills
     fixedItem = new JCheckBoxMenuItem(TrackerRes.getString("TapeMeasure.MenuItem.Fixed")); //$NON-NLS-1$
-    fixedItem.addItemListener(new ItemListener() {
-      public void itemStateChanged(ItemEvent e) {
-        setFixed(fixedItem.isSelected());
-      }
-    });
+    fixedItem.addItemListener(e -> setFixed(fixedItem.isSelected()));
   	attachmentItem = new JMenuItem(TrackerRes.getString("MeasuringTool.MenuItem.Attach")); //$NON-NLS-1$
-  	attachmentItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	AttachmentDialog control = trackerPanel.getAttachmentDialog(Protractor.this);
-      	control.setVisible(true);
-      }
-    });
+  	attachmentItem.addActionListener(e -> {
+          AttachmentDialog control = trackerPanel.getAttachmentDialog(Protractor.this);
+          control.setVisible(true);
+      });
     final FocusListener arcFocusListener = new FocusAdapter() {
       public void focusLost(FocusEvent e) {
       	if (angleField.getBackground() == Color.yellow) {
@@ -222,11 +214,9 @@ public class Protractor extends TTrack {
       }
     };
     angleField.addFocusListener(arcFocusListener);
-    angleField.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	arcFocusListener.focusLost(null);
-      	angleField.requestFocusInWindow();
-      }
+    angleField.addActionListener(e -> {
+        arcFocusListener.focusLost(null);
+        angleField.requestFocusInWindow();
     });
   }
 
@@ -275,7 +265,7 @@ public class Protractor extends TTrack {
   	    step.getFormattedLength(step.end1); // refreshes x field
   	    step.getFormattedLength(step.end2); // refreshes y field
   	    step.arcHighlight = null;
-	      stepValueLabel.setText((Integer)e.getNewValue()+":"); //$NON-NLS-1$
+	      stepValueLabel.setText(e.getNewValue() +":"); //$NON-NLS-1$
       }
       else if (name.equals("selectedpoint")) { //$NON-NLS-1$
       	TPoint p = trackerPanel.getSelectedPoint();
@@ -302,7 +292,8 @@ public class Protractor extends TTrack {
    *
    * @param visible ignored
    */
-  public void setTrailVisible(boolean visible) {/** empty block */}
+  public void setTrailVisible(boolean visible) {
+  }
 
   /**
    * Implements createStep but only mimics step creation since
@@ -584,9 +575,7 @@ public class Protractor extends TTrack {
   	attachmentItem.setText(TrackerRes.getString("MeasuringTool.MenuItem.Attach")); //$NON-NLS-1$
     menu.insert(attachmentItem, 0);
   	menu.insertSeparator(1);
-  	    
-//  	menu.addSeparator();
-//    menu.add(deleteTrackItem);
+
     return menu;
   }
 
@@ -712,12 +701,10 @@ public class Protractor extends TTrack {
   	JPopupMenu popup = new JPopupMenu();
 		JMenuItem item = new JMenuItem();
 		final boolean radians = angleField.getConversionFactor()==1;
-		item.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	TFrame frame = trackerPanel.getTFrame();
-      	frame.setAnglesInRadians(!radians);
-      }
-    });
+		item.addActionListener(e -> {
+            TFrame frame = trackerPanel.getTFrame();
+            frame.setAnglesInRadians(!radians);
+        });
 		item.setText(radians? 
 				TrackerRes.getString("TTrack.AngleField.Popup.Degrees"): //$NON-NLS-1$
 				TrackerRes.getString("TTrack.AngleField.Popup.Radians")); //$NON-NLS-1$
@@ -726,13 +713,11 @@ public class Protractor extends TTrack {
 			popup.addSeparator();			
 			item = new JMenuItem();
 			final String[] selected = new String[] {Tracker.THETA};
-			item.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-	      	TrackerPanel tp = Protractor.this.trackerPanel;
-	        NumberFormatDialog dialog = NumberFormatDialog.getNumberFormatDialog(tp, Protractor.this, selected);
-	  	    dialog.setVisible(true);
-	      }
-	    });
+			item.addActionListener(e -> {
+                TrackerPanel tp = Protractor.this.trackerPanel;
+              NumberFormatDialog dialog = NumberFormatDialog.getNumberFormatDialog(tp, Protractor.this, selected);
+                dialog.setVisible(true);
+            });
 			item.setText(TrackerRes.getString("TTrack.MenuItem.NumberFormat")); //$NON-NLS-1$
 			popup.add(item);
     }
@@ -832,43 +817,41 @@ public class Protractor extends TTrack {
       target = getKeyStep(target);
     }
     final ProtractorStep step = target;
-    Runnable runner = new Runnable() {
-      public void run() {
-        if (editing) {
-        	trackerPanel.setSelectedTrack(Protractor.this);
-          inputField.setForeground(footprint.getColor());
-          Rectangle bounds = step.layoutBounds.get(trackerPanel);
-          bounds.grow(3, 3);
-          bounds.setLocation(bounds.x+1, bounds.y);
-          for (Component c: trackerPanel.getComponents()) {
-            if (c == trackerPanel.noData) {
-              bounds.setLocation(bounds.x, bounds.y-c.getHeight());
-            }
+    Runnable runner = () -> {
+      if (editing) {
+          trackerPanel.setSelectedTrack(Protractor.this);
+        inputField.setForeground(footprint.getColor());
+        Rectangle bounds = step.layoutBounds.get(trackerPanel);
+        bounds.grow(3, 3);
+        bounds.setLocation(bounds.x+1, bounds.y);
+        for (Component c: trackerPanel.getComponents()) {
+          if (c == trackerPanel.noData) {
+            bounds.setLocation(bounds.x, bounds.y-c.getHeight());
           }
-          inputField.setBounds(bounds);
-          glassPanel = trackerPanel.getGlassPanel();
-          trackerPanel.remove(glassPanel);
-          trackerPanel.add(inputPanel, BorderLayout.CENTER);
-          Border space = BorderFactory.createEmptyBorder(0, 1, 1, 0);
-          Color color = getFootprint().getColor();
-          Border line = BorderFactory.createLineBorder(color);
-          inputField.setBorder(BorderFactory.createCompoundBorder(line, space));
-          inputField.setValue(step.getProtractorAngle());
-          trackerPanel.revalidate();
-          trackerPanel.repaint();
-          inputField.requestFocus();
         }
-        else { // end editing
-        	step.drawLayoutBounds = false;
-          step.setProtractorAngle(inputField.getValue());
-        	inputField.setSigFigs(4);
-          trackerPanel.add(glassPanel, BorderLayout.CENTER);
-          trackerPanel.remove(inputPanel);
-          dataValid = false;
-  	    	support.firePropertyChange("data", null, null); //$NON-NLS-1$
-          trackerPanel.revalidate();
-          trackerPanel.repaint();
-        }
+        inputField.setBounds(bounds);
+        glassPanel = trackerPanel.getGlassPanel();
+        trackerPanel.remove(glassPanel);
+        trackerPanel.add(inputPanel, BorderLayout.CENTER);
+        Border space = BorderFactory.createEmptyBorder(0, 1, 1, 0);
+        Color color = getFootprint().getColor();
+        Border line = BorderFactory.createLineBorder(color);
+        inputField.setBorder(BorderFactory.createCompoundBorder(line, space));
+        inputField.setValue(step.getProtractorAngle());
+        trackerPanel.revalidate();
+        trackerPanel.repaint();
+        inputField.requestFocus();
+      }
+      else { // end editing
+          step.drawLayoutBounds = false;
+        step.setProtractorAngle(inputField.getValue());
+          inputField.setSigFigs(4);
+        trackerPanel.add(glassPanel, BorderLayout.CENTER);
+        trackerPanel.remove(inputPanel);
+        dataValid = false;
+            support.firePropertyChange("data", null, null); //$NON-NLS-1$
+        trackerPanel.revalidate();
+        trackerPanel.repaint();
       }
     };
     EventQueue.invokeLater(runner);

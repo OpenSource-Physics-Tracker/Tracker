@@ -39,21 +39,21 @@ public interface Footprint {
    *
    * @return the name
    */
-  public String getName();
+  String getName();
 
   /**
    * Gets the display name of the footprint.
    *
    * @return the name
    */
-  public String getDisplayName();
+  String getDisplayName();
 
   /**
    * Gets the point array length required by this footprint.
    *
    * @return the length
    */
-  public int getLength();
+  int getLength();
 
   /**
    * Gets an icon representing the footprint.
@@ -62,14 +62,14 @@ public interface Footprint {
    * @param h height of the icon
    * @return the icon
    */
-  public Icon getIcon(int w, int h);
+  Icon getIcon(int w, int h);
 
   /**
    * Gets the hit shapes associated with the footprint.
    *
    * @return an array of hit shapes
    */
-  public Shape[] getHitShapes();
+  Shape[] getHitShapes();
 
   /**
    * Gets the footprint mark.
@@ -77,7 +77,7 @@ public interface Footprint {
    * @param points a Point array
    * @return the mark
    */
-  public Mark getMark(Point[] points);
+  Mark getMark(Point[] points);
 
   /**
    * Gets the footprint shape.
@@ -85,34 +85,34 @@ public interface Footprint {
    * @param points a Point array
    * @return the shape
    */
-  public Shape getShape(Point[] points);
+  Shape getShape(Point[] points);
 
   /**
    * Sets the stroke. Accepts only basic strokes.
    *
    * @param stroke the desired stroke
    */
-  public void setStroke(BasicStroke stroke);
+  void setStroke(BasicStroke stroke);
 
   /**
    * Gets the stroke.
    *
    * @return the basic stroke
    */
-  public BasicStroke getStroke();
+  BasicStroke getStroke();
 
   /**
    * Sets the color.
    *
    * @param color the desired color
    */
-  public void setColor(Color color);
+  void setColor(Color color);
 
   /**
    * Gets the color.
    *
    * @return the color
    */
-  public Color getColor();
+  Color getColor();
 
 }

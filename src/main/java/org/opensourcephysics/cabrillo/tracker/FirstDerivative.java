@@ -31,10 +31,8 @@ package org.opensourcephysics.cabrillo.tracker;
  */
 public class FirstDerivative implements Derivative {
 
-  // instance fields
-  private int spill, start, step, count;
   private double[] xDeriv, yDeriv = new double[0];
-  private Object[] result = new Object[4];
+  private final Object[] result = new Object[4];
 
   /**
    * Evaluates the derivative.
@@ -56,10 +54,11 @@ public class FirstDerivative implements Derivative {
    */
   public Object[] evaluate(Object[] data) {
     int[] params = (int[])data[0];
-    spill = params[0];
-    start = params[1];
-    step = params[2];
-    count = params[3];
+    // instance fields
+    int spill = params[0];
+    int start = params[1];
+    int step = params[2];
+    int count = params[3];
     double[] x = (double[])data[1];
     double[] y = (double[])data[2];
     boolean[] valid = (boolean[])data[3];
@@ -69,16 +68,15 @@ public class FirstDerivative implements Derivative {
     }
 
     // get upper and lower index checking limits
-    int lower = start;
-    int upper = Math.min(start + step*(count-1), x.length);
+    int upper = Math.min(start + step *(count -1), x.length);
 
     // find v at each step index from lower to upper
     outer:
-    for (int i = lower; i <= upper; i+=step) {
+    for (int i = start; i <= upper; i+= step) {
 
       // derivative at i will be valid only if all step positions
       // between i-spill*step and i+spill*step are valid
-      for (int j = i - spill*step; j <= i + spill*step; j+=step) {
+      for (int j = i - spill * step; j <= i + spill * step; j+= step) {
         if (j < 0 || j >= valid.length || !valid[j]) {
         	if (i<valid.length) {
         		xDeriv[i] = Double.NaN;
@@ -95,14 +93,14 @@ public class FirstDerivative implements Derivative {
         yDeriv[i] = (- y[i - step]
                      + y[i + step]) / 2;
       } else { // spill is 2
-        xDeriv[i] = (- 2 * x[i - 2*step]
+        xDeriv[i] = (- 2 * x[i - 2* step]
                      - x[i - step]
                      + x[i + step]
-                     + 2 * x[i + 2*step]) / 10;
-        yDeriv[i] = (- 2 * y[i - 2*step]
+                     + 2 * x[i + 2* step]) / 10;
+        yDeriv[i] = (- 2 * y[i - 2* step]
                      - y[i - step]
                      + y[i + step]
-                     + 2 * y[i + 2*step]) / 10;
+                     + 2 * y[i + 2* step]) / 10;
       }
     }
     return result;

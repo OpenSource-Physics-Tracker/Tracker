@@ -66,12 +66,12 @@ public class PointShapeFootprint implements Footprint, Cloneable {
    * @return the footprint
    */
   public static PointShapeFootprint getFootprint(String name) {
-    Iterator<PointShapeFootprint> it = footprints.iterator();
-    while(it.hasNext()) {
-      PointShapeFootprint footprint = it.next();
-      if (name == footprint.getName()) try {
-        return (PointShapeFootprint)footprint.clone();
-      } catch(CloneNotSupportedException ex) {ex.printStackTrace();}
+    for (PointShapeFootprint footprint : footprints) {
+      if (name.equals(footprint.getName())) try {
+        return (PointShapeFootprint) footprint.clone();
+      } catch (CloneNotSupportedException ex) {
+        ex.printStackTrace();
+      }
     }
     return null;
   }
@@ -238,7 +238,7 @@ public class PointShapeFootprint implements Footprint, Cloneable {
 
   // static fields
   protected static Collection<PointShapeFootprint> footprints 
-  		= new HashSet<PointShapeFootprint>();
+  		= new HashSet<>();
 
   // static constants
   private static final Shape HIGHLIGHT;

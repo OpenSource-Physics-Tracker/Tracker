@@ -45,7 +45,7 @@ public class TrackControl extends JDialog
     implements PropertyChangeListener {
 
   // static fields
-  protected static Map<TrackerPanel, TrackControl> controls = new HashMap<TrackerPanel, TrackControl>();
+  protected static Map<TrackerPanel, TrackControl> controls = new HashMap<>();
 
   // instance fields
   protected JPopupMenu popup;
@@ -221,9 +221,9 @@ public class TrackControl extends JDialog
     setTitle(TrackerRes.getString("TrackControl.Name")); //$NON-NLS-1$
     int perbar = 4;
     ArrayList<TTrack> tracks = trackerPanel.getUserTracks();
-    for (int i = 0; i < trackBars.length; i++) {
-      trackBars[i].removeAll();
-    }
+      for (JToolBar trackBar : trackBars) {
+          trackBar.removeAll();
+      }
     int barCount = (tracks.size()+perbar-1)/perbar;
     trackBarPanel.removeAll();
 		trackBarPanel.setLayout(new GridLayout(barCount, 1));
@@ -241,24 +241,23 @@ public class TrackControl extends JDialog
     }
     // add listeners to all tracks and count the mass tracks
     trackCount = 0;
-    TTrack track = null;
-    Iterator<TTrack> it = tracks.iterator();
-    while (it.hasNext()) {
-    	int barIndex = trackCount/perbar;
-      track = it.next();
-      // listen to tracks for property changes that affect icon or name
-      track.removePropertyChangeListener("name", this); //$NON-NLS-1$
-      track.removePropertyChangeListener("color", this); //$NON-NLS-1$
-      track.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
-      track.addPropertyChangeListener("name", this); //$NON-NLS-1$
-      track.addPropertyChangeListener("color", this); //$NON-NLS-1$
-      track.addPropertyChangeListener("footprint", this); //$NON-NLS-1$
-      // make the track buttons
-      TButton button = new TButton(track);
-      button.addKeyListener(shiftKeyListener);
-      trackBars[barIndex].add(button);
-      trackCount++;
-    }
+    TTrack track;
+      for (TTrack tTrack : tracks) {
+          int barIndex = trackCount / perbar;
+          track = tTrack;
+          // listen to tracks for property changes that affect icon or name
+          track.removePropertyChangeListener("name", this); //$NON-NLS-1$
+          track.removePropertyChangeListener("color", this); //$NON-NLS-1$
+          track.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
+          track.addPropertyChangeListener("name", this); //$NON-NLS-1$
+          track.addPropertyChangeListener("color", this); //$NON-NLS-1$
+          track.addPropertyChangeListener("footprint", this); //$NON-NLS-1$
+          // make the track buttons
+          TButton button = new TButton(track);
+          button.addKeyListener(shiftKeyListener);
+          trackBars[barIndex].add(button);
+          trackCount++;
+      }
   	FontSizer.setFonts(this, FontSizer.getLevel());
     pack();
     repaint();

@@ -44,7 +44,6 @@ public class ArrowFootprint extends LineFootprint {
   protected int tipWidth = 4;
   boolean openHead = true;
   protected BasicStroke headStroke = new BasicStroke();
-  protected BasicStroke tipStroke;
 
   /**
    * Constructs an ArrowFootprint.
@@ -158,8 +157,8 @@ public class ArrowFootprint extends LineFootprint {
     int tipL = Math.min(tiplen, Math.round(d-4));
     tipL = Math.max(8, tipL);
     int tipW = Math.max(tipL/4, 2);
-    float f = scale*baseStroke.getLineWidth();
-    float lineWidth = f < tipL/4? f: Math.max(tipL/4, 0.8f);
+    float f = scale * baseStroke.getLineWidth();
+    float lineWidth = f < tipL / 4? f: Math.max(tipL / 4, 0.8f);
   	if (stroke==null || stroke.getLineWidth()!=lineWidth) {
   		stroke = new BasicStroke(lineWidth,
           BasicStroke.CAP_BUTT,

@@ -47,8 +47,8 @@ public class PencilDrawing extends Trail {
   	XML.setLoader(PencilDrawing.class, PencilDrawing.getLoader());
   }
 
-	private ArrayList<double[]> pointArray = new ArrayList<double[]>();
-	private double[] coords = new double[6]; // used to get path points for XMLLoader
+	private final ArrayList<double[]> pointArray = new ArrayList<>();
+	private final double[] coords = new double[6]; // used to get path points for XMLLoader
 	
   /**
    * Constructs a PencilDrawing with the default color and stroke.

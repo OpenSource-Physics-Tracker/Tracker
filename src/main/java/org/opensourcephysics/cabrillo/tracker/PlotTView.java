@@ -128,7 +128,7 @@ public class PlotTView extends TrackChooserTView {
       TTrack track = view.getSelectedTrack();
       if (track != null) {
         control.setValue("selected_track", track.getName()); //$NON-NLS-1$
-        java.util.ArrayList<TrackView> list = new java.util.ArrayList<TrackView>();
+        java.util.ArrayList<TrackView> list = new java.util.ArrayList<>();
         for (TrackView next: view.trackViews.values()) {
         	if (next.isCustomState())
         		list.add(next);
@@ -178,22 +178,22 @@ public class PlotTView extends TrackChooserTView {
       }
 	    // load the track_views property, if any
       java.util.List<Object> props = control.getPropertyContent();
-	    for (int i = 0; i < props.size(); i++) {
-	      XMLProperty prop = (XMLProperty)props.get(i);
-	      if (prop.getPropertyName().equals("track_views")) { //$NON-NLS-1$
-	      	XMLControl[] controls = prop.getChildControls();
-	      	for (int j = 0; j < controls.length; j++) {
-	      		// get name of track, find its track view and load it
-	      		String trackName = controls[j].getString("track"); //$NON-NLS-1$
-	          track = view.getTrack(trackName);
-	          if (track != null) {
-	            PlotTrackView trackView = (PlotTrackView)view.getTrackView(track);
-	            controls[j].loadObject(trackView);
-	          }
-	      	}
-	      	break;
-	      }
-	    }
+        for (Object o : props) {
+            XMLProperty prop = (XMLProperty) o;
+            if (prop.getPropertyName().equals("track_views")) { //$NON-NLS-1$
+                XMLControl[] controls = prop.getChildControls();
+                for (XMLControl xmlControl : controls) {
+                    // get name of track, find its track view and load it
+                    String trackName = xmlControl.getString("track"); //$NON-NLS-1$
+                    track = view.getTrack(trackName);
+                    if (track != null) {
+                        PlotTrackView trackView = (PlotTrackView) view.getTrackView(track);
+                        xmlControl.loadObject(trackView);
+                    }
+                }
+                break;
+            }
+        }
       return obj;
     }
   }

@@ -1,29 +1,28 @@
 package org.opensourcephysics.cabrillo.tracker;
 
-import org.opensourcephysics.media.core.*;
+import org.opensourcephysics.media.core.BufferedImageUtils;
+import org.opensourcephysics.media.core.ImageCoordSystem;
+import org.opensourcephysics.media.core.TPoint;
+import org.opensourcephysics.media.core.TemplateMatcher;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class AutoTrackerCore {
-	private static int templateIconMagnification = 2;
+	private static final int templateIconMagnification = 2;
 
 	public AutoTrackerOptions options;
-	private AutoTrackerControl control;
-	private AutoTrackerFeedback feedback;
+	private final AutoTrackerControl control;
+	private final AutoTrackerFeedback feedback;
 
 	public int trackID;
 	/* trackFrameData maps tracks to indexFrameData which maps point index
 	to frameData which maps frame number to individual FrameData objects */
 	public Map<TTrack, Map<Integer, Map<Integer, FrameData>>> trackFrameData
-			= new HashMap<TTrack, Map<Integer, Map<Integer, FrameData>>>();
+			= new HashMap<>();
 
 	public AutoTrackerCore(AutoTrackerControl c, AutoTrackerFeedback f) {
 		control = c;
@@ -311,7 +310,7 @@ public class AutoTrackerCore {
 
 			double vxmax = 0, vxmean = 0, vymax = 0, vymean = 0;
 			int n = 0;
-			for (int i = 0; i < veloc.length; i++) {
+			for (int i = 0; i < Objects.requireNonNull(veloc).length; i++) {
 				if (veloc[i] != null) {
 					n++;
 					vxmax = Math.max(vxmax, Math.abs(veloc[i][0]));
@@ -325,7 +324,7 @@ public class AutoTrackerCore {
 
 			double axmax = 0, axmean = 0, aymax = 0, aymean = 0;
 			n = 0;
-			for (int i = 0; i < accel.length; i++) {
+			for (int i = 0; i < Objects.requireNonNull(accel).length; i++) {
 				if (accel[i] != null) {
 					n++;
 					axmax = Math.max(axmax, Math.abs(accel[i][0]));
@@ -339,24 +338,21 @@ public class AutoTrackerCore {
 
 			double jxmax = 0, jxmean = 0, jymax = 0, jymean = 0;
 			n = 0;
-			for (int i = 0; i < jerk.length; i++) {
-				if (jerk[i] != null) {
+			assert jerk != null;
+			for (double[] doubles : jerk) {
+				if (doubles != null) {
 					n++;
-					jxmax = Math.max(jxmax, Math.abs(jerk[i][0]));
-					jxmean += jerk[i][0];
-					jymax = Math.max(jymax, Math.abs(jerk[i][1]));
-					jymean += jerk[i][1];
+					jxmax = Math.max(jxmax, Math.abs(doubles[0]));
+					jxmean += doubles[0];
+					jymax = Math.max(jymax, Math.abs(doubles[1]));
+					jymean += doubles[1];
 				}
 			}
-			jxmean = Math.abs(jxmean / n);
-			jymean = Math.abs(jymean / n);
 
-			boolean xVelocValid = prevPoints[2] == null || Math.abs(accel[0][0]) < vxmean;
+			boolean xVelocValid = prevPoints[2] == null || Math.abs(Objects.requireNonNull(accel[0])[0]) < vxmean;
 			boolean yVelocValid = prevPoints[2] == null || Math.abs(accel[0][1]) < vymean;
 			boolean xAccelValid = prevPoints[2] != null && (prevPoints[3] == null || Math.abs(jerk[0][0]) < axmean);
 			boolean yAccelValid = prevPoints[2] != null && (prevPoints[3] == null || Math.abs(jerk[0][1]) < aymean);
-//			boolean velocValid = prevPoints[2]==null || (accel[0][0]<vxmean && accel[0][1]<vymean);
-//			boolean accelValid = prevPoints[2]!=null && (prevPoints[3]==null || (jerk[0][0]<axmean && jerk[0][1]<aymean));
 
 			if (xAccelValid) {
 				// base x-coordinate prediction on acceleration
@@ -390,25 +386,7 @@ public class AutoTrackerCore {
 				predictedTarget.setLocation(predictedTarget.x, y);
 				success = true;
 			}
-//			if (accelValid) {
-//				// base prediction on acceleration
-//				TPoint loc0 = prevPoints[2];
-//				TPoint loc1 = prevPoints[1];
-//				TPoint loc2 = prevPoints[0];
-//				double x = 3*loc2.getX() - 3*loc1.getX() + loc0.getX();
-//				double y = 3*loc2.getY() - 3*loc1.getY() + loc0.getY();
-//	  		predictedTarget.setLocation(x, y);
-//	    	success = true;
-//			}
-//			else if (velocValid) {
-//				// else base prediction on velocity
-//				TPoint loc0 = prevPoints[1];
-//				TPoint loc1 = prevPoints[0];
-//				double x = 2*loc1.getX() -loc0.getX();
-//				double y = 2*loc1.getY() -loc0.getY();
-//	  		predictedTarget.setLocation(x, y);
-//	    	success = true;
-//			}
+//
 		}
 		if (success) {
 			// make sure prediction is within the video image
@@ -463,7 +441,7 @@ public class AutoTrackerCore {
 
 
 	public void deleteLater(int n) {
-		ArrayList<Integer> toRemove = new ArrayList<Integer>();
+		ArrayList<Integer> toRemove = new ArrayList<>();
 		// TODO: to core!
 		Map<Integer, FrameData> frameData = getFrameData();
 		for (int i : frameData.keySet()) {
@@ -541,7 +519,7 @@ public class AutoTrackerCore {
 		// get earlier keyframe, if any
 		keyFrame = getFrame(n).getKeyFrame();
 		if (keyFrame == null) { // no earlier key frame, so clear all matches up to nextKey
-			ArrayList<Integer> toRemove = new ArrayList<Integer>();
+			ArrayList<Integer> toRemove = new ArrayList<>();
 			for (int i : frameData.keySet()) {
 				if (nextKey > -1 && i >= nextKey) break;
 				FrameData frame = frameData.get(i);
@@ -571,7 +549,7 @@ public class AutoTrackerCore {
 	}
 
 	public ArrayList<Integer> listKeyFrames() {
-		ArrayList<Integer> keyFrames = new ArrayList<Integer>();
+		ArrayList<Integer> keyFrames = new ArrayList<>();
 		Map<Integer, FrameData> frameData = getFrameData();
 		for (Integer i : frameData.keySet()) {
 			FrameData frame = frameData.get(i);
@@ -672,22 +650,12 @@ public class AutoTrackerCore {
 	// indexFrameData maps point index to frameData
 	protected Map<Integer, Map<Integer, FrameData>> getIndexFrameData() {
 		TTrack track = getTrack();
-		Map<Integer, Map<Integer, FrameData>> indexFrameData = trackFrameData.get(track);
-		if (indexFrameData == null) {
-			indexFrameData = new TreeMap<Integer, Map<Integer, FrameData>>();
-			trackFrameData.put(track, indexFrameData);
-		}
-		return indexFrameData;
+		return trackFrameData.computeIfAbsent(track, k -> new TreeMap<>());
 	}
 
 	// frameData maps frame number to individual FrameData objects
 	protected Map<Integer, FrameData> getFrameData(int index) {
-		Map<Integer, FrameData> frameData = getIndexFrameData().get(index);
-		if (frameData == null) {
-			frameData = new TreeMap<Integer, FrameData>();
-			getIndexFrameData().put(index, frameData);
-		}
-		return frameData;
+		return getIndexFrameData().computeIfAbsent(index, k -> new TreeMap<>());
 	}
 
 	protected Map<Integer, FrameData> getFrameData() {
@@ -727,7 +695,10 @@ public class AutoTrackerCore {
 	 */
 	protected class FrameData {
 
-		private int index, frameNum, templateAlpha, matcherHashCode;
+		private final int index;
+		private final int frameNum;
+		private int templateAlpha;
+		private int matcherHashCode;
 		private double[] targetOffset = {0, 0};
 		private double[] matchWidthAndHeight;
 		private TPoint[] matchPoints;
@@ -994,9 +965,9 @@ public class AutoTrackerCore {
 	 */
 	protected class KeyFrame extends FrameData {
 
-		private Shape mask;
-		private TPoint target;
-		private TPoint[] maskPoints = {new TPoint(), new TPoint()};
+		private final Shape mask;
+		private final TPoint target;
+		private final TPoint[] maskPoints = {new TPoint(), new TPoint()};
 		private TemplateMatcher matcher;
 
 		KeyFrame(TPoint keyPt, Shape mask, TPoint target, int index, TPoint center, TPoint corner) {
@@ -1026,16 +997,6 @@ public class AutoTrackerCore {
 
 		void setTemplateMatcher(TemplateMatcher matcher) {
 			this.matcher = matcher;
-		}
-
-		boolean isFirstKeyFrame() {
-			Map<Integer, FrameData> frames = getFrameData(getIndex());
-			for (int i = getFrameNumber() - 1; i >= 0; i--) {
-				FrameData frame = frames.get(i);
-				if (frame != null && frame.isKeyFrame())
-					return false;
-			}
-			return true;
 		}
 
 	}

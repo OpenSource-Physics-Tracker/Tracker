@@ -55,14 +55,14 @@ public class OffsetOrigin extends TTrack {
   	formatVariables = new String[] {"xy"}; //$NON-NLS-1$
   	
   	// assemble format map
-		formatMap = new HashMap<String, ArrayList<String>>();		
-		ArrayList<String> list = new ArrayList<String>();
+		formatMap = new HashMap<>();
+		ArrayList<String> list = new ArrayList<>();
 		list.add(dataVariables[0]); 
 		list.add(dataVariables[1]); 
 		formatMap.put(formatVariables[0], list);
 		
 		// assemble format description map
-		formatDescriptionMap = new HashMap<String, String>();
+		formatDescriptionMap = new HashMap<>();
 		formatDescriptionMap.put(formatVariables[0], TrackerRes.getString("PointMass.Position.Name")); //$NON-NLS-1$ 
 
   }
@@ -109,7 +109,7 @@ public class OffsetOrigin extends TTrack {
       step = new OffsetOriginStep(this, n, x, y);
       step.setFootprint(getFootprint());
       steps = new StepArray(step);
-      support.firePropertyChange("step", null, new Integer(n)); //$NON-NLS-1$
+      support.firePropertyChange("step", null, n); //$NON-NLS-1$
     }
     else if (trackerPanel!=null) {
     	XMLControl currentState = new XMLControlElement(this);
@@ -238,7 +238,8 @@ public class OffsetOrigin extends TTrack {
    *
    * @param visible ignored
    */
-  public void setTrailVisible(boolean visible) {/** empty block */}
+  public void setTrailVisible(boolean visible) {
+  }
 
   /**
    * Gets the length of the steps created by this track.
@@ -363,7 +364,7 @@ public class OffsetOrigin extends TTrack {
     if (name.equals("stepnumber")) { //$NON-NLS-1$
       if (trackerPanel.getSelectedTrack() == this) {
       	displayWorldCoordinates();
-	      stepValueLabel.setText((Integer)e.getNewValue()+":"); //$NON-NLS-1$
+	      stepValueLabel.setText(e.getNewValue() +":"); //$NON-NLS-1$
       }
     }
     else if (name.equals("locked")) { //$NON-NLS-1$
@@ -486,17 +487,11 @@ public class OffsetOrigin extends TTrack {
   	unmarkedLabel = new JLabel();
   	unmarkedLabel.setForeground(Color.red.darker());
     fixedCoordinatesItem = new JCheckBoxMenuItem(TrackerRes.getString("OffsetOrigin.MenuItem.Fixed")); //$NON-NLS-1$
-    fixedCoordinatesItem.addItemListener(new ItemListener() {
-      public void itemStateChanged(ItemEvent e) {
-        setFixedCoordinates(fixedCoordinatesItem.isSelected());
-      }
-    });
+    fixedCoordinatesItem.addItemListener(e -> setFixedCoordinates(fixedCoordinatesItem.isSelected()));
     // create xy ActionListener and FocusListener
-    ActionListener xyAction = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setWorldCoordinatesFromFields();
-        ( (NumberField) e.getSource()).requestFocusInWindow();
-      }
+    ActionListener xyAction = e -> {
+      setWorldCoordinatesFromFields();
+      ( (NumberField) e.getSource()).requestFocusInWindow();
     };
     FocusListener xyFocusListener = new FocusAdapter() {
       public void focusLost(FocusEvent e) {

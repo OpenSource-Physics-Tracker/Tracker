@@ -1,46 +1,16 @@
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.swing.Box;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-
-import org.opensourcephysics.controls.ListChooser;
-import org.opensourcephysics.controls.OSPLog;
-import org.opensourcephysics.controls.XML;
-import org.opensourcephysics.controls.XMLControl;
-import org.opensourcephysics.controls.XMLControlElement;
-import org.opensourcephysics.controls.XMLProperty;
+import org.opensourcephysics.controls.*;
 import org.opensourcephysics.display.DatasetManager;
 import org.opensourcephysics.display.Drawable;
 import org.opensourcephysics.display.OSPRuntime;
-import org.opensourcephysics.tools.DataFunctionPanel;
-import org.opensourcephysics.tools.FontSizer;
-import org.opensourcephysics.tools.AbstractAutoloadManager;
-import org.opensourcephysics.tools.FunctionEditor;
-import org.opensourcephysics.tools.FunctionPanel;
-import org.opensourcephysics.tools.FunctionTool;
-import org.opensourcephysics.tools.Parameter;
-import org.opensourcephysics.tools.ResourceLoader;
-import org.opensourcephysics.tools.ToolsRes;
-import org.opensourcephysics.tools.TristateCheckBox;
+import org.opensourcephysics.tools.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.*;
 
 /**
  * A FunctionTool for building data functions for track data.
@@ -67,12 +37,10 @@ public class TrackDataBuilder extends FunctionTool {
 		addPropertyChangeListener("function", trackerPanel); //$NON-NLS-1$
 		addPropertyChangeListener("visible", trackerPanel); //$NON-NLS-1$
 		ArrayList<Drawable> nogos = trackerPanel.getSystemDrawables();
-		Iterator<TTrack> it = trackerPanel.getTracks().iterator();
-		while (it.hasNext()) {
-			TTrack track = it.next();
+		for (TTrack track : trackerPanel.getTracks()) {
 			if (nogos.contains(track)) continue;
 			FunctionPanel panel = trackerPanel.createFunctionPanel(track);
-	    addPanel(track.getName(), panel);
+			addPanel(track.getName(), panel);
 		}
 	}
 	
@@ -84,164 +52,163 @@ public class TrackDataBuilder extends FunctionTool {
     String imageFile = "/org/opensourcephysics/resources/tools/images/open.gif"; //$NON-NLS-1$
     Icon openIcon  = ResourceLoader.getIcon(imageFile);
 		loadButton = new JButton(openIcon);
-		loadButton.addActionListener(new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
-		    JFileChooser chooser = OSPRuntime.createChooser(
-		    		TrackerRes.getString("TrackerPanel.DataBuilder.Load.Title"),  //$NON-NLS-1$
-		    		TrackerRes.getString("TrackerPanel.DataBuilder.Chooser.XMLFiles"),  //$NON-NLS-1$
-		    		new String[] {"xml"}); //$NON-NLS-1$
-		    int result = chooser.showOpenDialog(TrackDataBuilder.this);
-		    if(result==JFileChooser.APPROVE_OPTION) {
-		      OSPRuntime.chooserDir = chooser.getCurrentDirectory().toString();
-		      String fileName = chooser.getSelectedFile().getAbsolutePath();
-		      XMLControl control = new XMLControlElement(fileName);
-		      if (control.failedToRead()) {
-		        JOptionPane.showMessageDialog(trackerPanel.getTFrame(), 
-		            TrackerRes.getString("Tracker.Dialog.Invalid.Message"), //$NON-NLS-1$
-		        		TrackerRes.getString("Tracker.Dialog.Invalid.Title"), //$NON-NLS-1$
-		        		JOptionPane.ERROR_MESSAGE);
-		        return;
-		      }
-		      
-		      Class<?> type = control.getObjectClass();
-		      if (DataFunctionPanel.class.isAssignableFrom(type)) {
-		      	// determine what track type the control is for
-		      	FunctionPanel dataPanel = getSelectedPanel();
-		      	Class<?> panelType = null;
-		      	Class<?> controlType = null;
-		      	try {
-							panelType = Class.forName(dataPanel.getDescription());
-		      		controlType = Class.forName(control.getString("description")); //$NON-NLS-1$);
-						} catch (ClassNotFoundException ex) {
-						}
-		      	String trackType = TrackerRes.getString("TrackerPanel.DataBuilder.TrackType.Unknown"); //$NON-NLS-1$
-		      	if (controlType!=null)
-		      		trackType = TrackerRes.getString(controlType.getSimpleName()+".Name").toLowerCase(); //$NON-NLS-1$
-		      	
-		      	if (controlType!=panelType) {
-		        	String targetType = TrackerRes.getString(panelType.getSimpleName()+".Name").toLowerCase(); //$NON-NLS-1$
-		          JOptionPane.showMessageDialog(trackerPanel.getTFrame(), 
-		              TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.WrongTrackType.Message1")+" \""+trackType+".\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		              +"\n"+TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.WrongTrackType.Message2")+" \""+targetType+".\"", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		          		TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.WrongTrackType.Title"), //$NON-NLS-1$
-		          		JOptionPane.ERROR_MESSAGE);            	
-		      		return;
-		      	}
-		      	
-		      	if (choosePanelDataFunctions(control, "Load", null)) { //$NON-NLS-1$
-		      		// load data function panel(s)
-		      		ArrayList<FunctionPanel> panelsToLoad = new ArrayList<FunctionPanel>();
-		          for (String name: getPanelNames()) {
-		          	FunctionPanel nextPanel = getPanel(name);
-		          	try {
-									panelType = Class.forName(nextPanel.getDescription());
-								} catch (ClassNotFoundException ex) {
-								}
-		          	if (panelType==controlType) {
-		            	panelsToLoad.add(nextPanel);
-		          	}
-		          }
-		      		
-		      		result = 1; // default if only one track to load
-		      		if (panelsToLoad.size()>1) {
-		        		Object[] options = new String[] {
-		        				TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Button.All"),  //$NON-NLS-1$
-		        				TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Button.Only")+" "+dataPanel.getName(),  //$NON-NLS-1$ //$NON-NLS-2$
-		        				TrackerRes.getString("Dialog.Button.Cancel")}; //$NON-NLS-1$
-		        		result = JOptionPane.showOptionDialog(TrackDataBuilder.this, 
-		        				TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Message")+" \""+trackType+"\"?",  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		        				TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Title"),  //$NON-NLS-1$
-		        				JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-		      		}
-		      		if (result==0) {
-		            for (FunctionPanel nextPanel: panelsToLoad) {
-		              control.loadObject(nextPanel);
-		            }
-		      		}
-		      		else if (result==1) {
-		          	control.loadObject(dataPanel);            			
-		      		}
-		        }
-		      }
-		      else if (TrackDataBuilder.class.isAssignableFrom(type)) {
-		      	// determine what the selected panel track type is
-		      	FunctionPanel dataPanel = getSelectedPanel();
-		      	String panelTrackType = dataPanel.getDescription();
+		loadButton.addActionListener(e -> {
+		  JFileChooser chooser = OSPRuntime.createChooser(
+				  TrackerRes.getString("TrackerPanel.DataBuilder.Load.Title"),  //$NON-NLS-1$
+				  TrackerRes.getString("TrackerPanel.DataBuilder.Chooser.XMLFiles"),  //$NON-NLS-1$
+				  new String[] {"xml"}); //$NON-NLS-1$
+		  int result = chooser.showOpenDialog(TrackDataBuilder.this);
+		  if(result==JFileChooser.APPROVE_OPTION) {
+			OSPRuntime.chooserDir = chooser.getCurrentDirectory().toString();
+			String fileName = chooser.getSelectedFile().getAbsolutePath();
+			XMLControl control = new XMLControlElement(fileName);
+			if (control.failedToRead()) {
+			  JOptionPane.showMessageDialog(trackerPanel.getTFrame(),
+				  TrackerRes.getString("Tracker.Dialog.Invalid.Message"), //$NON-NLS-1$
+					  TrackerRes.getString("Tracker.Dialog.Invalid.Title"), //$NON-NLS-1$
+					  JOptionPane.ERROR_MESSAGE);
+			  return;
+			}
 
-		      	// find the first DataFunctionPanel with same track type
-			    	XMLControl targetControl = null;
-		        outerLoop: for (Object next: control.getPropertyContent()) {
-		        	if (next instanceof XMLProperty 
-		        			&& ((XMLProperty)next).getPropertyName().equals("functions")) { //$NON-NLS-1$
-		        		// found DataFunctionPanels
-		        		XMLControl[] panels = ((XMLProperty)next).getChildControls();
-		        		for (XMLControl panelControl: panels) {
-		        			String trackType = panelControl.getString("description"); //$NON-NLS-1$
-		        			if (trackType==null || panelTrackType==null || !panelTrackType.equals(trackType)) {
-		        				// wrong track type
-		        				continue;
-		        			}
-		        			// found right panel
-	        				targetControl = panelControl;
-	        				break outerLoop;        					
-		        		}
-		        	}
-		        } // end outerLoop
-		      	
-		      	String trackType = TrackerRes.getString("TrackerPanel.DataBuilder.TrackType.Unknown"); //$NON-NLS-1$
-		      	if (panelTrackType!=null)
-		      		trackType = TrackerRes.getString(XML.getExtension(panelTrackType)+".Name").toLowerCase(); //$NON-NLS-1$
-		      	
-		      	if (targetControl==null) {
-		          JOptionPane.showMessageDialog(trackerPanel.getTFrame(), 
-		              TrackerRes.getString("TrackDataBuilder.Dialog.NoFunctionsFound.Message")+" \""+trackType+".\"", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		          		TrackerRes.getString("TrackDataBuilder.Dialog.NoFunctionsFound.Title"), //$NON-NLS-1$
-		          		JOptionPane.ERROR_MESSAGE);            	
-		      		return;
-		      	}
-		      	
-		      	
-		      	if (choosePanelDataFunctions(targetControl, "Load", null)) { //$NON-NLS-1$
-		      		// load data function panel(s)
-		      		ArrayList<FunctionPanel> panelsToLoad = new ArrayList<FunctionPanel>();
-		          for (String name: getPanelNames()) {
-		          	FunctionPanel nextPanel = getPanel(name);
-		          	if (panelTrackType.equalsIgnoreCase(nextPanel.getDescription())) {
-		            	panelsToLoad.add(nextPanel);
-		          	}
-		          }
-		      		
-		      		result = 1; // default if only one track to load
-		      		if (panelsToLoad.size()>1) {
-		        		Object[] options = new String[] {
-		        				TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Button.All"),  //$NON-NLS-1$
-		        				TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Button.Only")+" "+dataPanel.getName(),  //$NON-NLS-1$ //$NON-NLS-2$
-		        				TrackerRes.getString("Dialog.Button.Cancel")}; //$NON-NLS-1$
-		        		result = JOptionPane.showOptionDialog(TrackDataBuilder.this, 
-		        				TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Message")+" \""+trackType+"\"?",  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		        				TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Title"),  //$NON-NLS-1$
-		        				JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-		      		}
-		      		if (result==0) {
-		            for (FunctionPanel nextPanel: panelsToLoad) {
-		            	targetControl.loadObject(nextPanel);
-		            }
-		      		}
-		      		else if (result==1) {
-		      			targetControl.loadObject(dataPanel);            			
-		      		}
-		        }
-		      }
-		  		else {
-		        JOptionPane.showMessageDialog(trackerPanel.getTFrame(), 
-		            TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.WrongType.Message"), //$NON-NLS-1$
-		        		TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.WrongType.Title"), //$NON-NLS-1$
-		        		JOptionPane.ERROR_MESSAGE);
-		  		}
-		
-		    }
+			Class<?> type = control.getObjectClass();
+			if (DataFunctionPanel.class.isAssignableFrom(type)) {
+				// determine what track type the control is for
+				FunctionPanel dataPanel = getSelectedPanel();
+				Class<?> panelType = null;
+				Class<?> controlType = null;
+				try {
+						  panelType = Class.forName(dataPanel.getDescription());
+					controlType = Class.forName(control.getString("description")); //$NON-NLS-1$);
+					  } catch (ClassNotFoundException ex) {
+				  ex.printStackTrace();
+			  }
+				String trackType = TrackerRes.getString("TrackerPanel.DataBuilder.TrackType.Unknown"); //$NON-NLS-1$
+				if (controlType!=null)
+					trackType = TrackerRes.getString(controlType.getSimpleName()+".Name").toLowerCase(); //$NON-NLS-1$
+
+				if (controlType!=panelType) {
+				  String targetType = TrackerRes.getString(panelType.getSimpleName()+".Name").toLowerCase(); //$NON-NLS-1$
+				JOptionPane.showMessageDialog(trackerPanel.getTFrame(),
+					TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.WrongTrackType.Message1")+" \""+trackType+".\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					+"\n"+TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.WrongTrackType.Message2")+" \""+targetType+".\"", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+						TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.WrongTrackType.Title"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				if (choosePanelDataFunctions(control, "Load")) { //$NON-NLS-1$
+					// load data function panel(s)
+					ArrayList<FunctionPanel> panelsToLoad = new ArrayList<>();
+				for (String name: getPanelNames()) {
+					FunctionPanel nextPanel = getPanel(name);
+					try {
+								  panelType = Class.forName(nextPanel.getDescription());
+							  } catch (ClassNotFoundException ex) {
+					  ex.printStackTrace();
+				  }
+					if (panelType==controlType) {
+					  panelsToLoad.add(nextPanel);
+					}
+				}
+
+					result = 1; // default if only one track to load
+					if (panelsToLoad.size()>1) {
+					  Object[] options = new String[] {
+							  TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Button.All"),  //$NON-NLS-1$
+							  TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Button.Only")+" "+dataPanel.getName(),  //$NON-NLS-1$ //$NON-NLS-2$
+							  TrackerRes.getString("Dialog.Button.Cancel")}; //$NON-NLS-1$
+					  result = JOptionPane.showOptionDialog(TrackDataBuilder.this,
+							  TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Message")+" \""+trackType+"\"?",  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							  TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Title"),  //$NON-NLS-1$
+							  JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+					}
+					if (result==0) {
+				  for (FunctionPanel nextPanel: panelsToLoad) {
+					control.loadObject(nextPanel);
+				  }
+					}
+					else if (result==1) {
+					control.loadObject(dataPanel);
+					}
+			  }
+			}
+			else if (TrackDataBuilder.class.isAssignableFrom(type)) {
+				// determine what the selected panel track type is
+				FunctionPanel dataPanel = getSelectedPanel();
+				String panelTrackType = dataPanel.getDescription();
+
+				// find the first DataFunctionPanel with same track type
+				  XMLControl targetControl = null;
+			  outerLoop: for (Object next: control.getPropertyContent()) {
+				  if (next instanceof XMLProperty
+						  && ((XMLProperty)next).getPropertyName().equals("functions")) { //$NON-NLS-1$
+					  // found DataFunctionPanels
+					  XMLControl[] panels = ((XMLProperty)next).getChildControls();
+					  for (XMLControl panelControl: panels) {
+						  String trackType = panelControl.getString("description"); //$NON-NLS-1$
+						  if (panelTrackType == null || !panelTrackType.equals(trackType)) {
+							  // wrong track type
+							  continue;
+						  }
+						  // found right panel
+						  targetControl = panelControl;
+						  break outerLoop;
+					  }
+				  }
+			  } // end outerLoop
+
+				String trackType = TrackerRes.getString("TrackerPanel.DataBuilder.TrackType.Unknown"); //$NON-NLS-1$
+				if (panelTrackType!=null)
+					trackType = TrackerRes.getString(XML.getExtension(panelTrackType)+".Name").toLowerCase(); //$NON-NLS-1$
+
+				if (targetControl==null) {
+				JOptionPane.showMessageDialog(trackerPanel.getTFrame(),
+					TrackerRes.getString("TrackDataBuilder.Dialog.NoFunctionsFound.Message")+" \""+trackType+".\"", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						TrackerRes.getString("TrackDataBuilder.Dialog.NoFunctionsFound.Title"), //$NON-NLS-1$
+						JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+
+				if (choosePanelDataFunctions(targetControl, "Load")) { //$NON-NLS-1$
+					// load data function panel(s)
+					ArrayList<FunctionPanel> panelsToLoad = new ArrayList<>();
+				for (String name: getPanelNames()) {
+					FunctionPanel nextPanel = getPanel(name);
+					if (panelTrackType.equalsIgnoreCase(nextPanel.getDescription())) {
+					  panelsToLoad.add(nextPanel);
+					}
+				}
+
+					result = 1; // default if only one track to load
+					if (panelsToLoad.size()>1) {
+					  Object[] options = new String[] {
+							  TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Button.All"),  //$NON-NLS-1$
+							  TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Button.Only")+" "+dataPanel.getName(),  //$NON-NLS-1$ //$NON-NLS-2$
+							  TrackerRes.getString("Dialog.Button.Cancel")}; //$NON-NLS-1$
+					  result = JOptionPane.showOptionDialog(TrackDataBuilder.this,
+							  TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Message")+" \""+trackType+"\"?",  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							  TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.Load.Title"),  //$NON-NLS-1$
+							  JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+					}
+					if (result==0) {
+				  for (FunctionPanel nextPanel: panelsToLoad) {
+					  targetControl.loadObject(nextPanel);
+				  }
+					}
+					else if (result==1) {
+						targetControl.loadObject(dataPanel);
+					}
+			  }
+			}
+				else {
+			  JOptionPane.showMessageDialog(trackerPanel.getTFrame(),
+				  TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.WrongType.Message"), //$NON-NLS-1$
+					  TrackerRes.getString("TrackerPanel.DataBuilder.Dialog.WrongType.Title"), //$NON-NLS-1$
+					  JOptionPane.ERROR_MESSAGE);
+				}
+
 		  }
-		
 		});
 
 		// create saveButton
@@ -249,87 +216,76 @@ public class TrackDataBuilder extends FunctionTool {
     Icon saveIcon = ResourceLoader.getIcon(imageFile);
 		saveButton = new JButton(saveIcon);
 		
-		final ActionListener saveBuilderAction = new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
-		  	XMLControl control = new XMLControlElement(TrackDataBuilder.this);
-		   	if (chooseBuilderDataFunctions(control, "Save", null)) { //$NON-NLS-1$
-		      JFileChooser chooser = OSPRuntime.createChooser(
-		      		TrackerRes.getString("TrackerPanel.DataBuilder.Save.Title"),  //$NON-NLS-1$
-		      		TrackerRes.getString("TrackerPanel.DataBuilder.Chooser.XMLFiles"),  //$NON-NLS-1$
-		      		new String[] {"xml"}); //$NON-NLS-1$
-		      int result = chooser.showSaveDialog(TrackDataBuilder.this);
-		      if (result==JFileChooser.APPROVE_OPTION) {
-		        OSPRuntime.chooserDir = chooser.getCurrentDirectory().toString();
-		        File file = chooser.getSelectedFile();
-		        String fileName = file.getAbsolutePath();
-		        if (!"xml".equals(XML.getExtension(fileName))) { //$NON-NLS-1$
-		        	fileName = XML.stripExtension(fileName)+".xml"; //$NON-NLS-1$
-		        	file = new File(fileName);
-		        }
-		        if(!TrackerIO.canWrite(file)) {
-		        	return;
-		        }
-		        control.write(fileName);
-		      }
-		    }
+		final ActionListener saveBuilderAction = e -> {
+			XMLControl control = new XMLControlElement(TrackDataBuilder.this);
+			 if (chooseBuilderDataFunctions(control)) { //$NON-NLS-1$
+			JFileChooser chooser = OSPRuntime.createChooser(
+					TrackerRes.getString("TrackerPanel.DataBuilder.Save.Title"),  //$NON-NLS-1$
+					TrackerRes.getString("TrackerPanel.DataBuilder.Chooser.XMLFiles"),  //$NON-NLS-1$
+					new String[] {"xml"}); //$NON-NLS-1$
+			int result = chooser.showSaveDialog(TrackDataBuilder.this);
+			if (result==JFileChooser.APPROVE_OPTION) {
+			  OSPRuntime.chooserDir = chooser.getCurrentDirectory().toString();
+			  File file = chooser.getSelectedFile();
+			  String fileName = file.getAbsolutePath();
+			  if (!"xml".equals(XML.getExtension(fileName))) { //$NON-NLS-1$
+				  fileName = XML.stripExtension(fileName)+".xml"; //$NON-NLS-1$
+				  file = new File(fileName);
+			  }
+			  if(!TrackerIO.canWrite(file)) {
+				  return;
+			  }
+			  control.write(fileName);
+			}
 		  }
-		
 		};
-		final ActionListener savePanelAction = new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
-      	XMLControl control = new XMLControlElement(getSelectedPanel());
-       	if (choosePanelDataFunctions(control, "Save", null)) { //$NON-NLS-1$
-          JFileChooser chooser = OSPRuntime.createChooser(
-          		TrackerRes.getString("TrackerPanel.DataBuilder.Save.Title"),  //$NON-NLS-1$
-          		TrackerRes.getString("TrackerPanel.DataBuilder.Chooser.XMLFiles"),  //$NON-NLS-1$
-          		new String[] {"xml"}); //$NON-NLS-1$
-          int result = chooser.showSaveDialog(TrackDataBuilder.this);
-          if (result==JFileChooser.APPROVE_OPTION) {
-            OSPRuntime.chooserDir = chooser.getCurrentDirectory().toString();
-		        File file = chooser.getSelectedFile();
-		        String fileName = file.getAbsolutePath();
-		        if (!"xml".equals(XML.getExtension(fileName))) { //$NON-NLS-1$
-		        	fileName = XML.stripExtension(fileName)+".xml"; //$NON-NLS-1$
-		        	file = new File(fileName);
-		        }
-		        if(!TrackerIO.canWrite(file)) {
-		        	return;
-		        }
-		        control.write(fileName);
-          }
-        }
-		  }
-		
+		final ActionListener savePanelAction = e -> {
+		XMLControl control = new XMLControlElement(getSelectedPanel());
+		 if (choosePanelDataFunctions(control, "Save")) { //$NON-NLS-1$
+		JFileChooser chooser = OSPRuntime.createChooser(
+				TrackerRes.getString("TrackerPanel.DataBuilder.Save.Title"),  //$NON-NLS-1$
+				TrackerRes.getString("TrackerPanel.DataBuilder.Chooser.XMLFiles"),  //$NON-NLS-1$
+				new String[] {"xml"}); //$NON-NLS-1$
+		int result = chooser.showSaveDialog(TrackDataBuilder.this);
+		if (result==JFileChooser.APPROVE_OPTION) {
+		  OSPRuntime.chooserDir = chooser.getCurrentDirectory().toString();
+			  File file = chooser.getSelectedFile();
+			  String fileName = file.getAbsolutePath();
+			  if (!"xml".equals(XML.getExtension(fileName))) { //$NON-NLS-1$
+				  fileName = XML.stripExtension(fileName)+".xml"; //$NON-NLS-1$
+				  file = new File(fileName);
+			  }
+			  if(!TrackerIO.canWrite(file)) {
+				  return;
+			  }
+			  control.write(fileName);
+		}
+	  }
 		};
-	  saveButton.addActionListener(new ActionListener() {
-		  public void actionPerformed(ActionEvent e) {
-        JPopupMenu popup = new JPopupMenu();
-        JMenuItem item = new JMenuItem(TrackerRes.getString("TrackDataBuilder.MenuItem.SaveAll.Text"));  //$NON-NLS-1$
-        item.setToolTipText(TrackerRes.getString("TrackDataBuilder.MenuItem.SaveAll.Tooltip")); //$NON-NLS-1$
-        popup.add(item);
-        item.addActionListener(saveBuilderAction);
-        
-        String s = " "+getSelectedPanel().getName(); //$NON-NLS-1$
-        item = new JMenuItem(TrackerRes.getString("TrackDataBuilder.MenuItem.SaveOnly.Text")+s);  //$NON-NLS-1$
-        item.setToolTipText(TrackerRes.getString("TrackDataBuilder.MenuItem.SaveOnly.Tooltip")); //$NON-NLS-1$
-        popup.add(item);
-        item.addActionListener(savePanelAction);
+	  saveButton.addActionListener(e -> {
+JPopupMenu popup = new JPopupMenu();
+JMenuItem item = new JMenuItem(TrackerRes.getString("TrackDataBuilder.MenuItem.SaveAll.Text"));  //$NON-NLS-1$
+item.setToolTipText(TrackerRes.getString("TrackDataBuilder.MenuItem.SaveAll.Tooltip")); //$NON-NLS-1$
+popup.add(item);
+item.addActionListener(saveBuilderAction);
 
-        FontSizer.setFonts(popup, FontSizer.getLevel());
-        popup.show(saveButton, 0, saveButton.getHeight());       		
-		  }
+String s = " "+getSelectedPanel().getName(); //$NON-NLS-1$
+item = new JMenuItem(TrackerRes.getString("TrackDataBuilder.MenuItem.SaveOnly.Text")+s);  //$NON-NLS-1$
+item.setToolTipText(TrackerRes.getString("TrackDataBuilder.MenuItem.SaveOnly.Tooltip")); //$NON-NLS-1$
+popup.add(item);
+item.addActionListener(savePanelAction);
+
+FontSizer.setFonts(popup, FontSizer.getLevel());
+popup.show(saveButton, 0, saveButton.getHeight());
 	  });
 
 		// create autoloadButton
 		autoloadButton = new JButton();
-	  autoloadButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				AutoloadManager manager = getAutoloadManager();
-				manager.refreshAutoloadData();
-				manager.setVisible(true);	
-	    }
-	
-	  });
+	  autoloadButton.addActionListener(e -> {
+		  AutoloadManager manager = getAutoloadManager();
+		  manager.refreshAutoloadData();
+		  manager.setVisible(true);
+});
 	}
 	
 	/**
@@ -397,7 +353,8 @@ public class TrackDataBuilder extends FunctionTool {
   	try {
 			trackType = Class.forName(panel.getDescription());
 			} catch (ClassNotFoundException ex) {
-		}
+		ex.printStackTrace();
+	}
   	// load from Strings read from tracker.prefs (deprecated Dec 2014)
     for (String xml: Tracker.dataFunctionControlStrings) {
     	XMLControl control = new XMLControlElement(xml);
@@ -406,7 +363,8 @@ public class TrackDataBuilder extends FunctionTool {
 	  	try {
 	  		controlTrackType = Class.forName(control.getString("description")); //$NON-NLS-1$);
 			} catch (Exception ex) {
-			}
+			ex.printStackTrace();
+		}
 	  	
 	  	if (controlTrackType==trackType) {
 	  		control.loadObject(panel);            			
@@ -422,7 +380,8 @@ public class TrackDataBuilder extends FunctionTool {
 		  	try {
 		  		controlTrackType = Class.forName(control.getString("description")); //$NON-NLS-1$);
 				} catch (Exception ex) {
-				}
+				ex.printStackTrace();
+			}
 		  	
 		  	if (controlTrackType==trackType) {
 		  		// copy the control for modification if any functions are autoload_off
@@ -446,21 +405,19 @@ public class TrackDataBuilder extends FunctionTool {
    *
    * @param control the XMLControl
    * @param description "Save" or "Load"
-   * @param selectedFunctions collection of DataFunction choices
    * @return true if user clicked OK
    */
-	protected boolean choosePanelDataFunctions(XMLControl control, String description, 
-			Collection<String[]> selectedFunctions) {
+	protected boolean choosePanelDataFunctions(XMLControl control, String description) {
 	  ListChooser listChooser = new ListChooser(
 	  		TrackerRes.getString("TrackerPanel.DataBuilder."+description+".Title"), //$NON-NLS-1$ //$NON-NLS-2$
 	  		TrackerRes.getString("TrackerPanel.DataBuilder."+description+".Message"), //$NON-NLS-1$ //$NON-NLS-2$
 	      this);
     listChooser.setSeparator(" = "); //$NON-NLS-1$
 	  // choose the elements and save
-	  ArrayList<Object> originals = new ArrayList<Object>();
-	  ArrayList<Object> choices = new ArrayList<Object>();
-	  ArrayList<String> names = new ArrayList<String>();
-	  ArrayList<String> expressions = new ArrayList<String>();
+	  ArrayList<Object> originals = new ArrayList<>();
+	  ArrayList<Object> choices = new ArrayList<>();
+	  ArrayList<String> names = new ArrayList<>();
+	  ArrayList<String> expressions = new ArrayList<>();
 	  ArrayList<?> functions = (ArrayList<?>)control.getObject("functions"); //$NON-NLS-1$
 	  
 	  for (Object next: functions) {
@@ -472,9 +429,7 @@ public class TrackDataBuilder extends FunctionTool {
 	  }
 	  // select all by default
 	  boolean[] selected = new boolean[choices.size()];
-	  for (int i = 0; i<selected.length; i++) {
-	  	selected[i] = true;
-	  }
+		Arrays.fill(selected, true);
 	  if (listChooser.choose(choices, names, expressions, selected)) {
 	    // compare choices with originals and remove unwanted object content
 	    for (Object next: originals) {
@@ -493,27 +448,25 @@ public class TrackDataBuilder extends FunctionTool {
    * Chooses data functions from a DataBuilder XMLControl.
    *
    * @param control the XMLControl
-   * @param description "Save" or "Load"
-   * @param selectedFunctions collection of DataFunction choices
    * @return true if user clicked OK
    */
   @SuppressWarnings("unchecked")
-  protected boolean chooseBuilderDataFunctions(XMLControl control, String description, Collection<String[]> selectedFunctions) {
+  protected boolean chooseBuilderDataFunctions(XMLControl control) {
     ListChooser listChooser = new ListChooser(
-    		TrackerRes.getString("TrackerPanel.DataBuilder."+description+".Title"), //$NON-NLS-1$ //$NON-NLS-2$
-    		TrackerRes.getString("TrackerPanel.DataBuilder."+description+".Message"), //$NON-NLS-1$ //$NON-NLS-2$
+    		TrackerRes.getString("TrackerPanel.DataBuilder."+ "Save" +".Title"), //$NON-NLS-1$ //$NON-NLS-2$
+    		TrackerRes.getString("TrackerPanel.DataBuilder."+ "Save" +".Message"), //$NON-NLS-1$ //$NON-NLS-2$
         this);
     listChooser.setSeparator(" = "); //$NON-NLS-1$
     // choose the elements and save
-    ArrayList<String[]> originals = new ArrayList<String[]>();
-    ArrayList<String[]> choices = new ArrayList<String[]>();
-    ArrayList<String> names = new ArrayList<String>();
-    ArrayList<String> expressions = new ArrayList<String>();
-    ArrayList<String> trackTypes = new ArrayList<String>();
+    ArrayList<String[]> originals = new ArrayList<>();
+    ArrayList<String[]> choices = new ArrayList<>();
+    ArrayList<String> names = new ArrayList<>();
+    ArrayList<String> expressions = new ArrayList<>();
+    ArrayList<String> trackTypes = new ArrayList<>();
     	    
-    Map<String, XMLControl> xmlControlMap = new TreeMap<String, XMLControl>();
-    Map<String, ArrayList<Parameter>> parameterMap = new TreeMap<String, ArrayList<Parameter>>();
-    Map<String, ArrayList<String[]>> functionMap = new TreeMap<String, ArrayList<String[]>>();
+    Map<String, XMLControl> xmlControlMap = new TreeMap<>();
+    Map<String, ArrayList<Parameter>> parameterMap = new TreeMap<>();
+    Map<String, ArrayList<String[]>> functionMap = new TreeMap<>();
     for (Object obj: control.getPropertyContent()) {
     	if (obj instanceof XMLProperty) {
     		XMLProperty prop = (XMLProperty)obj;
@@ -525,12 +478,8 @@ public class TrackDataBuilder extends FunctionTool {
     			xmlControlMap.put(trackType, xmlControl);
     			
     			// get the list of functions for this track type
-    			ArrayList<String[]> functions = functionMap.get(trackType);
-    	    if (functions==null) {
-    	    	functions = new ArrayList<String[]>();
-    	    	functionMap.put(trackType, functions);
-    	    }
-    	    // add functions found in this xmlControl unless already present
+				ArrayList<String[]> functions = functionMap.computeIfAbsent(trackType, k -> new ArrayList<>());
+				// add functions found in this xmlControl unless already present
     	    ArrayList<String[]> panelFunctions = (ArrayList<String[]>)xmlControl.getObject("functions"); //$NON-NLS-1$
     	    outer: for (String[] f: panelFunctions) {
     	    	// check for duplicate function names
@@ -541,16 +490,12 @@ public class TrackDataBuilder extends FunctionTool {
     	    }
     	    
     			// get the list of parameters for this track type
-    			ArrayList<Parameter> params = parameterMap.get(trackType);
-    	    if (params==null) {
-    	    	params = new ArrayList<Parameter>();
-    	    	parameterMap.put(trackType, params);
-    	    }
-    	    // add parameters found in this xmlControl unless already present
+				ArrayList<Parameter> params = parameterMap.computeIfAbsent(trackType, k -> new ArrayList<>());
+				// add parameters found in this xmlControl unless already present
     	    Parameter[] panelParams = (Parameter[])xmlControl.getObject("user_parameters"); //$NON-NLS-1$
     	    outer: for (Parameter p: panelParams) {
     	    	if (trackType.endsWith("PointMass") && p.getName().equals("m")) { //$NON-NLS-1$ //$NON-NLS-2$
-    	    		continue outer;
+    	    		continue;
     	    	}
     	    	// check for duplicate parameter names
     	    	for (Parameter existing: params) {
@@ -577,9 +522,7 @@ public class TrackDataBuilder extends FunctionTool {
     }
     // select all by default
     boolean[] selected = new boolean[choices.size()];
-    for (int i = 0; i<selected.length; i++) {
-    	selected[i] = true;
-    }
+	  Arrays.fill(selected, true);
     
     if (listChooser.choose(choices, names, expressions, trackTypes, selected)) {
       // compare choices with originals and remove unwanted object content
@@ -595,7 +538,7 @@ public class TrackDataBuilder extends FunctionTool {
       for (String trackType: xmlControlMap.keySet()) {
       	ArrayList<String[]> functions = functionMap.get(trackType);
       	ArrayList<Parameter> paramList = parameterMap.get(trackType);
-      	Parameter[] params = paramList.toArray(new Parameter[paramList.size()]);
+      	Parameter[] params = paramList.toArray(new Parameter[0]);
       	XMLControl xmlControl = xmlControlMap.get(trackType);
       	xmlControl.setValue("functions", functions); //$NON-NLS-1$
       	xmlControl.setValue("user_parameters", params); //$NON-NLS-1$
@@ -606,10 +549,10 @@ public class TrackDataBuilder extends FunctionTool {
       	if (next instanceof XMLProperty && ((XMLProperty)next).getPropertyName().equals("functions")) { //$NON-NLS-1$
       		XMLProperty panels = (XMLProperty)next;
           java.util.List<Object> content = panels.getPropertyContent();
-	        ArrayList<Object> toRemove = new ArrayList<Object>();
+	        ArrayList<Object> toRemove = new ArrayList<>();
       		for (Object child: content) {
       			XMLControl xmlControl = ((XMLProperty)child).getChildControls()[0];
-      			if (!xmlControlMap.values().contains(xmlControl)) {
+      			if (!xmlControlMap.containsValue(xmlControl)) {
       				toRemove.add(child);
       			}
       			else { // check to see if functions is empty
@@ -655,7 +598,7 @@ public class TrackDataBuilder extends FunctionTool {
     		// found functions
     		XMLProperty functions = (XMLProperty)prop;
         java.util.List<Object> items = functions.getPropertyContent();
-        ArrayList<XMLProperty> toRemove = new ArrayList<XMLProperty>();
+        ArrayList<XMLProperty> toRemove = new ArrayList<>();
     		for (Object child: items) {
     			XMLProperty item = (XMLProperty)child;
     			XMLProperty nameProp = (XMLProperty)item.getPropertyContent().get(0);
@@ -708,33 +651,31 @@ public class TrackDataBuilder extends FunctionTool {
       	ArrayList<String> searchPaths = OSPRuntime.getDefaultSearchPaths();
     		final String directory = searchPaths.size()>0? searchPaths.get(0): null;
     		if (directory!=null) {
-	      	Runnable runner = new Runnable() {
-	      		public void run() {
-			      	int response = JOptionPane.showConfirmDialog(TrackDataBuilder.this, 
-			      			TrackerRes.getString("TrackDataBuilder.Dialog.ConvertAutoload.Message1") //$NON-NLS-1$
-			      			+ "\n"+TrackerRes.getString("TrackDataBuilder.Dialog.ConvertAutoload.Message2") //$NON-NLS-1$ //$NON-NLS-2$
-			      			+ "\n\n"+TrackerRes.getString("TrackDataBuilder.Dialog.ConvertAutoload.Message3"),  //$NON-NLS-1$ //$NON-NLS-2$
-			      			TrackerRes.getString("TrackDataBuilder.Dialog.ConvertAutoload.Title"),  //$NON-NLS-1$
-			      			JOptionPane.YES_NO_OPTION);
-			      	if (response==JOptionPane.YES_OPTION) {		      		
-			      		TrackDataBuilder builder = new TrackDataBuilder(new TrackerPanel());
-			      		int i = 0;
-			      		for (String next: Tracker.dataFunctionControlStrings) {
-			      			XMLControl panelControl = new XMLControlElement(next);
-			      			DataFunctionPanel panel = new DataFunctionPanel(new DatasetManager());
-			      			panelControl.loadObject(panel);
-			      			builder.addPanelWithoutAutoloading("panel"+i, panel); //$NON-NLS-1$
-			      			i++;
-			      		}
-			      		File file = new File(directory, "TrackerConvertedAutoloadFunctions.xml"); //$NON-NLS-1$
-			      		XMLControl control = new XMLControlElement(builder);
-			      		control.write(file.getAbsolutePath());
-			      		Tracker.dataFunctionControlStrings.clear();
-			      		autoloadManager.refreshAutoloadData();
-			      	}
-	      			
-	      		}
-	      	};
+	      	Runnable runner = () -> {
+				  int response = JOptionPane.showConfirmDialog(TrackDataBuilder.this,
+						  TrackerRes.getString("TrackDataBuilder.Dialog.ConvertAutoload.Message1") //$NON-NLS-1$
+						  + "\n"+TrackerRes.getString("TrackDataBuilder.Dialog.ConvertAutoload.Message2") //$NON-NLS-1$ //$NON-NLS-2$
+						  + "\n\n"+TrackerRes.getString("TrackDataBuilder.Dialog.ConvertAutoload.Message3"),  //$NON-NLS-1$ //$NON-NLS-2$
+						  TrackerRes.getString("TrackDataBuilder.Dialog.ConvertAutoload.Title"),  //$NON-NLS-1$
+						  JOptionPane.YES_NO_OPTION);
+				  if (response==JOptionPane.YES_OPTION) {
+					  TrackDataBuilder builder = new TrackDataBuilder(new TrackerPanel());
+					  int i = 0;
+					  for (String next: Tracker.dataFunctionControlStrings) {
+						  XMLControl panelControl = new XMLControlElement(next);
+						  DataFunctionPanel panel = new DataFunctionPanel(new DatasetManager());
+						  panelControl.loadObject(panel);
+						  builder.addPanelWithoutAutoloading("panel"+i, panel); //$NON-NLS-1$
+						  i++;
+					  }
+					  File file = new File(directory, "TrackerConvertedAutoloadFunctions.xml"); //$NON-NLS-1$
+					  XMLControl control = new XMLControlElement(builder);
+					  control.write(file.getAbsolutePath());
+					  Tracker.dataFunctionControlStrings.clear();
+					  autoloadManager.refreshAutoloadData();
+				  }
+
+			  };
 	      	SwingUtilities.invokeLater(runner);
     		}
       }      
@@ -813,7 +754,7 @@ public class TrackDataBuilder extends FunctionTool {
   				Tracker.preferredAutoloadSearchPaths = null;
   			}
   			else {
-  				Tracker.preferredAutoloadSearchPaths = searchPaths.toArray(new String[searchPaths.size()]);
+  				Tracker.preferredAutoloadSearchPaths = searchPaths.toArray(new String[0]);
   			}
   		}
   	}
@@ -831,22 +772,8 @@ public class TrackDataBuilder extends FunctionTool {
   				+" "+TrackerRes.getString("TrackDataBuilder.Instructions.HowToAddFunction") //$NON-NLS-1$ //$NON-NLS-2$
   				+" "+TrackerRes.getString("TrackDataBuilder.Instructions.HowToAddDirectory")); //$NON-NLS-1$ //$NON-NLS-2$
   	}
-  	
-  	/**
-  	 * Gets a localized track name from the fully qualified track class name.
-  	 * 
-  	 * @param trackClass the class name
-  	 * @return the localized name
-  	 */
-  	protected String getLocalizedTrackName(String trackClass) {
-  		String trackName = XML.getExtension(trackClass);
-			String localized = TrackerRes.getString(trackName+".Name"); //$NON-NLS-1$
-			if (!localized.startsWith("!")) //$NON-NLS-1$
-				trackName = localized;
-			return trackName;
-  	}
 
-    /**
+	  /**
      * Sets the selection state of a function.
      *
      * @param filePath the path to the file defining the function
@@ -874,12 +801,12 @@ public class TrackDataBuilder extends FunctionTool {
   			// remove entry
 				int n = oldExclusions.length;
 				if (n>1) {
-					ArrayList<String> exclusions = new ArrayList<String>();
+					ArrayList<String> exclusions = new ArrayList<>();
 					for (String f: oldExclusions) {
 						if (f.equals(function[0])) continue;
 						exclusions.add(f);
 					}
-					newExclusions = exclusions.toArray(new String[exclusions.size()]);
+					newExclusions = exclusions.toArray(new String[0]);
 				}
   		}
   		
@@ -958,7 +885,7 @@ public class TrackDataBuilder extends FunctionTool {
   	@Override
   	protected void refreshAutoloadData() {
     	final Map<String, Map<String, ArrayList<String[]>>> data 
-    		= new TreeMap<String, Map<String, ArrayList<String[]>>>();
+    		= new TreeMap<>();
     	for (String path: getSearchPaths()) {
         Map<String, ArrayList<String[]>> functionMap = Tracker.findDataFunctions(path);
         data.put(path, functionMap);

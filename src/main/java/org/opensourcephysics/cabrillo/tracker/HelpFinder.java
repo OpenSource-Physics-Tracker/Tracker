@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -65,22 +66,22 @@ import org.opensourcephysics.tools.Launcher.HTMLPane;
 public class HelpFinder {
 	
 	// map of pagekey to map of anchor to text lines
-	private static Map<String, Map<String, ArrayList<String>>> pages 
-			= new TreeMap<String, Map<String, ArrayList<String>>>();
+	private static final Map<String, Map<String, ArrayList<String>>> pages
+			= new TreeMap<>();
 	// map of pagekey to page title
-	private static Map<String, String> pageNames = new TreeMap<String, String>();
+	private static final Map<String, String> pageNames = new TreeMap<>();
 	// map of anchor to section title
-	private static Map<String, String> anchorNames = new TreeMap<String, String>();
+	private static final Map<String, String> anchorNames = new TreeMap<>();
 	// map of pagekey to html path
-	private static Map<String, String> pagePaths = new TreeMap<String, String>();
+	private static final Map<String, String> pagePaths = new TreeMap<>();
 	// initial context phrase extent before/after the search phrase
-	private static int contextPhraseLength = 120;
+	private static final int contextPhraseLength = 120;
 	// maximum trim taken from context phrase to render more readable
-	private static int contextPhraseTrim = 15;
+	private static final int contextPhraseTrim = 15;
 	// minimum length of search phrase to trigger search
-	private static int minimumSearchPhraseLength = 3;
+	private static final int minimumSearchPhraseLength = 3;
 	// color shown for search terms not found
-	private static Color _RED = new Color(255, 160, 180);
+	private static final Color _RED = new Color(255, 160, 180);
 	// help launcher elements
 	private static Launcher helpLauncher;
 	private static LaunchPanel searchResultsTab;
@@ -115,25 +116,25 @@ public class HelpFinder {
 		// no use continuing if only one term in the search phrase
 		if (terms.length<2) return results;
 		
-		ArrayList<ArrayList<String[]>> allResults = new ArrayList<ArrayList<String[]>>();
-		ArrayList<String[]> termResults = new ArrayList<String[]>();
+		ArrayList<ArrayList<String[]>> allResults = new ArrayList<>();
+		ArrayList<String[]> termResults = new ArrayList<>();
 		// get results for each term independently
 		for (String term: terms) {
 			termResults = search(term);
 			allResults.add(termResults);
 		}
 		// go through the last set of results and look for keywords that are found in all (AND mode)
-		ArrayList<String> contexts = new ArrayList<String>();
+		ArrayList<String> contexts = new ArrayList<>();
 		outer: for (String[] next: termResults) {
 			contexts.clear();
 			String keyword = next[2];
 			for (ArrayList<String[]> nextResults: allResults) {
 				boolean found = false;
-				inner: for (String[] result: nextResults) {
+				for (String[] result : nextResults) {
 					if (keyword.equals(result[2])) {
 						found = true;
 						contexts.add(result[1]);
-						break inner;
+						break;
 					}
 				}
 				if (!found) continue outer;
@@ -143,17 +144,15 @@ public class HelpFinder {
 			results.add(new String[] {next[0], context, next[2]});
 		}
 		if (results.size()>0) {
-			for (String term: terms) {
-				termsFound.add(term);
-			}
+			Collections.addAll(termsFound, terms);
 		}
 		return results;
 	}
 	
 	private static String getMergedContext(ArrayList<String> contexts) {
-		ArrayList<String> phrases = new ArrayList<String>();
-		ArrayList<String> cleanStarts = new ArrayList<String>();
-		ArrayList<String> cleanEnds = new ArrayList<String>();
+		ArrayList<String> phrases = new ArrayList<>();
+		ArrayList<String> cleanStarts = new ArrayList<>();
+		ArrayList<String> cleanEnds = new ArrayList<>();
 		
 		for (String next: contexts) {
 			if (!next.startsWith("...")) { //$NON-NLS-1$
@@ -169,7 +168,7 @@ public class HelpFinder {
 			}
 			boolean merged = false;
 			// check each phrase to see if one is substring of other
-			ArrayList<String> testing = new ArrayList<String>(phrases);
+			ArrayList<String> testing = new ArrayList<>(phrases);
 			for (String context: testing) {
 				if (context.contains(next)) {
 					merged = true;
@@ -215,23 +214,29 @@ public class HelpFinder {
 			}
 		}
 		// assemble final context
-		String context = ""; //$NON-NLS-1$
+		StringBuilder context = new StringBuilder(); //$NON-NLS-1$
 		boolean addEllipsis = true;
 		for (String next: phrases) {
-			if  (!addEllipsis) context += "\" | \""; //$NON-NLS-1$
+			if  (!addEllipsis) context.append("\" | \""); //$NON-NLS-1$
 			addEllipsis = true;
 			for (String cleanStart: cleanStarts) {
-				if (next.startsWith(cleanStart)) addEllipsis = false;
+				if (next.startsWith(cleanStart)) {
+					addEllipsis = false;
+					break;
+				}
 			}
-			if  (addEllipsis) context += "..."; //$NON-NLS-1$
-			context += next;
+			if  (addEllipsis) context.append("..."); //$NON-NLS-1$
+			context.append(next);
 			addEllipsis = true;
 			for (String cleanEnd: cleanEnds) {
-				if (next.endsWith(cleanEnd)) addEllipsis = false;
+				if (next.endsWith(cleanEnd)) {
+					addEllipsis = false;
+					break;
+				}
 			}
 		}
-		if  (addEllipsis) context += "..."; //$NON-NLS-1$
-		return context.trim();
+		if (addEllipsis) context.append("..."); //$NON-NLS-1$
+		return context.toString().trim();
 	}
 	
 	protected static Component[] getNavComponentsFor(Launcher launcher) {
@@ -253,27 +258,27 @@ public class HelpFinder {
    */
 	private static ArrayList<String[]> search(String searchPhrase) {
 		searchPhrase = searchPhrase.toLowerCase();
-		ArrayList<String> keywordsFound = new ArrayList<String>();
-		ArrayList<String[]> results = new ArrayList<String[]>();
+		ArrayList<String> keywordsFound = new ArrayList<>();
+		ArrayList<String[]> results = new ArrayList<>();
 		// search page titles
 		for (String pageKey: pageNames.keySet()) {
 			String pageTitle = pageNames.get(pageKey);
 			if (pageTitle.toLowerCase().contains(searchPhrase)) {
 				// found pagekey, so get the anchor and context
-				inner: for (String anchor: anchorNames.keySet()) {
+				for (String anchor : anchorNames.keySet()) {
 					String sectionTitle = anchorNames.get(anchor);
-					if (sectionTitle!=null && sectionTitle.equals(pageTitle)) {
+					if (sectionTitle != null && sectionTitle.equals(pageTitle)) {
 						// found the anchor so get the context: 1st line of text, if any
 						Map<String, ArrayList<String>> anchors = pages.get(pageKey);
 						ArrayList<String> lines = anchors.get(anchor);
-						String line = (lines!=null && lines.size()>0)? lines.get(0): pageTitle;
+						String line = (lines != null && lines.size() > 0) ? lines.get(0) : pageTitle;
 						String context = getContextPhrase(line, searchPhrase);
-						String keyword = pageKey+"#"+anchor; //$NON-NLS-1$
-						String fullPath = pagePaths.get(pageKey)+"#"+anchor; //$NON-NLS-1$
-						String[] result = new String[] {pageTitle, context, fullPath};
+						String keyword = pageKey + "#" + anchor; //$NON-NLS-1$
+						String fullPath = pagePaths.get(pageKey) + "#" + anchor; //$NON-NLS-1$
+						String[] result = new String[]{pageTitle, context, fullPath};
 						results.add(result);
 						keywordsFound.add(keyword);
-						break inner;
+						break;
 					}
 				}
 			}
@@ -338,8 +343,11 @@ public class HelpFinder {
 		// initialize the maps
   	URL url = Tracker.class.getResource("resources/help/tracker_topics.xml"); //$NON-NLS-1$
   	String xml = ResourceLoader.getString(url.toExternalForm());
-  	XMLControl control = new XMLControlElement(xml);
-  	ArrayList<LaunchNode> children = (ArrayList<LaunchNode>)control.getObject("child_nodes"); //$NON-NLS-1$
+		XMLControl control = null;
+		if (xml != null) {
+			control = new XMLControlElement(xml);
+		}
+		ArrayList<LaunchNode> children = (ArrayList<LaunchNode>)control.getObject("child_nodes"); //$NON-NLS-1$
   	for (LaunchNode next: children) {
   		String pagekey = next.getKeywords();
   		String name = next.getName();
@@ -365,10 +373,10 @@ public class HelpFinder {
       public void keyReleased(KeyEvent e) {
       	
         if(e.getKeyCode()==KeyEvent.VK_ENTER) {
-          String searchPhrase = stripExtraSpace(searchField.getText(), " "); //$NON-NLS-1$
+          String searchPhrase = stripExtraSpace(searchField.getText()); //$NON-NLS-1$
           if (searchPhrase.length()>=minimumSearchPhraseLength) {
           	
-          	ArrayList<String> found = new ArrayList<String>();
+          	ArrayList<String> found = new ArrayList<>();
           	ArrayList<String[]> results = search(searchPhrase, found);
           	if (results.size()==0) {
   	          searchField.setBackground(_RED);
@@ -420,7 +428,7 @@ public class HelpFinder {
 			helpLauncher.removeSelectedTab();
 		}
 		rootNode.add(node);
-		ArrayList<LaunchNode> children = new ArrayList<LaunchNode>();
+		ArrayList<LaunchNode> children = new ArrayList<>();
 		for (int i=0; i<rootNode.getChildCount(); i++) {
 			children.add((LaunchNode)rootNode.getChildAt(i));
 		}
@@ -428,7 +436,9 @@ public class HelpFinder {
 		if (rootNode.getDisplayTabCount()>0) {
 			rootNode.removeDisplayTab(0);
 		}
-		rootNode.addDisplayTab(null, file.getAbsolutePath(), null);
+		if (file != null) {
+			rootNode.addDisplayTab(null, file.getAbsolutePath(), null);
+		}
 		rootNode.getDisplayTab(0).getURL();  // so display tab url is not null
 		
   	helpLauncher.addTab(rootNode); // also selects the tab
@@ -451,7 +461,7 @@ public class HelpFinder {
 	private static Map<String, ArrayList<String>> getAnchors(String html) {
 		// clean the html
 		html = clean(html);
-		Map<String, ArrayList<String>> anchorMap = new TreeMap<String, ArrayList<String>>();
+		Map<String, ArrayList<String>> anchorMap = new TreeMap<>();
 		
   	String[] sections = html.split("<h1|<h3"); //$NON-NLS-1$
   	for (int i=1; i< sections.length; i++) {  		
@@ -476,17 +486,22 @@ public class HelpFinder {
     	
     	// strip section numbering
     	try {
+			if (name != null) {
 				Integer.parseInt(name.substring(0, 1));
-				name = name.substring(name.indexOf(" ")+1, name.length()); //$NON-NLS-1$
-			} catch (Exception e) {
 			}
+			if (name != null) {
+				name = name.substring(name.indexOf(" ")+1); //$NON-NLS-1$
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     	
     	anchorNames.put(anchor, name);
     	
     	// after finding the ID anchor, strip any other anchor tags
     	sections[i] = stripTag(sections[i], "<a href"); //$NON-NLS-1$
     	sections[i] = stripTag(sections[i], "</a"); //$NON-NLS-1$
-    	ArrayList<String> lines = new ArrayList<String>();
+    	ArrayList<String> lines = new ArrayList<>();
     	String[] split = sections[i].split("<p>"); //$NON-NLS-1$
     	for (int j=1; j< split.length; j++) {
     		n = split[j].indexOf("</p>"); //$NON-NLS-1$
@@ -500,7 +515,7 @@ public class HelpFinder {
     			System.out.println("found in section: "+sections[i]); //$NON-NLS-1$
     		}
     		// eliminate any extra spaces
-    		split[j] = stripExtraSpace(split[j], " "); //$NON-NLS-1$
+    		split[j] = stripExtraSpace(split[j]); //$NON-NLS-1$
     		lines.add(split[j]);
     	}
     	anchorMap.put(anchor, lines);
@@ -541,7 +556,6 @@ public class HelpFinder {
 			int end = Math.min(line.length(), n+searchPhrase.length()+contextPhraseLength);
 			String phrase = line.substring(start, end);
 			start = phrase.toLowerCase().indexOf(searchPhrase);
-			end = start+searchPhrase.length();
 			n = phrase.indexOf(" "); //$NON-NLS-1$
 			if (n>-1 && n<start-contextPhraseLength+contextPhraseTrim) {
 				phrase = "..."+phrase.substring(n+1); //$NON-NLS-1$
@@ -578,12 +592,12 @@ public class HelpFinder {
 		return text;
 	}
 	
-	private static String stripExtraSpace(String text, String space) {
+	private static String stripExtraSpace(String text) {
 		text = text.trim();
-		String extraSpace = " "+space; //$NON-NLS-1$
+		String extraSpace = " "+ "{2}"; //$NON-NLS-1$
 		int n = text.indexOf(extraSpace);
 		while (n>-1) {
-			text = text.replaceAll(extraSpace, space);
+			text = text.replaceAll(extraSpace, " ");
 			n = text.indexOf(extraSpace);
 		}
 		return text;
@@ -612,11 +626,11 @@ public class HelpFinder {
 	    }
     }
 
-    String pathlist = ""; //$NON-NLS-1$
+    StringBuilder pathlist = new StringBuilder(); //$NON-NLS-1$
     for (String path: paths) {
-    	pathlist += "\n"+path+","; //$NON-NLS-1$ //$NON-NLS-2$
+    	pathlist.append("\n").append(path).append(","); //$NON-NLS-1$ //$NON-NLS-2$
     }
-    pathlist = pathlist.substring(0, pathlist.length()-1);
+    pathlist = new StringBuilder(pathlist.substring(0, pathlist.length() - 1));
     // if all attempts failed, inform user and return null
     JOptionPane.showMessageDialog(searchField.getTopLevelAncestor(), 
     		TrackerRes.getString("HelpFinder.Dialog.UnableToWrite.Text")+pathlist, //$NON-NLS-1$
@@ -661,7 +675,9 @@ public class HelpFinder {
       fout.write(text);
       fout.close();
 	  	return target;
-    } catch(Exception ex) {}
+    } catch(Exception ex) {
+		ex.printStackTrace();
+	}
     return null;
   }
   
@@ -671,33 +687,26 @@ public class HelpFinder {
    * Gets the html code for a resource with specified properties.
    * Note this code is for display in the LibraryBrowser, and has no stylesheet of its own.
    * 
-   * @param title the name of the resource
-   * @param description a description of the resource
-   * @param authors authors
-   * @param contact author contact information or institution
-   *
    * @return the html code
    */
 	private static String getResultsHTMLCode(String searchPhrase, ArrayList<String[]> searchResults,	
 			ArrayList<String> termsToHighlight) {
-  	StringBuffer buffer = new StringBuffer();
+  	StringBuilder buffer = new StringBuilder();
     buffer.append (
     		"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">"); //$NON-NLS-1$
     buffer.append(
     		"\n  <html>"); //$NON-NLS-1$
     buffer.append(
     		"\n    <head>"); //$NON-NLS-1$
-    buffer.append(
-    		"\n"+getStyleSheetCode()); //$NON-NLS-1$
+    buffer.append("\n").append(getStyleSheetCode()); //$NON-NLS-1$
     buffer.append(
     		"\n      <meta http-equiv=\"content-type\" content=\"text/html;charset=iso-8859-1\">"); //$NON-NLS-1$
     buffer.append(
     		"\n    </head>\n"); //$NON-NLS-1$
     buffer.append(
     		"\n    <body>"); //$NON-NLS-1$
-    buffer.append(
-    		"\n    <h2>"+TrackerRes.getString("HelpFinder.ResultsFor")  //$NON-NLS-1$//$NON-NLS-2$
-    		+" \""+searchPhrase+"\"</h2>"); //$NON-NLS-1$ //$NON-NLS-2$
+    buffer.append("\n    <h2>").append(TrackerRes.getString("HelpFinder.ResultsFor")  //$NON-NLS-1$//$NON-NLS-2$
+	).append(" \"").append(searchPhrase).append("\"</h2>"); //$NON-NLS-1$ //$NON-NLS-2$
     for (String[] next: searchResults) {
     	buffer.append(getResultsHTMLBody(next, termsToHighlight));
     }
@@ -712,77 +721,53 @@ public class HelpFinder {
    * Gets the html code for a resource with specified properties.
    * Note this code is for display in the LibraryBrowser, and has no stylesheet of its own.
    * 
-   * @param title the name of the resource
-   * @param description a description of the resource
-   * @param authors authors
-   * @param contact author contact information or institution
    *
    * @return the html code
    */
 	private static String getSummaryHTMLCode(ArrayList<LaunchNode> resultNodes) {
-  	StringBuffer buffer = new StringBuffer();
-    buffer.append (
-    		"<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">"); //$NON-NLS-1$
-    buffer.append(
-    		"\n  <html>"); //$NON-NLS-1$
-    buffer.append(
-    		"\n    <head>"); //$NON-NLS-1$
-    buffer.append(
-    		"\n"+getStyleSheetCode()); //$NON-NLS-1$
-    buffer.append(
-    		"\n      <meta http-equiv=\"content-type\" content=\"text/html;charset=iso-8859-1\">"); //$NON-NLS-1$
-    buffer.append(
-    		"\n    </head>\n"); //$NON-NLS-1$
-    buffer.append(
-    		"\n    <body>"); //$NON-NLS-1$
-    buffer.append(
-    		"\n    <h2>"+TrackerRes.getString("HelpFinder.ResultsFor")+":</h2>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    buffer.append(getSummaryHTMLBody(resultNodes));
-    buffer.append(
-    		"\n    </body>"); //$NON-NLS-1$
-    buffer.append(
-    		"\n  </html>"); //$NON-NLS-1$
-    return buffer.toString();
+		return "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">" + //$NON-NLS-1$
+				"\n  <html>" + //$NON-NLS-1$
+				"\n    <head>" + //$NON-NLS-1$
+				"\n" + getStyleSheetCode() + //$NON-NLS-1$
+				"\n      <meta http-equiv=\"content-type\" content=\"text/html;charset=iso-8859-1\">" + //$NON-NLS-1$
+				"\n    </head>\n" + //$NON-NLS-1$
+				"\n    <body>" + //$NON-NLS-1$
+				"\n    <h2>" + TrackerRes.getString("HelpFinder.ResultsFor") + ":</h2>" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				getSummaryHTMLBody(resultNodes) +
+				"\n    </body>" + //$NON-NLS-1$
+				"\n  </html>";
 	}
 	  	
   /**
    * Gets html <body> code for a search result.
    * 
-   * @param title the name of the resource
-   * @param description a description of the resource
-   * @param authors authors
-   * @param contact author contact information or institution
    *
    * @return the html path
    */
 	private static String getResultsHTMLBody(String[] result, ArrayList<String> highlightTerms) {
-  	StringBuffer buffer = new StringBuffer();
-    buffer.append("\n<p><a href=\""+result[2]+"\"><strong>"  //$NON-NLS-1$//$NON-NLS-2$
-    		+result[0]+"</strong></a>"); //$NON-NLS-1$
+  	StringBuilder buffer = new StringBuilder();
+    buffer.append("\n<p><a href=\"").append(result[2]).append("\"><strong>"  //$NON-NLS-1$//$NON-NLS-2$
+	).append(result[0]).append("</strong></a>"); //$NON-NLS-1$
     String context = result[1];
     for (String term: highlightTerms) {
     	context = addHighlights(context, term);
     }
-    buffer.append(" \""+context+"\"</p>"); //$NON-NLS-1$ //$NON-NLS-2$
+    buffer.append(" \"").append(context).append("\"</p>"); //$NON-NLS-1$ //$NON-NLS-2$
     return buffer.toString();
 	}
 	  	
   /**
    * Gets html <body> code for a search result.
    * 
-   * @param title the name of the resource
-   * @param description a description of the resource
-   * @param authors authors
-   * @param contact author contact information or institution
    *
    * @return the html path
    */
 	private static String getSummaryHTMLBody(ArrayList<LaunchNode> resultNodes) {
-  	StringBuffer buffer = new StringBuffer();
+  	StringBuilder buffer = new StringBuilder();
   	buffer.append("<blockquote>");  //$NON-NLS-1$
   	for (LaunchNode next: resultNodes) {
-  		buffer.append("<h4><a href=\""+next.getDisplayTab(0).getURL()+"\">"  //$NON-NLS-1$//$NON-NLS-2$
-    		+next+"</a></h4>"); //$NON-NLS-1$
+  		buffer.append("<h4><a href=\"").append(next.getDisplayTab(0).getURL()).append("\">"  //$NON-NLS-1$//$NON-NLS-2$
+		).append(next).append("</a></h4>"); //$NON-NLS-1$
   	}
   	buffer.append("</blockquote>");  //$NON-NLS-1$
     return buffer.toString();
@@ -804,13 +789,13 @@ public class HelpFinder {
    */
   private static String addHighlights(String text, String highlight) {
   	highlight = highlight.toLowerCase();
-  	StringBuffer output = new StringBuffer();
+  	StringBuilder output = new StringBuilder();
   	int n = text.toLowerCase().indexOf(highlight);
   	while (n>-1) {
-			output.append(text.substring(0, n));
+			output.append(text, 0, n);
   		String term = text.substring(n, n+highlight.length());
   		text = text.substring(n+highlight.length());
-  		output.append("<strong>"+term+"</strong>"); //$NON-NLS-1$ //$NON-NLS-2$
+  		output.append("<strong>").append(term).append("</strong>"); //$NON-NLS-1$ //$NON-NLS-2$
   		n = text.toLowerCase().indexOf(highlight);
   	}
 		output.append(text);

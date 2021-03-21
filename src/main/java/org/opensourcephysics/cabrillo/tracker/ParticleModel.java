@@ -23,22 +23,23 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.text.NumberFormat;
-import java.util.*;
+import org.opensourcephysics.controls.XML;
+import org.opensourcephysics.controls.XMLControl;
+import org.opensourcephysics.display.DrawingPanel;
+import org.opensourcephysics.display.Interactive;
+import org.opensourcephysics.media.core.ImageCoordSystem;
+import org.opensourcephysics.media.core.TPoint;
+import org.opensourcephysics.media.core.VideoClip;
+import org.opensourcephysics.tools.*;
+
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import javax.swing.*;
-
-import org.opensourcephysics.media.core.*;
-import org.opensourcephysics.controls.*;
-import org.opensourcephysics.display.DrawingPanel;
-import org.opensourcephysics.display.Interactive;
-import org.opensourcephysics.tools.*;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 
 /**
  * A ParticleModel is a point mass whose positions are determined by a model.
@@ -88,9 +89,7 @@ abstract public class ParticleModel extends PointMass {
 		Footprint[] footprints = super.getFootprints();
 		Footprint[] newprints = new Footprint[footprints.length + 1];
 		newprints[0] = CircleFootprint.getFootprint("CircleFootprint.FilledCircle"); //$NON-NLS-1$
-		for (int i = 0; i < footprints.length; i++) {
-			newprints[i + 1] = footprints[i];
-		}
+		System.arraycopy(footprints, 0, newprints, 1, footprints.length);
 		setFootprints(newprints);
 		defaultFootprint = newprints[0];
 		setFootprint(defaultFootprint.getName());
@@ -127,12 +126,10 @@ abstract public class ParticleModel extends PointMass {
     if (inspectorX != Integer.MIN_VALUE && trackerPanel != null
 						&& trackerPanel.getTFrame() != null) {
     	positionModelBuilder();
-	    Runnable runner = new Runnable() {
-	    	public void run() {
-	      	showModelBuilder = false;
-	    		modelBuilder.setVisible(true);
-	    	}
-	    };
+	    Runnable runner = () -> {
+		  showModelBuilder = false;
+			modelBuilder.setVisible(true);
+		};
     	if (showModelBuilder)
     		SwingUtilities.invokeLater(runner);
     }
@@ -251,22 +248,24 @@ abstract public class ParticleModel extends PointMass {
 					refreshSteps();
 				}
 			}
-			if (name.equals("transform")) { //$NON-NLS-1$
-				// workaround to prevent infinite loop
-	      ImageCoordSystem coords = trackerPanel.getCoords();
-				if (!(coords instanceof ReferenceFrame && 
-	    				((ReferenceFrame)coords).getOriginTrack()==this)) {
+			switch (name) {
+				case "transform":  //$NON-NLS-1$
+					// workaround to prevent infinite loop
+					ImageCoordSystem coords = trackerPanel.getCoords();
+					if (!(coords instanceof ReferenceFrame &&
+							((ReferenceFrame) coords).getOriginTrack() == this)) {
+						refreshSteps();
+					}
+					break;
+				case "starttime":
+				case "frameduration":
+				case "startframe":  //$NON-NLS-1$
+					refreshInitialTime();
 					refreshSteps();
-				}
-			}
-			else if (name.equals("starttime")  //$NON-NLS-1$
-					|| name.equals("frameduration") //$NON-NLS-1$
-					|| name.equals("startframe")) { //$NON-NLS-1$
-				refreshInitialTime();
-				refreshSteps();
-			}
-			else if (name.equals("stepsize")) { //$NON-NLS-1$
-				refreshSteps();
+					break;
+				case "stepsize":  //$NON-NLS-1$
+					refreshSteps();
+					break;
 			}
 		}
 	}
@@ -354,7 +353,7 @@ abstract public class ParticleModel extends PointMass {
 	 * 
 	 * @param locked ignored
 	 */
-	public void setLocked(boolean locked) {/** empty block */
+	public void setLocked(boolean locked) {
 	}
 
 	/**
@@ -386,52 +385,46 @@ abstract public class ParticleModel extends PointMass {
 		if (modelBuilderItem==null) {
 			// create the model  item
 			modelBuilderItem = new JMenuItem();
-			modelBuilderItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					positionModelBuilder();
-					getModelBuilder().setVisible(true);
-				}
+			modelBuilderItem.addActionListener(e -> {
+				positionModelBuilder();
+				getModelBuilder().setVisible(true);
 			});
 			// create the useDefaultRefFrameItem item
 			useDefaultRefFrameItem = new JCheckBoxMenuItem();
 			useDefaultRefFrameItem.setSelected(!useDefaultReferenceFrame);
-			useDefaultRefFrameItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					setUseDefaultReferenceFrame(!useDefaultRefFrameItem.isSelected());
-					if (ParticleModel.this.trackerPanel.getCoords() instanceof ReferenceFrame) {
-		      	lastValidFrame = -1;
-		      	refreshSteps();						
-					}
+			useDefaultRefFrameItem.addActionListener(e -> {
+				setUseDefaultReferenceFrame(!useDefaultRefFrameItem.isSelected());
+				if (ParticleModel.this.trackerPanel.getCoords() instanceof ReferenceFrame) {
+			  lastValidFrame = -1;
+			  refreshSteps();
 				}
 			});
 			// create the stamp item
 			stampItem = new JMenuItem();
-			stampItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					refreshSteps();
-          PointMass pm = new PointMass();
-          String proposed = getName()+" "+TrackerRes.getString("ParticleModel.Stamp.Name")+"1"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-          for (TTrack track: ParticleModel.this.trackerPanel.getTracks()) {
-          	if (proposed.equals(track.getName())) {
-          		try {
-								int n = Integer.parseInt(proposed.substring(proposed.length()-1));
-								proposed = proposed.substring(0, proposed.length()-1) + (n+1);
-							} catch (NumberFormatException ex) {
-								continue;
-							}
-          	}
-          }
-      		pm.setName(proposed);
-      		pm.setColor(getColor().darker());
-          ParticleModel.this.trackerPanel.addTrack(pm);
-      		for (Step step: getSteps()) {
-      			if (step==null) continue;
-      			TPoint pt = step.getPoints()[0];
-      			int n = pt.getFrameNumber(ParticleModel.this.trackerPanel);
-      			pm.createStep(n, pt.x, pt.y);
-      		}
-      		ParticleModel.this.trackerPanel.repaint();
-				}
+			stampItem.addActionListener(e -> {
+				refreshSteps();
+PointMass pm = new PointMass();
+String proposed = getName()+" "+TrackerRes.getString("ParticleModel.Stamp.Name")+"1"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+for (TTrack track: ParticleModel.this.trackerPanel.getTracks()) {
+		  if (proposed.equals(track.getName())) {
+			  try {
+							int n = Integer.parseInt(proposed.substring(proposed.length()-1));
+							proposed = proposed.substring(0, proposed.length()-1) + (n+1);
+						} catch (NumberFormatException ex) {
+				ex.printStackTrace();
+			}
+		  }
+}
+		  pm.setName(proposed);
+		  pm.setColor(getColor().darker());
+ParticleModel.this.trackerPanel.addTrack(pm);
+		  for (Step step: getSteps()) {
+			  if (step==null) continue;
+			  TPoint pt = step.getPoints()[0];
+			  int n = pt.getFrameNumber(ParticleModel.this.trackerPanel);
+			  pm.createStep(n, pt.x, pt.y);
+		  }
+		  ParticleModel.this.trackerPanel.repaint();
 			});
 		}
 		modelBuilderItem.setText(TrackerRes.getString("ParticleModel.MenuItem.InspectModel")); //$NON-NLS-1$
@@ -749,16 +742,15 @@ abstract public class ParticleModel extends PointMass {
         			&& Math.abs(points[j].getY())<yLimit;
         	if (!valid && !invalidWarningShown) {
         		invalidWarningShown = true;
-            Runnable runner = new Runnable() { // avoids deadlock?
-            	public void run() {
+				// avoids deadlock?
+				Runnable runner = () -> {
 //            		if (invalidWarningShown) return;
-            		JOptionPane.showMessageDialog(trackerPanel, 
-            				TrackerRes.getString("ParticleModel.Dialog.Offscreen.Message1")+XML.NEW_LINE  //$NON-NLS-1$
-            				+ TrackerRes.getString("ParticleModel.Dialog.Offscreen.Message2"),  //$NON-NLS-1$
-            				TrackerRes.getString("ParticleModel.Dialog.Offscreen.Title"), //$NON-NLS-1$
-            				JOptionPane.WARNING_MESSAGE);
-            	}
-            };
+					JOptionPane.showMessageDialog(trackerPanel,
+							TrackerRes.getString("ParticleModel.Dialog.Offscreen.Message1")+XML.NEW_LINE  //$NON-NLS-1$
+							+ TrackerRes.getString("ParticleModel.Dialog.Offscreen.Message2"),  //$NON-NLS-1$
+							TrackerRes.getString("ParticleModel.Dialog.Offscreen.Title"), //$NON-NLS-1$
+							JOptionPane.WARNING_MESSAGE);
+				};
             SwingUtilities.invokeLater(runner);
         	}
           models[j].traceX[models[j].prevX.length+i] = 
@@ -806,18 +798,15 @@ abstract public class ParticleModel extends PointMass {
   	        step.getPosition().setPosition(next.point); // this method is fast
   	      }
   	      next.refreshing = prev; // restore refreshing value
-  	      if (!refreshDerivsLater) {
-  	      	next.updateDerivatives(startUpdate, count);
-  	      }
-  	    }
-  	    else if (!refreshDerivsLater) {
-  	    	next.updateDerivatives(startUpdate, count);
-  	    }
-  	    if (next.vAtOrigin) next.vTailsToOriginItem.doClick();
+		}
+		  if (!refreshDerivsLater) {
+			  next.updateDerivatives(startUpdate, count);
+		  }
+		  if (next.vAtOrigin) next.vTailsToOriginItem.doClick();
   	    if (next.aAtOrigin) next.aTailsToOriginItem.doClick();
   	    if (!refreshDerivsLater) {
 	  	    if (singleStep)
-	    	    next.support.firePropertyChange("step", null, new Integer(n)); //$NON-NLS-1$
+	    	    next.support.firePropertyChange("step", null, n); //$NON-NLS-1$
 	  	    else
 	  	    	next.support.firePropertyChange("steps", null, null); //$NON-NLS-1$
   	    }
@@ -985,37 +974,33 @@ abstract public class ParticleModel extends PointMass {
 		param.setNameEditable(false);
 		param.setDescription(TrackerRes.getString("ParticleModel.Parameter.InitialTime.Description")); //$NON-NLS-1$
 		functionPanel.getInitEditor().addObject(param, false);
-    massParamListener = new PropertyChangeListener() {
-		  public void propertyChange(PropertyChangeEvent e) {
-		  	if ("m".equals(e.getOldValue())) { //$NON-NLS-1$
-			  	if ("m".equals(e.getOldValue())) { //$NON-NLS-1$
-			  		Parameter param = (Parameter)getParamEditor().getObject("m"); //$NON-NLS-1$
-			      if (ParticleModel.super.getMass() != param.getValue()) {
-			      	setMass(param.getValue());
-			      }
-			  	}
-		  	}
-		  }
-		};
+    massParamListener = e -> {
+		if ("m".equals(e.getOldValue())) { //$NON-NLS-1$
+			if ("m".equals(e.getOldValue())) { //$NON-NLS-1$
+				Parameter param1 = (Parameter)getParamEditor().getObject("m"); //$NON-NLS-1$
+			if (ParticleModel.super.getMass() != param1.getValue()) {
+				setMass(param1.getValue());
+			}
+			}
+		}
+	};
 		getParamEditor().addPropertyChangeListener(massParamListener);
 
-    timeParamListener = new PropertyChangeListener() {
-		  public void propertyChange(PropertyChangeEvent e) {
-		  	if (refreshing) return;
-		  	if ("t".equals(e.getOldValue()) && trackerPanel != null) { //$NON-NLS-1$
-		  		Parameter param = (Parameter)getInitEditor().getObject("t"); //$NON-NLS-1$
-		      VideoClip clip = trackerPanel.getPlayer().getVideoClip();
-		      double timeOffset = param.getValue()*1000 - clip.getStartTime();
-		      double dt = trackerPanel.getPlayer().getMeanStepDuration();
-		      int n = clip.getStartFrameNumber();
-		      boolean mustRound = timeOffset%dt>0;
-		      n += clip.getStepSize()*(int)Math.round(timeOffset/dt);
-		      setStartFrame(n);
-		      if (getStartFrame()!=n || mustRound)
-		      	Toolkit.getDefaultToolkit().beep();
-		  	}
-		  }
-		};
+    timeParamListener = e -> {
+		if (refreshing) return;
+		if ("t".equals(e.getOldValue()) && trackerPanel != null) { //$NON-NLS-1$
+			Parameter param12 = (Parameter)getInitEditor().getObject("t"); //$NON-NLS-1$
+		VideoClip clip = trackerPanel.getPlayer().getVideoClip();
+		double timeOffset = param12.getValue()*1000 - clip.getStartTime();
+		double dt = trackerPanel.getPlayer().getMeanStepDuration();
+		int n = clip.getStartFrameNumber();
+		boolean mustRound = timeOffset%dt>0;
+		n += clip.getStepSize()*(int)Math.round(timeOffset/dt);
+		setStartFrame(n);
+		if (getStartFrame()!=n || mustRound)
+			Toolkit.getDefaultToolkit().beep();
+		}
+	};
 		getInitEditor().addPropertyChangeListener(timeParamListener);
 	}
 	
@@ -1170,7 +1155,7 @@ abstract public class ParticleModel extends PointMass {
       ParticleModel p = (ParticleModel)obj;
       // load mass
       double m = control.getDouble("mass"); //$NON-NLS-1$
-      if (m != Double.NaN) {
+      if (!Double.isNaN(m)) {
         p.mass = m;
       }
       // load velocity and acceleration footprint and color
@@ -1214,9 +1199,9 @@ abstract public class ParticleModel extends PointMass {
   		p.getFunctionEditor().setMainFunctions(functions);
   		functions = (UserFunction[])control.getObject("support_functions"); //$NON-NLS-1$
   		if (functions != null) {
-  			for (int i = 0; i < functions.length; i++) {
-    			p.getFunctionEditor().addObject(functions[i], false);
-  			}
+			for (UserFunction function : functions) {
+				p.getFunctionEditor().addObject(function, false);
+			}
   		}
   		p.functionPanel.refreshFunctions();
   		int n = control.getInt("start_frame"); //$NON-NLS-1$

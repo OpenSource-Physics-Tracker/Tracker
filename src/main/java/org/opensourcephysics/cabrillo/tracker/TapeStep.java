@@ -58,11 +58,11 @@ public class TapeStep extends Step {
   protected boolean endsEnabled = true;
   protected boolean drawLayoutBounds;
   protected boolean adjustingTips;
-  protected Map<TrackerPanel, Shape> end1Shapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, Shape> end2Shapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, Shape> shaftShapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, TextLayout> textLayouts = new HashMap<TrackerPanel, TextLayout>();
-  protected Map<TrackerPanel, Rectangle> layoutBounds = new HashMap<TrackerPanel, Rectangle>();
+  protected Map<TrackerPanel, Shape> end1Shapes = new HashMap<>();
+  protected Map<TrackerPanel, Shape> end2Shapes = new HashMap<>();
+  protected Map<TrackerPanel, Shape> shaftShapes = new HashMap<>();
+  protected Map<TrackerPanel, TextLayout> textLayouts = new HashMap<>();
+  protected Map<TrackerPanel, Rectangle> layoutBounds = new HashMap<>();
 
   /**
    * Constructs a TapeStep with specified end point coordinates in image space.
@@ -242,7 +242,7 @@ public class TapeStep extends Step {
    */
   protected Mark getMark(TrackerPanel trackerPanel) {
     Mark mark = marks.get(trackerPanel);
-    TPoint selection = null;
+    TPoint selection;
     if (mark == null) {
       // adjust tips if stick mode
     	if (tape.isStickMode()) {
@@ -452,11 +452,11 @@ public class TapeStep extends Step {
       step.end1.setTrackEditTrigger(true);
       step.end2.setTrackEditTrigger(true);
       step.handle.setTrackEditTrigger(true);
-      step.end1Shapes = new HashMap<TrackerPanel, Shape>();
-      step.end2Shapes = new HashMap<TrackerPanel, Shape>();
-      step.shaftShapes = new HashMap<TrackerPanel, Shape>();
-      step.textLayouts = new HashMap<TrackerPanel, TextLayout>();
-      step.layoutBounds = new HashMap<TrackerPanel, Rectangle>();
+      step.end1Shapes = new HashMap<>();
+      step.end2Shapes = new HashMap<>();
+      step.shaftShapes = new HashMap<>();
+      step.textLayouts = new HashMap<>();
+      step.layoutBounds = new HashMap<>();
       step.worldLength = worldLength;
     }
     return step;

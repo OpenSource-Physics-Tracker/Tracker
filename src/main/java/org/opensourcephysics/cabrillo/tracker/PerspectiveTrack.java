@@ -48,7 +48,7 @@ import org.opensourcephysics.media.core.TPoint;
 public class PerspectiveTrack extends TTrack {
 	
 	static int n=0;
-	static HashMap<Filter, PerspectiveTrack> filterMap = new HashMap<Filter, PerspectiveTrack>();
+	static HashMap<Filter, PerspectiveTrack> filterMap = new HashMap<>();
 	
 	PerspectiveFilter filter;
 	String filterState;
@@ -63,13 +63,19 @@ public class PerspectiveTrack extends TTrack {
 		filterMap.put(filter, this);
 		this.viewable = false;
 		CircleFootprint c = (CircleFootprint) CircleFootprint.getFootprint("CircleFootprint.Circle"); //$NON-NLS-1$
-		c.setColor(filter.getColor());
-		c.setSpotShown(false);
-		c.setAlpha(0);
-    setFootprints(new Footprint[] {c});
+		if (c != null) {
+			c.setColor(filter.getColor());
+		}
+		if (c != null) {
+			c.setSpotShown(false);
+		}
+		if (c != null) {
+			c.setAlpha(0);
+		}
+		setFootprints(new Footprint[] {c});
     String letter = alphabet.substring(n, n+1);
     setName(MediaRes.getString("Filter.Perspective.Title").toLowerCase()+" "+letter); //$NON-NLS-1$ //$NON-NLS-2$
-    Step step = new PerspectiveStep(this, 0, 0, 0);
+    Step step = new PerspectiveStep(this, 0);
     step.setFootprint(getFootprint());
     steps = new StepArray(step);
     filter.addPropertyChangeListener("color", this); //$NON-NLS-1$
@@ -101,35 +107,38 @@ public class PerspectiveTrack extends TTrack {
   public void propertyChange(PropertyChangeEvent e) {
   	String name = e.getPropertyName();
   	if (e.getSource()==filter) {
-	  	if (name.equals("color")) { //$NON-NLS-1$
-	  		setColor((Color)e.getNewValue());
-	  	}
-	  	else if (name.equals("enabled") || name.equals("tab") || name.equals("visible")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	  		if (trackerPanel.getSelectedTrack()==this) {
-  				trackerPanel.setSelectedPoint(null);
-          trackerPanel.selectedSteps.clear();
-	  		}
-	  		boolean visible = filter.hasInspector() && filter.getInspector().isVisible();
-	  		if (visible) {
-	  			trackerPanel.setSelectedTrack(this);
-	  		}
-	  		else {
-	  			trackerPanel.setSelectedTrack(null);  				  			
-	  		}
-	  	}
-	  	else if (name.equals("cornerlocation")) { //$NON-NLS-1$
-	  		PerspectiveFilter.Corner filtercorner = (PerspectiveFilter.Corner)e.getNewValue();
-	  		int i = filter.getCornerIndex(filtercorner);
-	  		int n = trackerPanel.getFrameNumber();
-	  		if (filter.isInputEnabled() && i<4) {
-	  			getStep(n).points[i].setXY(filtercorner.getX(), filtercorner.getY());
-	  		}
-	  	}
-	  	else if (name.equals("fixed")) { //$NON-NLS-1$
-	  		String xml = (String)e.getOldValue();
-		    XMLControl control = new XMLControlElement(xml);		    
-		    Undo.postFilterEdit(trackerPanel, filter, control);
-	  	}
+		switch (name) {
+			case "color":  //$NON-NLS-1$
+				setColor((Color) e.getNewValue());
+				break;
+			case "enabled":
+			case "tab":
+			case "visible":  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (trackerPanel.getSelectedTrack() == this) {
+					trackerPanel.setSelectedPoint(null);
+					trackerPanel.selectedSteps.clear();
+				}
+				boolean visible = filter.hasInspector() && filter.getInspector().isVisible();
+				if (visible) {
+					trackerPanel.setSelectedTrack(this);
+				} else {
+					trackerPanel.setSelectedTrack(null);
+				}
+				break;
+			case "cornerlocation":  //$NON-NLS-1$
+				PerspectiveFilter.Corner filtercorner = (PerspectiveFilter.Corner) e.getNewValue();
+				int i = filter.getCornerIndex(filtercorner);
+				int n = trackerPanel.getFrameNumber();
+				if (filter.isInputEnabled() && i < 4) {
+					getStep(n).points[i].setXY(filtercorner.getX(), filtercorner.getY());
+				}
+				break;
+			case "fixed":  //$NON-NLS-1$
+				String xml = (String) e.getOldValue();
+				XMLControl control = new XMLControlElement(xml);
+				Undo.postFilterEdit(trackerPanel, filter, control);
+				break;
+		}
   	}
   	if (name.equals("selectedtrack")) { //$NON-NLS-1$
   		if (e.getNewValue()==this) {
@@ -238,8 +247,7 @@ public class PerspectiveTrack extends TTrack {
     	filter.deleteKeyFrame(n, corner);
     	trackerPanel.repaint();
     }
-    Step step = getStep(n);
-    return step;
+	  return getStep(n);
   }
 
   /**

@@ -12,7 +12,8 @@ public class StepArray {
 	/**
 	 * Constructs a default StepArray.
 	 */
-	public StepArray() {/** empty block */}
+	public StepArray() {
+	}
 
 	/**
 	 * Constructs an autofill StepArray and fills the array with clones
@@ -83,8 +84,7 @@ public class StepArray {
 	 */
 	public boolean contains(Step step) {
 		synchronized (array) {
-			for (int i = 0; i < array.length; i++)
-				if (array[i] == step) return true;
+			for (Step value : array) if (value == step) return true;
 		}
 		return false;
 	}
@@ -114,8 +114,7 @@ public class StepArray {
 	 */
 	public boolean isEmpty() {
 		synchronized (array) {
-			for (int i = 0; i < array.length; i++)
-				if (array[i] != null) return false;
+			for (Step step : array) if (step != null) return false;
 		}
 		return true;
 	}

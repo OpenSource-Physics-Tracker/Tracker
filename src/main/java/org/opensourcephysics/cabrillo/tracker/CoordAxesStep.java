@@ -24,17 +24,21 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-
-import org.opensourcephysics.display.*;
-import org.opensourcephysics.media.core.*;
+import org.opensourcephysics.cabrillo.tracker.AutoTrackerCore.FrameData;
+import org.opensourcephysics.display.DrawingPanel;
+import org.opensourcephysics.display.Interactive;
+import org.opensourcephysics.media.core.ImageCoordSystem;
+import org.opensourcephysics.media.core.TPoint;
+import org.opensourcephysics.media.core.VideoPanel;
 import org.opensourcephysics.tools.FontSizer;
 
-import org.opensourcephysics.cabrillo.tracker.AutoTrackerCore.KeyFrame;
-import org.opensourcephysics.cabrillo.tracker.AutoTrackerCore.FrameData;
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This is a Step for a CoordAxes. It is used for displaying the axes and for
@@ -45,13 +49,12 @@ import org.opensourcephysics.cabrillo.tracker.AutoTrackerCore.FrameData;
 public class CoordAxesStep extends Step {
 
   // instance fields
-  private Origin origin;
-  private Handle handle;
+  private final Origin origin;
+  private final Handle handle;
   private boolean originEnabled = true;
-  private boolean handleEnabled = true;
-  private Map<TrackerPanel, Shape> handleShapes = new HashMap<TrackerPanel, Shape>();
-  private Shape[] fillShapes = new Shape[2];
-  private GeneralPath path = new GeneralPath();
+  private Map<TrackerPanel, Shape> handleShapes = new HashMap<>();
+  private final Shape[] fillShapes = new Shape[2];
+  private final GeneralPath path = new GeneralPath();
 
   /**
    * Constructs an AxesStep.
@@ -107,24 +110,6 @@ public class CoordAxesStep extends Step {
   }
 
   /**
-   * Enables and disables the interactivity of the handle.
-   *
-   * @param enabled <code>true</code> to enable the handle
-   */
-  public void setHandleEnabled(boolean enabled) {
-    handleEnabled = enabled;
-  }
-
-  /**
-   * Gets whether the handle is enabled.
-   *
-   * @return <code>true</code> if the handle is enabled
-   */
-  public boolean isHandleEnabled() {
-    return handleEnabled;
-  }
-
-  /**
    * Overrides Step findInteractive method.
    *
    * @param panel the drawing panel
@@ -138,18 +123,16 @@ public class CoordAxesStep extends Step {
     setHitRectCenter(xpix, ypix);
   	TTrack track = getTrack();
     AutoTracker autoTracker = track.trackerPanel==null? null: track.trackerPanel.getAutoTracker();
-    if (handleEnabled) {
-      Shape hitShape = handleShapes.get(trackerPanel);
-      if (hitShape != null && hitShape.intersects(hitRect)) {
-    		if (autoTracker!=null && autoTracker.getTrack()==track && track.getTargetIndex()==1) {
-	    		int n = track.trackerPanel.getFrameNumber();
-	    		FrameData frame = autoTracker.getFrame(n);
-	    		if (frame==frame.getKeyFrame()) {
-	    			return null;
-	    		}
-    		}      	
-        return handle;
-      }
+    Shape hitShape = handleShapes.get(trackerPanel);
+    if (hitShape != null && hitShape.intersects(hitRect)) {
+          if (autoTracker!=null && autoTracker.getTrack()==track && track.getTargetIndex()==1) {
+              int n = track.trackerPanel.getFrameNumber();
+              FrameData frame = autoTracker.getFrame(n);
+              if (frame==frame.getKeyFrame()) {
+                  return null;
+              }
+          }
+      return handle;
     }
     if (originEnabled && !track.isLocked()) {
     	Interactive ia = super.findInteractive(panel, xpix, ypix);
@@ -193,7 +176,7 @@ public class CoordAxesStep extends Step {
    */
   protected Mark getMark(TrackerPanel trackerPanel) {
     Mark mark = marks.get(trackerPanel);
-    TPoint selection = null;
+    TPoint selection;
     if (mark == null) {
       selection = trackerPanel.getSelectedPoint();
       // set origin location to coords origin
@@ -286,8 +269,7 @@ public class CoordAxesStep extends Step {
    * @return the bounding rectangle
    */
   public Rectangle getBounds(TrackerPanel trackerPanel) {
-    Rectangle bounds = getMark(trackerPanel).getBounds(false);
-    return bounds;
+    return getMark(trackerPanel).getBounds(false);
   }
 
   /**
@@ -298,7 +280,7 @@ public class CoordAxesStep extends Step {
   public Object clone() {
     CoordAxesStep step = (CoordAxesStep)super.clone();
     if (step != null) {
-      step.handleShapes = new HashMap<TrackerPanel, Shape>();
+      step.handleShapes = new HashMap<>();
     }
     return step;
   }

@@ -48,11 +48,11 @@ public class WorldGrid implements Trackable {
 	private static final float[] DASHED_LINE = new float[] {1, 8};
 	private static final float[] DOTTED_LINE = new float[] {2, 2};
 	private static Stroke dashed, dotted;
-	private static int defaultAlpha = 128;
-	private static Color defaultColor = new Color(128, 128, 128, defaultAlpha);
+	private static final int defaultAlpha = 128;
+	private static final Color defaultColor = new Color(128, 128, 128, defaultAlpha);
 	
-	ArrayList<Line2D> dashedLines = new ArrayList<Line2D>();
-	ArrayList<Line2D> dottedLines = new ArrayList<Line2D>();
+	ArrayList<Line2D> dashedLines = new ArrayList<>();
+	ArrayList<Line2D> dottedLines = new ArrayList<>();
 	TPoint[] viewCorners = {new TPoint(), new TPoint(), new TPoint(), new TPoint()};
 	Point2D[] worldCorners = new Point2D[4];
 	TPoint[] lineEnds = {new TPoint(), new TPoint()};
@@ -66,7 +66,6 @@ public class WorldGrid implements Trackable {
 	/**
 	 * Constructor.
 	 *
-	 * @param panel a TrackerPanel
 	 */
 	public WorldGrid() {
   	dashed = new BasicStroke(2,BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER,8,DASHED_LINE,0);
@@ -184,14 +183,14 @@ public class WorldGrid implements Trackable {
 		// set color and stroke for dashed lines
 		g2.setPaint(lineColor);
 		g2.setStroke(dashed);
-		for (int i=0; i<dashedLines.size(); i++) {
-	    g2.draw(dashedLines.get(i));
+		for (Line2D dashedLine : dashedLines) {
+			g2.draw(dashedLine);
 		}
 		
 		// set color and stroke for dotted lines
 		g2.setStroke(dotted);
-		for (int i=0; i<dottedLines.size(); i++) {
-	    g2.draw(dottedLines.get(i));
+		for (Line2D dottedLine : dottedLines) {
+			g2.draw(dottedLine);
 		}
 		
 		// restore original color and stroke
@@ -266,41 +265,5 @@ public class WorldGrid implements Trackable {
 	public boolean isCustom() {
 		return !defaultColor.equals(lineColor);
 	}
-	
-	/**
-	 * Sets the visibility of the major x grid lines.
-	 *
-	 * @param visible true to display the major x grid lines
-	 */
-	public void setMajorXGridVisible(boolean visible) {
-		showMajorX = visible;
-	}
 
-	/**
-	 * Sets the visibility of the minor x grid lines.
-	 *
-	 * @param visible true to display the minor x grid lines
-	 */
-	public void setMinorXGridVisible(boolean visible) {
-		showMinorX = visible;
-	}
-
-	/**
-	 * Sets the visibility of the major y grid lines.
-	 *
-	 * @param visible true to display the major y grid lines
-	 */
-	public void setMajorYGridVisible(boolean visible) {
-		showMajorY = visible;
-	}
-
-	/**
-	 * Sets the visibility of the minor y grid lines.
-	 *
-	 * @param visible true to display the minor y grid lines
-	 */
-	public void setMinorYGridVisible(boolean visible) {
-		showMinorY = visible;
-	}
-	
 }

@@ -24,36 +24,6 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.beans.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
-import javax.swing.undo.UndoableEdit;
-import javax.swing.undo.UndoableEditSupport;
-
 import org.opensourcephysics.controls.OSPLog;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
@@ -63,6 +33,20 @@ import org.opensourcephysics.tools.FontSizer;
 import org.opensourcephysics.tools.LaunchBuilder;
 import org.opensourcephysics.tools.Resource;
 import org.opensourcephysics.tools.ResourceLoader;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.undo.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * This displays html or plain text in one or more tabs.
@@ -74,10 +58,10 @@ public class PageTView extends JPanel implements TView {
   // instance fields
   protected Icon icon;
   protected TrackerPanel trackerPanel;
-  protected ArrayList<TabView> tabs = new ArrayList<TabView>();
+  protected ArrayList<TabView> tabs = new ArrayList<>();
   protected JTabbedPane tabbedPane;     // each tab is a TabView
   protected JButton pageButton;
-  protected ArrayList<Component> toolbarComponents = new ArrayList<Component>();
+  protected ArrayList<Component> toolbarComponents = new ArrayList<>();
   protected JDialog nameDialog;
   protected JTextField nameField;
   protected JPanel noTab;
@@ -284,11 +268,7 @@ public class PageTView extends JPanel implements TView {
     // create the tabbed pane
     tabbedPane = new JTabbedPane(SwingConstants.TOP);
     tabbedPane.setBackground(trackerPanel.getBackground());
-    tabbedPane.addChangeListener(new ChangeListener() {
-      public void stateChanged(ChangeEvent e) {
-      	refreshTitle();
-      }
-    });
+    tabbedPane.addChangeListener(e -> refreshTitle());
     tabbedPane.addMouseListener(new MouseAdapter() {
       public void mousePressed(MouseEvent e) {
       	tabbedPane.requestFocusInWindow();
@@ -327,47 +307,41 @@ public class PageTView extends JPanel implements TView {
 	    		return popup;
 	    	}
         JMenuItem item = new JMenuItem(TrackerRes.getString("TextTView.Button.NewTab")); //$NON-NLS-1$
-        item.addActionListener(new ActionListener() {
-    	    public void actionPerformed(ActionEvent e) {
-    	    	TabView tab = new TabView(new TabData());
-    	      int n = tabs.size()+1;
-    	      if (n>1) {
-    	      	tab.data.title += " "+n; //$NON-NLS-1$
-    	      }
-    	      addTab(tab);
-    	      setSelectedTab(tab);
-    	    }
-        });
+        item.addActionListener(e -> {
+			TabView tab = new TabView(new TabData());
+		  int n = tabs.size()+1;
+		  if (n>1) {
+			  tab.data.title += " "+n; //$NON-NLS-1$
+		  }
+		  addTab(tab);
+		  setSelectedTab(tab);
+		});
         item.setEnabled(!locked);
         popup.add(item);
         item = new JMenuItem(TrackerRes.getString("TextTView.MenuItem.OpenHTML")); //$NON-NLS-1$
-        item.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            JFileChooser chooser = LaunchBuilder.getHTMLChooser();
-            int result = chooser.showOpenDialog(trackerPanel);
-            if(result==JFileChooser.APPROVE_OPTION) {
-              File file = chooser.getSelectedFile();
-              TabView tab = getSelectedTab();
-              if (tab==null) {
-              	tab = new TabView(new TabData());
-              	addTab(tab);
-              }
-            	tab.setUndoableText(XML.getAbsolutePath(file));
-              refresh();
-              OSPRuntime.chooserDir = XML.getDirectoryPath(file.getPath());
-            }
-          }
-        });
+        item.addActionListener(e -> {
+		  JFileChooser chooser = LaunchBuilder.getHTMLChooser();
+		  int result = chooser.showOpenDialog(trackerPanel);
+		  if(result==JFileChooser.APPROVE_OPTION) {
+			File file = chooser.getSelectedFile();
+			TabView tab = getSelectedTab();
+			if (tab==null) {
+				tab = new TabView(new TabData());
+				addTab(tab);
+			}
+			  tab.setUndoableText(XML.getAbsolutePath(file));
+			refresh();
+			OSPRuntime.chooserDir = XML.getDirectoryPath(file.getPath());
+		  }
+		});
         item.setEnabled(!locked);
         popup.add(item);
         popup.addSeparator();
         item = new JRadioButtonMenuItem(TrackerRes.getString("TTrack.MenuItem.Locked")); //$NON-NLS-1$
-        item.addActionListener(new ActionListener() {
-    	    public void actionPerformed(ActionEvent e) {
-    	    	JMenuItem item = (JMenuItem)e.getSource();
-    	    	locked = item.isSelected();
-    	    }
-        });
+        item.addActionListener(e -> {
+			JMenuItem item1 = (JMenuItem)e.getSource();
+			locked = item1.isSelected();
+		});
         item.setSelected(locked);
         popup.add(item);
     		FontSizer.setFonts(popup, FontSizer.getLevel());
@@ -422,11 +396,9 @@ public class PageTView extends JPanel implements TView {
       	if (OSPRuntime.isPopupTrigger(e)) {
         	JPopupMenu popup = new JPopupMenu();
           JMenuItem helpItem = new JMenuItem(TrackerRes.getString("Dialog.Button.Help")+"..."); //$NON-NLS-1$ //$NON-NLS-2$
-          helpItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-              trackerPanel.getTFrame().showHelp("textview", 0); //$NON-NLS-1$
-            }
-          });
+          helpItem.addActionListener(e1 -> {
+			trackerPanel.getTFrame().showHelp("textview", 0); //$NON-NLS-1$
+		  });
           popup.add(helpItem);
         	FontSizer.setFonts(popup, FontSizer.getLevel());
           popup.show(noTab, e.getX(), e.getY());
@@ -479,51 +451,37 @@ public class PageTView extends JPanel implements TView {
    */
   protected JPopupMenu getPopup(final TabView tab) {
   	JPopupMenu popup = new JPopupMenu();
-    String s = null;
+    String s;
   	if (trackerPanel.isEnabled("pageView.edit")) { //$NON-NLS-1$
-      int keyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+      int keyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 	    JMenuItem renameItem = new JMenuItem(TrackerRes.getString("TextTView.MenuItem.SetTitle")); //$NON-NLS-1$
-	    renameItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-					renameTab(tab);
-	      }
-	    });
+	    renameItem.addActionListener(e -> renameTab(tab));
 	    renameItem.setEnabled(!locked);
 	    popup.add(renameItem);
 	    JMenuItem openItem = new JMenuItem(TrackerRes.getString("TextTView.MenuItem.OpenHTML")); //$NON-NLS-1$
-	    openItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-	        JFileChooser chooser = LaunchBuilder.getHTMLChooser();
-	        int result = chooser.showOpenDialog(trackerPanel);
-	        if(result==JFileChooser.APPROVE_OPTION) {
-	          File file = chooser.getSelectedFile();
-	        	tab.setUndoableText(XML.getAbsolutePath(file));
-	          refresh();
-	          OSPRuntime.chooserDir = XML.getDirectoryPath(file.getPath());
-	        }
-	      }
-	    });
+	    openItem.addActionListener(e -> {
+		  JFileChooser chooser = LaunchBuilder.getHTMLChooser();
+		  int result = chooser.showOpenDialog(trackerPanel);
+		  if(result==JFileChooser.APPROVE_OPTION) {
+			File file = chooser.getSelectedFile();
+			  tab.setUndoableText(XML.getAbsolutePath(file));
+			refresh();
+			OSPRuntime.chooserDir = XML.getDirectoryPath(file.getPath());
+		  }
+		});
 	    openItem.setEnabled(!locked);
 	    popup.add(openItem);
 	    popup.addSeparator();
 	  	s = TrackerRes.getString("PageTView.MenuItem.ClosePage")+" \""; //$NON-NLS-1$ //$NON-NLS-2$
 	  	s += tab.data.title+"\""; //$NON-NLS-1$
 	    JMenuItem closeItem = new JMenuItem(s);
-	    closeItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-	      	removeTab(tab);
-	      }
-	    });
+	    closeItem.addActionListener(e -> removeTab(tab));
 	    closeItem.setEnabled(!locked);
 	    popup.add(closeItem);
 	    if (tab.data.url!=null) {
 	    	s = TrackerRes.getString("PageTView.MenuItem.OpenInBrowser"); //$NON-NLS-1$
 		    JMenuItem item = new JMenuItem(s);
-		    item.addActionListener(new ActionListener() {
-		      public void actionPerformed(ActionEvent e) {
-          	OSPDesktop.displayURL(tab.data.url.toExternalForm());
-		      }
-		    });
+		    item.addActionListener(e -> OSPDesktop.displayURL(tab.data.url.toExternalForm()));
 		    popup.add(item);
 	    }
 	    if (tab.undoManager.canUndoOrRedo()) {
@@ -533,11 +491,7 @@ public class PageTView extends JPanel implements TView {
 		      s += TrackerRes.getString("TextTView.TextEdit.Description"); //$NON-NLS-1$	    	
 			    JMenuItem undoItem = new JMenuItem(s);
 			    undoItem.setAccelerator(KeyStroke.getKeyStroke('Z', keyMask));
-			    undoItem.addActionListener(new ActionListener() {
-			      public void actionPerformed(ActionEvent e) {
-			        tab.undoManager.undo();
-			      }
-			    });
+			    undoItem.addActionListener(e -> tab.undoManager.undo());
 			    undoItem.setEnabled(!locked);
 			    popup.add(undoItem);
 		    }
@@ -546,11 +500,7 @@ public class PageTView extends JPanel implements TView {
 		      s += TrackerRes.getString("TextTView.TextEdit.Description"); //$NON-NLS-1$	    	
 			    JMenuItem redoItem = new JMenuItem(s);
 			    redoItem.setAccelerator(KeyStroke.getKeyStroke('Y', keyMask));
-			    redoItem.addActionListener(new ActionListener() {
-			      public void actionPerformed(ActionEvent e) {
-			        tab.undoManager.redo();
-			      }
-			    });
+			    redoItem.addActionListener(e -> tab.undoManager.redo());
 			    redoItem.setEnabled(!locked);
 			    popup.add(redoItem);
 		    }
@@ -559,11 +509,9 @@ public class PageTView extends JPanel implements TView {
   	}
   	s = TrackerRes.getString("Dialog.Button.Help")+"..."; //$NON-NLS-1$ //$NON-NLS-2$
     JMenuItem helpItem = new JMenuItem(s);
-    helpItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        trackerPanel.getTFrame().showHelp("textview", 0); //$NON-NLS-1$
-      }
-    });
+    helpItem.addActionListener(e -> {
+	  trackerPanel.getTFrame().showHelp("textview", 0); //$NON-NLS-1$
+	});
     popup.add(helpItem);
 		FontSizer.setFonts(popup, FontSizer.getLevel());
     return popup;
@@ -573,14 +521,12 @@ public class PageTView extends JPanel implements TView {
   	if (nameDialog==null) {
       // create the name dialog
       nameField = new JTextField(20);
-      nameField.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-        	TabView tab = getSelectedTab();
-        	tab.data.setTitle(nameField.getText());
-        	refresh();
-        	nameDialog.setVisible(false);
-        }
-      });
+      nameField.addActionListener(e -> {
+		  TabView tab = getSelectedTab();
+		  tab.data.setTitle(nameField.getText());
+		  refresh();
+		  nameDialog.setVisible(false);
+	  });
       nameField.addKeyListener(new KeyAdapter() {
         public void keyPressed(KeyEvent e) {
           nameField.setBackground(Color.yellow);
@@ -644,20 +590,20 @@ public class PageTView extends JPanel implements TView {
     	// display pane
     	displayPane = new TextView();
       displayPane.setEditable(false);
-      hyperlinkListener = new HyperlinkListener() {
-        public void hyperlinkUpdate(HyperlinkEvent e) {
-          if(data.hyperlinksEnabled
-          		&& e.getEventType()==HyperlinkEvent.EventType.ACTIVATED) {
-            try {
-              if(!org.opensourcephysics.desktop.OSPDesktop.browse(e.getURL().toURI())) {
-                // try the old way
-                org.opensourcephysics.desktop.ostermiller.Browser.init();
-                org.opensourcephysics.desktop.ostermiller.Browser.displayURL(e.getURL().toString());
-              }
-            } catch(Exception ex) {}
-          }
-        }
-      };
+      hyperlinkListener = e -> {
+		if(data.hyperlinksEnabled
+				&& e.getEventType()==HyperlinkEvent.EventType.ACTIVATED) {
+		  try {
+			if(!OSPDesktop.browse(e.getURL().toURI())) {
+			  // try the old way
+			  org.opensourcephysics.desktop.ostermiller.Browser.init();
+			  org.opensourcephysics.desktop.ostermiller.Browser.displayURL(e.getURL().toString());
+			}
+		  } catch(Exception ex) {
+			  ex.printStackTrace();
+		  }
+		}
+	  };
       displayPane.addHyperlinkListener(hyperlinkListener);      
       displayPane.addKeyListener(new KeyAdapter() {
         public void keyPressed(KeyEvent e) {
@@ -1015,12 +961,11 @@ public class PageTView extends JPanel implements TView {
     	PageTView view = (PageTView)obj;
     	view.locked = control.getBoolean("locked"); //$NON-NLS-1$
       // load the tabs
-      ArrayList<?> tabs = ArrayList.class.cast(control.getObject("tabs")); //$NON-NLS-1$
+      ArrayList<?> tabs = (ArrayList) control.getObject("tabs"); //$NON-NLS-1$
       if (tabs != null) {
-        Iterator<?> it = tabs.iterator();
-        while (it.hasNext()) {
-        	view.addTab((TabView)it.next());
-        }
+		  for (Object tab : tabs) {
+			  view.addTab((TabView) tab);
+		  }
       }
       return obj;
     }

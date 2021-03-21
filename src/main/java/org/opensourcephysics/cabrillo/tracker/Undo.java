@@ -42,7 +42,7 @@ import org.opensourcephysics.media.core.*;
 public class Undo {
 
 	// static fields
-  protected static Map<TrackerPanel, Undo> undomap = new HashMap<TrackerPanel, Undo>();
+  protected static Map<TrackerPanel, Undo> undomap = new HashMap<>();
 	
 	// instance fields
   protected UndoableEditSupport undoSupport;
@@ -94,7 +94,7 @@ public class Undo {
   	// check last edit and (if trackEdit) modify its redo state with current state of track
   	if (!getUndo(panel).undoManager.canRedo()) {
 	  	UndoableEdit lastEdit = getUndo(panel).undoManager.getUndoEdit();
-  		if (lastEdit!=null && lastEdit instanceof TrackEdit) {
+  		if (lastEdit instanceof TrackEdit) {
   			TrackEdit trackEdit = (TrackEdit)lastEdit;
   			String name = trackEdit.trackName;
   			TTrack track = panel.getTrack(name);
@@ -154,7 +154,7 @@ public class Undo {
   protected static void postTrackDelete(TTrack track) {
   	TrackerPanel panel = track.trackerPanel;
   	if (panel == null) return;
-  	UndoableEdit edit = getUndo(panel).new TrackDelete(panel, track); 
+  	UndoableEdit edit = new TrackDelete(panel, track);
   	getUndo(panel).undoSupport.postEdit(edit);
   	refreshMenus(panel);
   }
@@ -166,7 +166,7 @@ public class Undo {
    * @param xml a list of XML strings describing the cleared tracks
    */
   protected static void postTrackClear(TrackerPanel panel, List<String> xml) {
-  	UndoableEdit edit = getUndo(panel).new TrackClear(panel, xml); 
+  	UndoableEdit edit = new TrackClear(panel, xml);
   	getUndo(panel).undoSupport.postEdit(edit);
   	refreshMenus(panel);
   }
@@ -180,7 +180,7 @@ public class Undo {
   protected static void postTrackEdit(TTrack track, XMLControl control) {
   	TrackerPanel panel = track.trackerPanel;
   	if (panel == null) return;
-  	UndoableEdit edit = getUndo(panel).new TrackEdit(track, control); 
+  	UndoableEdit edit = new TrackEdit(track, control);
   	getUndo(panel).undoSupport.postEdit(edit);
   	refreshMenus(panel);
   }
@@ -201,11 +201,11 @@ public class Undo {
   		track = (TTrack)next[0];
 	  	XMLControl control = (XMLControl)next[1];
   		if (edit==null) { // create track edit for first track
-  			edit = getUndo(panel).new TrackEdit(track, control);   			
+  			edit = new TrackEdit(track, control);
   		}
   		else { // create compound edit for subsequent tracks
-  	  	UndoableEdit trackEdit = getUndo(panel).new TrackEdit(track, control); 
-  			edit = getUndo(panel).new CompoundEdit(trackEdit, edit);
+  	  	UndoableEdit trackEdit = new TrackEdit(track, control);
+  			edit = new CompoundEdit(trackEdit, edit);
   		}
   	}
   	getUndo(panel).undoSupport.postEdit(edit);
@@ -221,7 +221,7 @@ public class Undo {
   public static void postStepEdit(Step step, XMLControl control) {
   	TrackerPanel panel = step.getTrack().trackerPanel;
   	if (panel == null) return;
-  	UndoableEdit edit = getUndo(panel).new StepEdit(step, control); 
+  	UndoableEdit edit = new StepEdit(step, control);
   	getUndo(panel).undoSupport.postEdit(edit);
   	refreshMenus(panel);
   }
@@ -249,10 +249,10 @@ public class Undo {
   	}
   	UndoableEdit edit;
   	if (track!=null && singleTrack) {
-    	edit = getUndo(panel).new TrackEdit(track, control); 
+    	edit = new TrackEdit(track, control);
   	}
   	else {
-  		edit = getUndo(panel).new StepSetEdit(steps, control); 
+  		edit = new StepSetEdit(steps, control);
   	}
   	getUndo(panel).undoSupport.postEdit(edit);
   	steps.setChanged(false); // prevents clear() method from saving another undoable edit
@@ -267,7 +267,7 @@ public class Undo {
    * @param control an XMLControl with the previous state of the coords
    */
   protected static void postCoordsEdit(TrackerPanel panel, XMLControl control) {
-  	UndoableEdit edit = getUndo(panel).new CoordsEdit(panel, control); 
+  	UndoableEdit edit = new CoordsEdit(panel, control);
   	getUndo(panel).undoSupport.postEdit(edit);
   	refreshMenus(panel);
   }
@@ -283,9 +283,9 @@ public class Undo {
   	TrackerPanel panel = track.trackerPanel;
   	if (panel == null) return;
   	// coords edit first!
-  	UndoableEdit edit1 = getUndo(panel).new CoordsEdit(panel, coordsControl); 
-  	UndoableEdit edit2 = getUndo(panel).new TrackEdit(track, trackControl); 
-  	UndoableEdit compound = getUndo(panel).new CompoundEdit(edit1, edit2); 
+  	UndoableEdit edit1 = new CoordsEdit(panel, coordsControl);
+  	UndoableEdit edit2 = new TrackEdit(track, trackControl);
+  	UndoableEdit compound = new CompoundEdit(edit1, edit2);
   	getUndo(panel).undoSupport.postEdit(compound);
   	refreshMenus(panel);
   }
@@ -301,8 +301,8 @@ public class Undo {
    */
   protected static void postImageVideoEdit(TrackerPanel panel, 
   				String[] paths, int index, int step, boolean added) {
-  	UndoableEdit edit = getUndo(panel).new ImageVideoEdit(
-  					panel, paths, index, step, added); 
+  	UndoableEdit edit = new ImageVideoEdit(
+			panel, paths, index, step, added);
   	getUndo(panel).undoSupport.postEdit(edit);
   	refreshMenus(panel);
   }
@@ -314,7 +314,7 @@ public class Undo {
    * @param control an XMLControl describing the previous video clip
    */
   protected static void postVideoReplace(TrackerPanel panel, XMLControl control) {
-  	UndoableEdit edit = getUndo(panel).new VideoReplace(panel, control); 
+  	UndoableEdit edit = new VideoReplace(panel, control);
   	getUndo(panel).undoSupport.postEdit(edit);
   	refreshMenus(panel);
   }
@@ -326,7 +326,7 @@ public class Undo {
    * @param filter the deleted filter
    */
   protected static void postFilterDelete(TrackerPanel panel, Filter filter) {
-  	UndoableEdit edit = getUndo(panel).new FilterDelete(panel, filter); 
+  	UndoableEdit edit = new FilterDelete(panel, filter);
   	getUndo(panel).undoSupport.postEdit(edit);
   	refreshMenus(panel);
   }
@@ -339,7 +339,7 @@ public class Undo {
    * @param control an XMLControl with the previous state of the filter
    */
   protected static void postFilterEdit(TrackerPanel panel, Filter filter, XMLControl control) {
-  	UndoableEdit edit = getUndo(panel).new FilterEdit(panel, filter, control); 
+  	UndoableEdit edit = new FilterEdit(panel, filter, control);
   	getUndo(panel).undoSupport.postEdit(edit);
   	refreshMenus(panel);
   }
@@ -351,7 +351,7 @@ public class Undo {
    * @param xml a list of XML strings describing the cleared tracks
    */
   protected static void postFilterClear(TrackerPanel panel, List<String> xml) {
-  	UndoableEdit edit = getUndo(panel).new FilterClear(panel, xml); 
+  	UndoableEdit edit = new FilterClear(panel, xml);
   	getUndo(panel).undoSupport.postEdit(edit);
   	refreshMenus(panel);
   }
@@ -365,7 +365,7 @@ public class Undo {
   protected static void postTrackDisplayEdit(TTrack track, XMLControl control) {
   	TrackerPanel panel = track.trackerPanel;
   	if (panel == null) return;
-  	UndoableEdit edit = getUndo(panel).new TrackDisplayEdit(track, control); 
+  	UndoableEdit edit = new TrackDisplayEdit(track, control);
   	getUndo(panel).undoSupport.postEdit(edit);
   	refreshMenus(panel);
   }
@@ -381,7 +381,7 @@ public class Undo {
 
   private static void refreshMenus(TrackerPanel panel) {
   	TMenuBar menubar = TMenuBar.getMenuBar(panel);
-    if (menubar != null) menubar.refresh();
+	  menubar.refresh();
   }
 
 //______________________ inner UndoableEdit classes ______________________
@@ -389,7 +389,7 @@ public class Undo {
   /**
    * A class to undo/redo track changes.
    */
-  protected class TrackEdit extends TEdit {
+  protected static class TrackEdit extends TEdit {
   	
   	String trackName, trackType;
 
@@ -424,7 +424,7 @@ public class Undo {
   /**
    * A class to undo/redo step changes.
    */
-  protected class StepEdit extends TEdit {
+  protected static class StepEdit extends TEdit {
 
   	Step step;
   	String trackType;
@@ -456,7 +456,7 @@ public class Undo {
   /**
    * A class to undo/redo footprint, color and name changes.
    */
-  protected class TrackDisplayEdit extends TEdit {
+  protected static class TrackDisplayEdit extends TEdit {
 
   	String undoName, redoName;
   	String trackName, trackType;
@@ -518,7 +518,7 @@ public class Undo {
   /**
    * A class to undo/redo stepset changes.
    */
-  protected class StepSetEdit extends TEdit {
+  protected static class StepSetEdit extends TEdit {
   	
   	private StepSetEdit(StepSet steps, XMLControl control) {
   		super(steps.trackerPanel, steps, control);
@@ -540,7 +540,7 @@ public class Undo {
   /**
    * A class to undo/redo coords changes.
    */
-  protected class CoordsEdit extends TEdit {
+  protected static class CoordsEdit extends TEdit {
   	
   	private CoordsEdit(TrackerPanel panel, XMLControl control) {
   		super(panel, panel.getCoords(), control);
@@ -562,7 +562,7 @@ public class Undo {
   /**
    * A class to undo/redo image video edits.
    */
-  protected class ImageVideoEdit extends AbstractUndoableEdit {
+  protected static class ImageVideoEdit extends AbstractUndoableEdit {
   	
   	String[] paths; // image path
   	TrackerPanel panel;
@@ -595,10 +595,9 @@ public class Undo {
   		if (paths == null || paths.length==0) return;
 			try {
 				int index = n;
-				for (int i = 0; i < paths.length; i++) {
-					String path = paths[i];
+				for (String path : paths) {
 					if (path == null) continue;
-					ImageVideo imageVid = (ImageVideo)panel.getVideo();
+					ImageVideo imageVid = (ImageVideo) panel.getVideo();
 					imageVid.insert(path, index, false);
 					VideoClip clip = panel.getPlayer().getVideoClip();
 					clip.setStepCount(imageVid.getFrameCount());
@@ -638,7 +637,7 @@ public class Undo {
   /**
    * A class to undo/redo video replacements.
    */
-  protected class VideoReplace extends TEdit {
+  protected static class VideoReplace extends TEdit {
   	
   	private VideoReplace(TrackerPanel panel, XMLControl control) {
   		super(panel, panel.getPlayer().getVideoClip(), control);
@@ -682,7 +681,7 @@ public class Undo {
         	if (filter.inspectorX != Integer.MIN_VALUE) {
         		filter.inspectorVisible = true;
         		if (panel.visibleFilters == null) {
-        			panel.visibleFilters = new HashMap<Filter, Point>();
+        			panel.visibleFilters = new HashMap<>();
         		}
         		Point p = new Point(filter.inspectorX, filter.inspectorY);
         		panel.visibleFilters.put(filter, p);	
@@ -703,7 +702,7 @@ public class Undo {
    * The constructor takes the TrackerPanel, the object AFTER being changed,
    * and an XMLControl storing the state of the object BEFORE the changes.
    */
-  protected abstract class TEdit extends AbstractUndoableEdit {
+  protected abstract static class TEdit extends AbstractUndoableEdit {
   	
   	String undo; // xml string
   	String redo; // xml string
@@ -732,7 +731,7 @@ public class Undo {
   /**
    * A class to undo/redo a pair of UndoableEdits.
    */
-  protected class CompoundEdit extends AbstractUndoableEdit {
+  protected static class CompoundEdit extends AbstractUndoableEdit {
   	
   	UndoableEdit editA;
   	UndoableEdit editB;
@@ -764,7 +763,7 @@ public class Undo {
   /**
    * A class to undo/redo track deletion.
    */
-  protected class TrackDelete extends AbstractUndoableEdit {
+  protected static class TrackDelete extends AbstractUndoableEdit {
   	
   	String xml;
   	int trackID;
@@ -807,7 +806,7 @@ public class Undo {
   /**
    * A class to undo/redo clearing tracks.
    */
-  protected class TrackClear extends AbstractUndoableEdit {
+  protected static class TrackClear extends AbstractUndoableEdit {
   	
   	List<String> xml;
   	TrackerPanel panel;
@@ -819,12 +818,11 @@ public class Undo {
 
     public void undo() throws CannotUndoException {
     	super.undo();
-    	Iterator<String> it = xml.iterator();
-    	while (it.hasNext()) {
-      	XMLControl control = new XMLControlElement(it.next());
-      	TTrack track = (TTrack)control.loadObject(null);
-        panel.addTrack(track);    		
-    	}
+		for (String s : xml) {
+			XMLControl control = new XMLControlElement(s);
+			TTrack track = (TTrack) control.loadObject(null);
+			panel.addTrack(track);
+		}
       panel.requestFocus();
     }
 
@@ -843,7 +841,7 @@ public class Undo {
   /**
    * A class to undo/redo filter deletion.
    */
-  protected class FilterDelete extends AbstractUndoableEdit {
+  protected static class FilterDelete extends AbstractUndoableEdit {
   	
   	String xml;
   	TrackerPanel panel;
@@ -874,22 +872,11 @@ public class Undo {
       	if (filter.inspectorX != Integer.MIN_VALUE) {
       		filter.inspectorVisible = true;
       		if (panel.visibleFilters == null) {
-      			panel.visibleFilters = new HashMap<Filter, Point>();
+      			panel.visibleFilters = new HashMap<>();
       		}
       		Point p = new Point(filter.inspectorX, filter.inspectorY);
       		panel.visibleFilters.put(filter, p);	
       	}
-//      	if (filter.inspectorX != Integer.MIN_VALUE) {
-//          Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-//          TFrame frame = panel.getTFrame();
-//      		JDialog inspector = filter.getInspector();
-//    			int x = Math.max(filter.inspectorX + frame.getLocation().x, 0);
-//    			x = Math.min(x, dim.width-inspector.getWidth());
-//    			int y = Math.max(filter.inspectorY + frame.getLocation().y, 0);
-//    			y = Math.min(y, dim.height-inspector.getHeight());
-//        	inspector.setLocation(x, y);
-//      		inspector.setVisible(true);
-//      	}
       }
     }
 
@@ -917,7 +904,7 @@ public class Undo {
   /**
    * A class to undo/redo filter clearing.
    */
-  protected class FilterClear extends AbstractUndoableEdit {
+  protected static class FilterClear extends AbstractUndoableEdit {
   	
   	List<String> xml;
   	TrackerPanel panel;
@@ -939,7 +926,7 @@ public class Undo {
         	if (filter.inspectorX != Integer.MIN_VALUE) {
         		filter.inspectorVisible = true;
         		if (panel.visibleFilters == null) {
-        			panel.visibleFilters = new HashMap<Filter, Point>();
+        			panel.visibleFilters = new HashMap<>();
         		}
         		Point p = new Point(filter.inspectorX, filter.inspectorY);
         		panel.visibleFilters.put(filter, p);	
@@ -974,7 +961,7 @@ public class Undo {
   /**
    * A class to undo/redo filter edit.
    */
-  protected class FilterEdit extends TEdit {
+  protected static class FilterEdit extends TEdit {
   	
   	int filterIndex;
   	int frameNumber;

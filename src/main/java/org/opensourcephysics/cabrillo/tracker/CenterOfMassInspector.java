@@ -69,9 +69,7 @@ public class CenterOfMassInspector extends JDialog
       }
     }
     // listener for the point mass checkboxes
-    listener = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {updateCM();}
-    };
+    listener = e -> updateCM();
     setResizable(false);
     createGUI();
     initialize();
@@ -126,9 +124,7 @@ public class CenterOfMassInspector extends JDialog
     checkboxPanel.removeAll();
     if (trackerPanel != null) {
       trackerPanel.removePropertyChangeListener("track", this); //$NON-NLS-1$
-      Iterator<PointMass> it = trackerPanel.getDrawables(PointMass.class).iterator();
-      while (it.hasNext()) {
-        PointMass p = it.next();
+      for (PointMass p : trackerPanel.getDrawables(PointMass.class)) {
         p.removePropertyChangeListener("name", this); //$NON-NLS-1$
         p.removePropertyChangeListener("color", this); //$NON-NLS-1$
         p.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
@@ -160,11 +156,7 @@ public class CenterOfMassInspector extends JDialog
     // create ok button
     okButton = new JButton(TrackerRes.getString("Dialog.Button.OK")); //$NON-NLS-1$
     okButton.setForeground(new Color(0, 0, 102));
-    okButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-      }
-    });
+    okButton.addActionListener(e -> setVisible(false));
     // create buttonbar at bottom
     JPanel buttonbar = new JPanel(new GridLayout(1, 3));
     buttonbar.setBorder(BorderFactory.createEmptyBorder(1, 0, 3, 0));
@@ -182,8 +174,8 @@ public class CenterOfMassInspector extends JDialog
   private void updateCM() {
     // get the checkbox array
     Component[] checkboxes = checkboxPanel.getComponents();
-    for (int i = 0; i < checkboxes.length; i++) {
-      JCheckBoxMenuItem checkbox = (JCheckBoxMenuItem)checkboxes[i];
+    for (Component component : checkboxes) {
+      JCheckBoxMenuItem checkbox = (JCheckBoxMenuItem) component;
       // get the pointmass
       PointMass m = getPointMass(checkbox.getActionCommand());
       if (checkbox.isSelected() && !cm.containsMass(m))
@@ -203,7 +195,7 @@ public class CenterOfMassInspector extends JDialog
   private PointMass getPointMass(String name) {
     ArrayList<PointMass> masses = trackerPanel.getDrawables(PointMass.class);
     for (PointMass m: masses) {
-      if (m.getName() == name) return m;
+      if (m.getName().equals(name)) return m;
     }
     return null;
   }
@@ -216,9 +208,7 @@ public class CenterOfMassInspector extends JDialog
              + " \"" + cm.getName() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
     // make checkboxes for all point masses in tracker panel
     checkboxPanel.removeAll();
-    Iterator<PointMass> it = trackerPanel.getDrawables(PointMass.class).iterator();
-    while (it.hasNext()) {
-      PointMass m = it.next();
+    for (PointMass m : trackerPanel.getDrawables(PointMass.class)) {
       m.removePropertyChangeListener("name", this); //$NON-NLS-1$
       m.removePropertyChangeListener("color", this); //$NON-NLS-1$
       m.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
@@ -227,7 +217,7 @@ public class CenterOfMassInspector extends JDialog
       m.addPropertyChangeListener("footprint", this); //$NON-NLS-1$
       if (m instanceof CenterOfMass) continue; // don't include other cms
       JCheckBoxMenuItem checkbox = new JCheckBoxMenuItem(
-          m.getName(), m.getFootprint().getIcon(21, 16));
+              m.getName(), m.getFootprint().getIcon(21, 16));
       // check the checkbox if m is in the cm
       if (cm.containsMass(m)) checkbox.setSelected(true);
       checkbox.addActionListener(listener);

@@ -47,7 +47,7 @@ import org.opensourcephysics.media.core.Trackable;
 public class PencilScene implements Trackable, Comparable, Interactive {
 		
 	private PencilCaption caption;
-	private ArrayList<PencilDrawing> drawings = new ArrayList<PencilDrawing>();
+	private ArrayList<PencilDrawing> drawings = new ArrayList<>();
 	private boolean visible = true;
 	private boolean heavy;
   private TrackerPanel trackerPanel;
@@ -170,8 +170,7 @@ public class PencilScene implements Trackable, Comparable, Interactive {
 		if (name.length()>len) {
 			name = name.substring(0, len)+"..."; //$NON-NLS-1$
 		}
-		String s = name+" ("+startframe+"-"+last+")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		return s;
+		return name+" ("+startframe+"-"+last+")";
 	}
 	
 	public boolean includesFrame(int frame) {
@@ -373,8 +372,7 @@ public class PencilScene implements Trackable, Comparable, Interactive {
 
     @Override
     public Object createObject(XMLControl control) {
-      PencilScene scene = new PencilScene();
-      return scene;
+		return new PencilScene();
     }
 
     @Override

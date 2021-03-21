@@ -18,7 +18,6 @@ import org.opensourcephysics.tools.*;
  *
  * @author Douglas Brown
  */
-@SuppressWarnings("serial")
 public class ModelFunctionPanel extends FunctionPanel {
 
 	InitialValueEditor initEditor;
@@ -115,13 +114,13 @@ public class ModelFunctionPanel extends FunctionPanel {
   protected void refreshFunctions() {
   	if (paramEditor != null) {
     	UserFunction[] functions = ((UserFunctionEditor)functionEditor).getMainFunctions();
-  		for (int i = 0; i < functions.length; i++) {
-  			functions[i].setParameters(paramEditor.getNames(), paramEditor.getValues(), paramEditor.getDescriptions());
-  		}		
+		for (UserFunction function : functions) {
+			function.setParameters(paramEditor.getNames(), paramEditor.getValues(), paramEditor.getDescriptions());
+		}
     	functions = ((UserFunctionEditor)functionEditor).getSupportFunctions();
-    	for (int i = 0; i < functions.length; i++) {
-    		functions[i].setParameters(paramEditor.getNames(), paramEditor.getValues(), paramEditor.getDescriptions());
-    	}		
+		for (UserFunction function : functions) {
+			function.setParameters(paramEditor.getNames(), paramEditor.getValues(), paramEditor.getDescriptions());
+		}
   	}
   	// evaluate the initial values 
     initEditor.evaluateAll();

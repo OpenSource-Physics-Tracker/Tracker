@@ -59,8 +59,8 @@ public class Calibration extends TTrack {
   	formatVariables = new String[] {"xy"}; //$NON-NLS-1$ 
   	
   	// assemble format map
-		formatMap = new HashMap<String, ArrayList<String>>();		
-		ArrayList<String> list = new ArrayList<String>();
+		formatMap = new HashMap<>();
+		ArrayList<String> list = new ArrayList<>();
 		list.add(dataVariables[0]); 
 		list.add(dataVariables[1]); 
 		list.add(dataVariables[2]); 
@@ -68,7 +68,7 @@ public class Calibration extends TTrack {
 		formatMap.put(formatVariables[0], list);
 		
 		// assemble format description map
-		formatDescriptionMap = new HashMap<String, String>();
+		formatDescriptionMap = new HashMap<>();
 		formatDescriptionMap.put(formatVariables[0], TrackerRes.getString("CircleFitter.Description.Positions")); //$NON-NLS-1$ 
 
   }
@@ -77,13 +77,12 @@ public class Calibration extends TTrack {
   protected NumberField x1Field, y1Field;
   protected JLabel point1MissingLabel, point2MissingLabel;
   protected TTrackTextLineLabel x1Label, y1Label;
-  private Component[] fieldSeparators = new Component[3];
+  private final Component[] fieldSeparators = new Component[3];
   private Component axisSeparator;
   protected JComboBox axisDropdown;
   protected ActionListener axisDropdownAction;
   protected JLabel axisLabel = new JLabel();
   protected int axes = XY_AXES;
-  protected boolean[] isWorldDataValid = new boolean[] {false, false};
   protected boolean fixedCoordinates = true;
   protected JCheckBoxMenuItem fixedCoordinatesItem;
 
@@ -196,8 +195,7 @@ public class Calibration extends TTrack {
    */
   public Step createStep(int n, double x1, double y1, double x2, double y2) {
     createStep(n, x1, y1); // first point
-    Step step = createStep(n, x2, y2); // adds second point
-    return step;
+      return createStep(n, x2, y2);
   }
 
   /**
@@ -291,7 +289,8 @@ public class Calibration extends TTrack {
    *
    * @param visible ignored
    */
-  public void setTrailVisible(boolean visible) {/** empty block */}
+  public void setTrailVisible(boolean visible) {
+  }
 
   /**
    * Determines if at least one point in this track is autotrackable.
@@ -633,7 +632,7 @@ public class Calibration extends TTrack {
     if (name.equals("stepnumber")) { //$NON-NLS-1$
       if (trackerPanel.getSelectedTrack() == this) {
         displayWorldCoordinates();
-	      stepValueLabel.setText((Integer)e.getNewValue()+":"); //$NON-NLS-1$
+	      stepValueLabel.setText(e.getNewValue() +":"); //$NON-NLS-1$
       }
     }
     else if (name.equals("locked")) { //$NON-NLS-1$
@@ -739,20 +738,14 @@ public class Calibration extends TTrack {
    */
   private void createGUI() {
     fixedCoordinatesItem = new JCheckBoxMenuItem(TrackerRes.getString("OffsetOrigin.MenuItem.Fixed")); //$NON-NLS-1$
-    fixedCoordinatesItem.addItemListener(new ItemListener() {
-      public void itemStateChanged(ItemEvent e) {
-        setFixedCoordinates(fixedCoordinatesItem.isSelected());
-      }
-    });
+    fixedCoordinatesItem.addItemListener(e -> setFixedCoordinates(fixedCoordinatesItem.isSelected()));
     // create xy ActionListener and FocusListener
-    ActionListener xyAction = new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	NumberField field = (NumberField)e.getSource();
-      	if (field.getBackground().equals(Color.YELLOW)) {
-      		setWorldCoordinatesFromFields();
-      	}
-        field.requestFocusInWindow();
-      }
+    ActionListener xyAction = e -> {
+        NumberField field = (NumberField)e.getSource();
+        if (field.getBackground().equals(Color.YELLOW)) {
+            setWorldCoordinatesFromFields();
+        }
+      field.requestFocusInWindow();
     };
     FocusListener xyFocusListener = new FocusAdapter() {
       public void focusLost(FocusEvent e) {
@@ -788,40 +781,37 @@ public class Calibration extends TTrack {
     fieldSeparators[1] = Box.createRigidArea(new Dimension(8, 4));
     fieldSeparators[2] = Box.createRigidArea(new Dimension(4, 4));
     axisSeparator = Box.createRigidArea(new Dimension(8, 4));
-    axisDropdownAction = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int i = axisDropdown.getSelectedIndex();
-      	if (axes == i) return;
-      	// check for invalid coords if step is complete
-      	if (trackerPanel != null) {
-        	int n = trackerPanel.getFrameNumber();
-      		CalibrationStep step = (CalibrationStep)getStep(n);            	
-        	boolean isComplete = step!=null && step.getPoints()[1]!=null;
-        	if (isComplete) {
-          	if (i == X_AXIS && step.worldX0 == step.worldX1) {
-          		JOptionPane.showMessageDialog(trackerPanel, 
-                  				TrackerRes.getString("Calibration.Dialog.InvalidXCoordinates.Message"), //$NON-NLS-1$
-                  				TrackerRes.getString("Calibration.Dialog.InvalidCoordinates.Title"), //$NON-NLS-1$
-                  				JOptionPane.WARNING_MESSAGE);
-          		axisDropdown.setSelectedIndex(axes);
-          		return;
-          	}
-          	else if (i == Y_AXIS && step.worldY0 == step.worldY1) {
-              JOptionPane.showMessageDialog(trackerPanel, 
-                      		TrackerRes.getString("Calibration.Dialog.InvalidYCoordinates.Message"), //$NON-NLS-1$
-                      		TrackerRes.getString("Calibration.Dialog.InvalidCoordinates.Title"), //$NON-NLS-1$
-                      		JOptionPane.WARNING_MESSAGE);
-          		axisDropdown.setSelectedIndex(axes);
-              return;
-            }
-        	}
-      	}
-      	setAxisType(i);
-      	if (trackerPanel != null) {
-      		trackerPanel.getTFrame().getTrackBar(trackerPanel).refresh();
-      	}
-			}    	
+    axisDropdownAction = e -> {
+        int i = axisDropdown.getSelectedIndex();
+if (axes == i) return;
+// check for invalid coords if step is complete
+if (trackerPanel != null) {
+int n = trackerPanel.getFrameNumber();
+CalibrationStep step = (CalibrationStep)getStep(n);
+boolean isComplete = step!=null && step.getPoints()[1]!=null;
+if (isComplete) {
+if (i == X_AXIS && step.worldX0 == step.worldX1) {
+JOptionPane.showMessageDialog(trackerPanel,
+                          TrackerRes.getString("Calibration.Dialog.InvalidXCoordinates.Message"), //$NON-NLS-1$
+                          TrackerRes.getString("Calibration.Dialog.InvalidCoordinates.Title"), //$NON-NLS-1$
+                          JOptionPane.WARNING_MESSAGE);
+axisDropdown.setSelectedIndex(axes);
+return;
+}
+else if (i == Y_AXIS && step.worldY0 == step.worldY1) {
+JOptionPane.showMessageDialog(trackerPanel,
+TrackerRes.getString("Calibration.Dialog.InvalidYCoordinates.Message"), //$NON-NLS-1$
+TrackerRes.getString("Calibration.Dialog.InvalidCoordinates.Title"), //$NON-NLS-1$
+JOptionPane.WARNING_MESSAGE);
+axisDropdown.setSelectedIndex(axes);
+return;
+}
+}
+}
+setAxisType(i);
+if (trackerPanel != null) {
+trackerPanel.getTFrame().getTrackBar(trackerPanel).refresh();
+}
     };
   }
   

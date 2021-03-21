@@ -45,15 +45,14 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
 	The value of this must never change even in future releases */
   private static final long serialVersionUID = 1L;
   
-  private TFrame frame;
-  private TreeMap<Integer, Tool> replyToTools = new TreeMap<Integer, Tool>();
-  private TreeMap<Integer, String> jarPaths = new TreeMap<Integer, String>();
+  private final TFrame frame;
+  private final TreeMap<Integer, Tool> replyToTools = new TreeMap<>();
+  private final TreeMap<Integer, String> jarPaths = new TreeMap<>();
   
   /**
    * Constructor for a TFrame.
    *
    * @param tFrame the TFrame
-   * @throws RemoteException
    */
 	public DataTrackTool(TFrame tFrame) throws RemoteException {
 		frame = tFrame;		
@@ -67,7 +66,6 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
    *
    * @param job the Job
    * @param replyTo the tool to notify when the job is complete (may be null)
-   * @throws RemoteException
    */
   public void send(Job job, Tool replyTo) throws RemoteException {
     // read the job's XML into an XMLControl
@@ -111,7 +109,7 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
     				+" \""+path+"\"" //$NON-NLS-1$ //$NON-NLS-2$
         		+"\n"+TrackerRes.getString("DataTrackTool.Dialog.VideoNotFound.Message2"), //$NON-NLS-1$ //$NON-NLS-2$
     				TrackerRes.getString("DataTrackTool.Dialog.FileNotFound.Title"),  //$NON-NLS-1$
-    				JOptionPane.ERROR_MESSAGE);
+				JOptionPane.YES_NO_OPTION);
         if (result==JOptionPane.YES_OPTION) {
           java.io.File[] files = TrackerIO.getChooserFiles("open trk");  //$NON-NLS-1$
           if (files!=null && files.length>0) {
@@ -197,7 +195,7 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
 	  				+" \""+videoFullPath+"\"" //$NON-NLS-1$ //$NON-NLS-2$
 	      		+"\n"+TrackerRes.getString("DataTrackTool.Dialog.VideoNotFound.Message2"), //$NON-NLS-1$ //$NON-NLS-2$
 	  				TrackerRes.getString("DataTrackTool.Dialog.VideoNotFound.Title"),  //$NON-NLS-1$
-	  				JOptionPane.ERROR_MESSAGE);
+				  JOptionPane.YES_NO_OPTION);
 	      if (result==JOptionPane.YES_OPTION) {
 	        java.io.File[] files = VideoIO.getChooserFiles("open video");  //$NON-NLS-1$
 	        if (files!=null && files.length>0) {
@@ -302,7 +300,8 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
     		try {
 					dataTrack.setData(data, replyTo);
 				} catch (Exception e) {
-				}
+				e.printStackTrace();
+			}
     	}
     }
     
@@ -356,7 +355,8 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
 				tool.send(job, this);
 			}
 		} catch (RemoteException e) {
-		}
+		e.printStackTrace();
+	}
   }
   
   /**
@@ -392,6 +392,7 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
 						}
 						jar.close();
 					} catch (Exception e) {
+						e.printStackTrace();
 					}
   				if (entry!=null) {	  					
   					String source = jarPath+"!/"+entry.getName(); //$NON-NLS-1$
@@ -423,7 +424,7 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
     	}
     	name = name.replaceAll("_", " "); //$NON-NLS-1$ //$NON-NLS-2$
     	TTrack track = trackerPanel.getTrack(name);
-    	if (track!=null && track instanceof ParticleDataTrack) {
+    	if (track instanceof ParticleDataTrack) {
     		return (ParticleDataTrack)track;
     	}
   		for (ParticleDataTrack dataTrack: trackerPanel.getDrawables(ParticleDataTrack.class)) {
@@ -491,10 +492,11 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
 			String classPath = DataTrackSupport.class.getName().replace(".", "/"); //$NON-NLS-1$ //$NON-NLS-2$
 			JarEntry entry = jar.getJarEntry(classPath+".class"); //$NON-NLS-1$
 			jar.close();
-			return entry!=null;
+			return entry == null;
 		} catch (IOException ex) {
+			ex.printStackTrace();
 		}
-		return false;
+		return true;
   }
   
   /**
@@ -504,7 +506,7 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
    * @param requestData true to request data
    */
   public static void launchDataSource(String jarPath, boolean requestData) {
-  	if (!isDataSource(jarPath)) {
+  	if (isDataSource(jarPath)) {
   		// inform user
   		String jarName = TrackerRes.getString("TActions.Action.DataTrack.Unsupported.JarFile") //$NON-NLS-1$
   				+ " \""+XML.getName(jarPath)+"\" "; //$NON-NLS-1$ //$NON-NLS-2$
@@ -515,7 +517,7 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
   		return;
   	}
 		// assemble the command
-		final ArrayList<String> cmd = new ArrayList<String>();
+		final ArrayList<String> cmd = new ArrayList<>();
 		cmd.add("java"); //$NON-NLS-1$
 		cmd.add("-jar"); //$NON-NLS-1$
 		cmd.add(jarPath);
@@ -530,11 +532,11 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
 		}
 		
 		// log the command
-		String command = ""; //$NON-NLS-1$
+		StringBuilder command = new StringBuilder(); //$NON-NLS-1$
 		for (String next: cmd) {
-			command += next + " "; //$NON-NLS-1$
+			command.append(next).append(" "); //$NON-NLS-1$
 		}
-		OSPLog.config(command);
+		OSPLog.config(command.toString());
 							
 		// start the process
 		startProcess(builder);
@@ -547,33 +549,31 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
    */
   private static void startProcess(final ProcessBuilder builder) {
 		// start the process and wait for it to finish
-		Runnable runner = new Runnable() {
-			public void run() {
-				try {
-					Process process = builder.start();
-					// read output stream from the process--important so process doesn't block
-	        InputStream is = process.getInputStream();
-	        InputStreamReader isr = new InputStreamReader(is);
-	        BufferedReader br = new BufferedReader(isr);
-	        String line;
-	        while ((line = br.readLine()) != null) {
-	            System.out.println(line);
-	        }
-			    br.close();
-	        
-					int result = process.waitFor();
-					// if process returns with exit code > 0, print it's error stream
-					if (result > 0) {
-						isr = new InputStreamReader(process.getErrorStream());
-						br = new BufferedReader(isr);
-		        while ((line = br.readLine()) != null) {
-	            System.err.println(line);
-		        }
-				    br.close();
-					}
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}					
+		Runnable runner = () -> {
+			try {
+				Process process = builder.start();
+				// read output stream from the process--important so process doesn't block
+		InputStream is = process.getInputStream();
+		InputStreamReader isr = new InputStreamReader(is);
+		BufferedReader br = new BufferedReader(isr);
+		String line;
+		while ((line = br.readLine()) != null) {
+			System.out.println(line);
+		}
+			br.close();
+
+				int result = process.waitFor();
+				// if process returns with exit code > 0, print it's error stream
+				if (result > 0) {
+					isr = new InputStreamReader(process.getErrorStream());
+					br = new BufferedReader(isr);
+			while ((line = br.readLine()) != null) {
+			System.err.println(line);
+			}
+				br.close();
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 		};
 		

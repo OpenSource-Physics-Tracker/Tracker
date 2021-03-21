@@ -49,7 +49,8 @@ public class TrackerRes {
 	/**
 	 * Private constructor to prevent instantiation.
 	 */
-	private TrackerRes() {/** empty block */}
+	private TrackerRes() {
+	}
 
 	/**
 	 * Gets the localized value of a string. If no localized value is found, the

@@ -56,18 +56,18 @@ public class ProtractorStep extends Step {
   protected boolean endsEnabled = true;
   protected boolean drawLayoutBounds, drawLayout1, drawLayout2;
   protected Shape vertexCircle, arcHighlight;
-  protected Map<TrackerPanel, Shape> vertexShapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, Shape> end1Shapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, Shape> end2Shapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, Shape> line1Shapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, Shape> line2Shapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, Shape> rotatorShapes = new HashMap<TrackerPanel, Shape>();
-  protected Map<TrackerPanel, TextLayout> textLayouts = new HashMap<TrackerPanel, TextLayout>();
-  protected Map<TrackerPanel, Rectangle> layoutBounds = new HashMap<TrackerPanel, Rectangle>();
-  protected Map<TrackerPanel, TextLayout> textLayouts1 = new HashMap<TrackerPanel, TextLayout>();
-  protected Map<TrackerPanel, Rectangle> layout1Bounds = new HashMap<TrackerPanel, Rectangle>();
-  protected Map<TrackerPanel, TextLayout> textLayouts2 = new HashMap<TrackerPanel, TextLayout>();
-  protected Map<TrackerPanel, Rectangle> layout2Bounds = new HashMap<TrackerPanel, Rectangle>();
+  protected Map<TrackerPanel, Shape> vertexShapes = new HashMap<>();
+  protected Map<TrackerPanel, Shape> end1Shapes = new HashMap<>();
+  protected Map<TrackerPanel, Shape> end2Shapes = new HashMap<>();
+  protected Map<TrackerPanel, Shape> line1Shapes = new HashMap<>();
+  protected Map<TrackerPanel, Shape> line2Shapes = new HashMap<>();
+  protected Map<TrackerPanel, Shape> rotatorShapes = new HashMap<>();
+  protected Map<TrackerPanel, TextLayout> textLayouts = new HashMap<>();
+  protected Map<TrackerPanel, Rectangle> layoutBounds = new HashMap<>();
+  protected Map<TrackerPanel, TextLayout> textLayouts1 = new HashMap<>();
+  protected Map<TrackerPanel, Rectangle> layout1Bounds = new HashMap<>();
+  protected Map<TrackerPanel, TextLayout> textLayouts2 = new HashMap<>();
+  protected Map<TrackerPanel, Rectangle> layout2Bounds = new HashMap<>();
   protected Shape selectedShape;
   
   /**
@@ -286,7 +286,7 @@ public class ProtractorStep extends Step {
    */
   protected Mark getMark(TrackerPanel trackerPanel) {
     Mark mark = marks.get(trackerPanel);
-    TPoint selection = null;
+    TPoint selection;
     if (mark == null) {
       getProtractorAngle(); // updates angle display
       selection = trackerPanel.getSelectedPoint();
@@ -386,7 +386,6 @@ public class ProtractorStep extends Step {
   /**
    * Formats the specified length value.
    *
-   * @param length the length value to format
    * @return the formatted length string
    */
   public String getFormattedLength(TPoint end) {
@@ -481,14 +480,14 @@ public class ProtractorStep extends Step {
       step.end1.setTrackEditTrigger(true);
       step.end2.setTrackEditTrigger(true);
       step.handle.setTrackEditTrigger(true);
-      step.vertexShapes = new HashMap<TrackerPanel, Shape>();
-      step.end1Shapes = new HashMap<TrackerPanel, Shape>();
-      step.end2Shapes = new HashMap<TrackerPanel, Shape>();
-      step.line1Shapes = new HashMap<TrackerPanel, Shape>();
-      step.line2Shapes = new HashMap<TrackerPanel, Shape>();
-      step.rotatorShapes = new HashMap<TrackerPanel, Shape>();
-      step.textLayouts = new HashMap<TrackerPanel, TextLayout>();
-      step.layoutBounds = new HashMap<TrackerPanel, Rectangle>();
+      step.vertexShapes = new HashMap<>();
+      step.end1Shapes = new HashMap<>();
+      step.end2Shapes = new HashMap<>();
+      step.line1Shapes = new HashMap<>();
+      step.line2Shapes = new HashMap<>();
+      step.rotatorShapes = new HashMap<>();
+      step.textLayouts = new HashMap<>();
+      step.layoutBounds = new HashMap<>();
     }
     return step;
   }
@@ -712,12 +711,7 @@ public class ProtractorStep extends Step {
     public int getFrameNumber(VideoPanel vidPanel) {
       return n();
     }
-    
-//    public void setLocation(double x, double y) {
-//    	super.setLocation(x, y);
-//    	protractor.dataValid = false;
-//    	protractor.firePropertyChange("data", null, protractor);
-//    }
+
   }
   
   //______________________ inner Rotator class ________________________
@@ -764,7 +758,7 @@ public class ProtractorStep extends Step {
     	}      
       
       // show arc highlight shape
-      ProtractorFootprint footprint = null;
+      ProtractorFootprint footprint;
       if (protractor.getFootprint()!=null 
       		&& protractor.getFootprint() instanceof ProtractorFootprint) {
       	footprint = (ProtractorFootprint)protractor.getFootprint();
