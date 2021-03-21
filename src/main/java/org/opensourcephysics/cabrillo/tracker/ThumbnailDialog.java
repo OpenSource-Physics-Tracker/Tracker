@@ -24,26 +24,23 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.text.JTextComponent;
-
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.media.core.VideoFileFilter;
 import org.opensourcephysics.media.core.VideoIO;
 import org.opensourcephysics.media.core.VideoType;
 import org.opensourcephysics.tools.FontSizer;
 
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.HashMap;
 
 /**
  * A dialog for saving thumbnail images of a TrackerPanel.
@@ -72,8 +69,7 @@ public class ThumbnailDialog extends JDialog {
   protected HashMap<Object, Dimension> sizes;
   protected Dimension fullSize = new Dimension(), thumbSize;
   protected boolean isRefreshing;
-  protected String savedFilePath;
-  protected JPanel buttonbar;
+    protected JPanel buttonbar;
   
   /**
    * Returns the singleton ThumbnailDialog for a specified TrackerPanel.
@@ -87,21 +83,17 @@ public class ThumbnailDialog extends JDialog {
   	if (thumbnailDialog==null) {
   		thumbnailDialog = new ThumbnailDialog(panel);
   		FontSizer.setFonts(thumbnailDialog, FontSizer.getLevel());
-  		fileChooserListener = new PropertyChangeListener() {
- 			  public void propertyChange(PropertyChangeEvent e) {
- 			  	if (chooserField!=null && e.getNewValue()!=null) {
-	 			  	VideoFileFilter filter = (VideoFileFilter)e.getNewValue();
-			  		final String ext = filter.getDefaultExtension();
-	 			    Runnable runner = new Runnable() {
-	 			      public void run() {
-	 			        String name = XML.stripExtension(chooserField.getText())+"."+ext; //$NON-NLS-1$ 
-	 			        chooserField.setText(name);
-	 			      }
-	 			    };
-	 			    SwingUtilities.invokeLater(runner);
- 			  	}
- 			  }
- 			};
+  		fileChooserListener = e -> {
+              if (chooserField!=null && e.getNewValue()!=null) {
+                  VideoFileFilter filter = (VideoFileFilter)e.getNewValue();
+                 final String ext = filter.getDefaultExtension();
+                Runnable runner = () -> {
+String name = XML.stripExtension(chooserField.getText())+"."+ext; //$NON-NLS-1$
+chooserField.setText(name);
+};
+                SwingUtilities.invokeLater(runner);
+              }
+          };
  			// set up file filters
   		for (int i=0; i<formatNames.length; i++) {
 		    VideoType type = VideoIO.getVideoType(null, formatNames[i]);
@@ -168,8 +160,7 @@ public class ThumbnailDialog extends JDialog {
   		filePath = XML.stripExtension(filePath)+"."+format; //$NON-NLS-1$
     Dimension size = sizes.get(sizeDropdown.getSelectedItem());
     BufferedImage thumb = getThumbnailImage(size);
-	  File thumbnail = VideoIO.writeImageFile(thumb, filePath);
-    return thumbnail;
+      return VideoIO.writeImageFile(thumb, filePath);
   }
   
   /**
@@ -239,7 +230,7 @@ public class ThumbnailDialog extends JDialog {
     JPanel lower = new JPanel(new GridLayout(1, 2));
     
     // size panel
-    sizes = new HashMap<Object, Dimension>();
+    sizes = new HashMap<>();
     sizePanel = Box.createVerticalBox();
     sizeDropdown = new JComboBox();
   	sizePanel.add(sizeDropdown);
@@ -249,13 +240,11 @@ public class ThumbnailDialog extends JDialog {
     viewModel = new DefaultComboBoxModel();
     viewDropdown = new JComboBox(viewModel);
     viewPanel.add(viewDropdown);
-    viewDropdown.addItemListener(new ItemListener() {
-    	public void itemStateChanged(ItemEvent e) {
-    		if (e.getStateChange()==ItemEvent.SELECTED) {
-    			if (!isRefreshing)
-    				refreshSizeDropdown();
-    		}
-    	}
+    viewDropdown.addItemListener(e -> {
+        if (e.getStateChange()==ItemEvent.SELECTED) {
+            if (!isRefreshing)
+                refreshSizeDropdown();
+        }
     });
    
     // format panel
@@ -274,19 +263,15 @@ public class ThumbnailDialog extends JDialog {
     // buttons
     saveAsButton = new JButton();
     saveAsButton.setForeground(new Color(0, 0, 102));
-    saveAsButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-        saveThumbnail(null);
-      }
+    saveAsButton.addActionListener(e -> {
+      setVisible(false);
+      saveThumbnail(null);
     });
     closeButton = new JButton();
     closeButton.setForeground(new Color(0, 0, 102));
-    closeButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-        firePropertyChange("accepted", null, null); //$NON-NLS-1$
-      }
+    closeButton.addActionListener(e -> {
+      setVisible(false);
+      firePropertyChange("accepted", null, null); //$NON-NLS-1$
     });
     // buttonbar
     buttonbar = new JPanel();
@@ -335,10 +320,10 @@ public class ThumbnailDialog extends JDialog {
   	int index = formatDropdown.getSelectedIndex();
   	index = Math.max(index, 0);
   	formatModel.removeAllElements();
-    for (int i=0; i< formatNames.length; i++) {
-    	String format = TrackerRes.getString("ThumbnailDialog.Format."+formatNames[i].toUpperCase()); //$NON-NLS-1$
-    	formatModel.addElement(format);
-    }
+      for (String formatName : formatNames) {
+          String format = TrackerRes.getString("ThumbnailDialog.Format." + formatName.toUpperCase()); //$NON-NLS-1$
+          formatModel.addElement(format);
+      }
     formatDropdown.setSelectedIndex(index);  	
   	int lastIndex = trackerPanel.getVideo()==null? viewNames.length-2: viewNames.length-1;
   	index = Math.min(viewDropdown.getSelectedIndex(), lastIndex);
@@ -400,24 +385,22 @@ public class ThumbnailDialog extends JDialog {
 		
 		// add additional sizes if acceptable
 		double[] factor = new double[] {0.75, 0.5, 0.375, 0.25};
-		for (int i=0; i<factor.length; i++) {
-			dim = new Dimension((int)(thumbSize.width*factor[i]), (int)(thumbSize.height*factor[i]));
-			if (isAcceptedDimension(dim.width, dim.height)) {
-	  		s = dim.width+"x"+dim.height; //$NON-NLS-1$
-	  		sizeDropdown.addItem(s);
-	  		sizes.put(s, dim);
-			}
-		}
+      for (double v : factor) {
+          dim = new Dimension((int) (thumbSize.width * v), (int) (thumbSize.height * v));
+          if (isAcceptedDimension(dim.width, dim.height)) {
+              s = dim.width + "x" + dim.height; //$NON-NLS-1$
+              sizeDropdown.addItem(s);
+              sizes.put(s, dim);
+          }
+      }
 		// select previous or default size
-		sizeDropdown.setSelectedItem(sizes.keySet().contains(selectedItem)? selectedItem: defaultItem);
+		sizeDropdown.setSelectedItem(sizes.containsKey(selectedItem)? selectedItem: defaultItem);
   	isRefreshing = false;
   }
 
   /**
    * Gets the "full-sized" thumbnail dimension for a specified image size.
-   * 
-   * @param w the desired width
-   * @param h the desired height
+   *
    * @return an acceptable dimension
    */
   private Dimension getFullThumbnailSize(Dimension imageSize) {
@@ -443,8 +426,7 @@ public class ThumbnailDialog extends JDialog {
    * @return true if accepted
    */
   private boolean isAcceptedDimension(int w, int h) {
-  	if (w>=80 || h>=60) return true;
-  	return false;
+      return w >= 80 || h >= 60;
   }
   
   /**
@@ -498,17 +480,17 @@ public class ThumbnailDialog extends JDialog {
   
   private static JTextComponent getTextComponent(Container c, String toMatch) {
     Component[] comps = c.getComponents();
-    for(int i = 0; i<comps.length; i++) {
-      if((comps[i] instanceof JTextComponent)&&toMatch.equals(((JTextComponent) comps[i]).getText())) {
-        return(JTextComponent) comps[i];
+      for (Component comp : comps) {
+          if ((comp instanceof JTextComponent) && toMatch.equals(((JTextComponent) comp).getText())) {
+              return (JTextComponent) comp;
+          }
+          if (comp instanceof Container) {
+              JTextComponent tc = getTextComponent((Container) comp, toMatch);
+              if (tc != null) {
+                  return tc;
+              }
+          }
       }
-      if(comps[i] instanceof Container) {
-        JTextComponent tc = getTextComponent((Container) comps[i], toMatch);
-        if(tc!=null) {
-          return tc;
-        }
-      }
-    }
     return null;
   }
 

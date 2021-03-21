@@ -96,7 +96,7 @@ public class PlotTrackView extends TrackView {
 
   @Override
   public void refresh(int frameNumber) {
-  	if (!isRefreshEnabled()) return;
+  	if (isRefreshEnabled()) return;
     Tracker.logTime(getClass().getSimpleName()+hashCode()+" refresh "+frameNumber); //$NON-NLS-1$
   	TTrack track = getTrack();
   	if (track==null) return;  	

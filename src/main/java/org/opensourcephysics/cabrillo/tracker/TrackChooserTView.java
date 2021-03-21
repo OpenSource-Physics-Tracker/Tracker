@@ -47,10 +47,10 @@ public abstract class TrackChooserTView extends JPanel implements TView {
 
   // instance fields
   protected TrackerPanel trackerPanel;
-  protected Map<TTrack, TrackView> trackViews = new HashMap<TTrack, TrackView>(); // maps track to its trackView
-  protected Map<Object, TTrack> tracks = new HashMap<Object, TTrack>(); // maps dropdown items to track
+  protected Map<TTrack, TrackView> trackViews = new HashMap<>(); // maps track to its trackView
+  protected Map<Object, TTrack> tracks = new HashMap<>(); // maps dropdown items to track
   protected JComboBox dropdown;
-  protected ArrayList<Component> toolbarComponents = new ArrayList<Component>();
+  protected ArrayList<Component> toolbarComponents = new ArrayList<>();
   protected boolean refreshing;
   protected TTrack selectedTrack;
   protected JPanel noData;
@@ -94,9 +94,11 @@ public abstract class TrackChooserTView extends JPanel implements TView {
         // show the trackView for the selected track
         Object item = dropdown.getSelectedItem();
         TTrack track = tracks.get(item);
-//        if (track==selectedTrack) return;
-        String name = (String)((Object[])item)[1];
-        if (track != null) {
+          String name = null;
+          if (item != null) {
+              name = (String)((Object[])item)[1];
+          }
+          if (track != null) {
           trackerPanel.changed = true;
           TrackView trackView = getTrackView(track);
           // remove step propertyChangeListeners from prev selected track
@@ -141,12 +143,10 @@ public abstract class TrackChooserTView extends JPanel implements TView {
           // inform track views
           PropertyChangeEvent event = 
           	new PropertyChangeEvent(this, "track", null, track); //$NON-NLS-1$
-          Iterator<TTrack> it = trackViews.keySet().iterator();
-          while (it.hasNext()) {
-          	TTrack nextTrack = it.next();
-          	TrackView next = trackViews.get(nextTrack);
-          	next.propertyChange(event);
-          }
+            for (TTrack nextTrack : trackViews.keySet()) {
+                TrackView next = trackViews.get(nextTrack);
+                next.propertyChange(event);
+            }
         }
       }
     });
@@ -162,15 +162,13 @@ public abstract class TrackChooserTView extends JPanel implements TView {
       	if (OSPRuntime.isPopupTrigger(e)) {
         	JPopupMenu popup = new JPopupMenu();
           JMenuItem helpItem = new JMenuItem(TrackerRes.getString("Dialog.Button.Help")+"..."); //$NON-NLS-1$ //$NON-NLS-2$
-          helpItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	if (TrackChooserTView.this instanceof TableTView) {
-            		trackerPanel.getTFrame().showHelp("datatable", 0); //$NON-NLS-1$
-            	}
-            	else {
-            		trackerPanel.getTFrame().showHelp("plot", 0); //$NON-NLS-1$
-            	}
-            }
+          helpItem.addActionListener(e1 -> {
+              if (TrackChooserTView.this instanceof TableTView) {
+                  trackerPanel.getTFrame().showHelp("datatable", 0); //$NON-NLS-1$
+              }
+              else {
+                  trackerPanel.getTFrame().showHelp("plot", 0); //$NON-NLS-1$
+              }
           });
           popup.add(helpItem);
         	FontSizer.setFonts(popup, FontSizer.getLevel());
@@ -190,7 +188,7 @@ public abstract class TrackChooserTView extends JPanel implements TView {
     TTrack selectedTrack = getSelectedTrack();
     TTrack defaultTrack = null;
     // get views and rebuild for all tracks on trackerPanel
-    Map<TTrack, TrackView> newViews = new HashMap<TTrack, TrackView>();
+    Map<TTrack, TrackView> newViews = new HashMap<>();
     removeAll(); // removes views from card layout
     tracks.clear();
     dropdown.removeAllItems();
@@ -342,28 +340,26 @@ public abstract class TrackChooserTView extends JPanel implements TView {
     if (!track.isViewable() || !trackerPanel.containsTrack(track)) return;
   	if (track==selectedTrack 
   			&& tracks.get(dropdown.getSelectedItem())==track) return;
-    Iterator<Object> it = tracks.keySet().iterator();
-    while (it.hasNext()) {
-      Object item = it.next();
-      if (tracks.get(item) == track) {
-        // be sure listeners are registered once only
-        track.removePropertyChangeListener("stepnumber", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("image", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("name", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("color", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("data", this); //$NON-NLS-1$
-        track.addPropertyChangeListener("stepnumber", this); //$NON-NLS-1$
-        track.addPropertyChangeListener("image", this); //$NON-NLS-1$
-        track.addPropertyChangeListener("name", this); //$NON-NLS-1$
-        track.addPropertyChangeListener("color", this); //$NON-NLS-1$
-        track.addPropertyChangeListener("footprint", this); //$NON-NLS-1$
-        track.addPropertyChangeListener("data", this); //$NON-NLS-1$
-        // select the track dropdown item
-        dropdown.setSelectedItem(item);
-        break;
+      for (Object item : tracks.keySet()) {
+          if (tracks.get(item) == track) {
+              // be sure listeners are registered once only
+              track.removePropertyChangeListener("stepnumber", this); //$NON-NLS-1$
+              track.removePropertyChangeListener("image", this); //$NON-NLS-1$
+              track.removePropertyChangeListener("name", this); //$NON-NLS-1$
+              track.removePropertyChangeListener("color", this); //$NON-NLS-1$
+              track.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
+              track.removePropertyChangeListener("data", this); //$NON-NLS-1$
+              track.addPropertyChangeListener("stepnumber", this); //$NON-NLS-1$
+              track.addPropertyChangeListener("image", this); //$NON-NLS-1$
+              track.addPropertyChangeListener("name", this); //$NON-NLS-1$
+              track.addPropertyChangeListener("color", this); //$NON-NLS-1$
+              track.addPropertyChangeListener("footprint", this); //$NON-NLS-1$
+              track.addPropertyChangeListener("data", this); //$NON-NLS-1$
+              // select the track dropdown item
+              dropdown.setSelectedItem(item);
+              break;
+          }
       }
-    }
   }
 
   /**
@@ -417,10 +413,10 @@ public abstract class TrackChooserTView extends JPanel implements TView {
         break;
   		}
   	}
-  	for (Iterator<TTrack> it = trackViews.keySet().iterator(); it.hasNext();) {
-    	TrackView view = trackViews.get(it.next());
-  		if (view.isCustomState()) return true;
-  	}
+      for (TTrack tTrack : trackViews.keySet()) {
+          TrackView view = trackViews.get(tTrack);
+          if (view.isCustomState()) return true;
+      }
   	return false;
   }
 
@@ -433,93 +429,100 @@ public abstract class TrackChooserTView extends JPanel implements TView {
    */
   public void propertyChange(PropertyChangeEvent e) {
     String name = e.getPropertyName();
-    if (name.equals("track")) {               // track has been added or removed //$NON-NLS-1$
-      TTrack track = (TTrack)e.getOldValue();
-      if (track != null) {
-        track.removePropertyChangeListener("stepnumber", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("image", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("name", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("color", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("data", this); //$NON-NLS-1$
-        TrackView view = trackViews.get(track);
-        if (view != null) {
-        	view.dispose();
-        	trackViews.remove(track);
-        }
+      switch (name) {
+          case "track": {               // track has been added or removed //$NON-NLS-1$
+              TTrack track = (TTrack) e.getOldValue();
+              if (track != null) {
+                  track.removePropertyChangeListener("stepnumber", this); //$NON-NLS-1$
+                  track.removePropertyChangeListener("image", this); //$NON-NLS-1$
+                  track.removePropertyChangeListener("name", this); //$NON-NLS-1$
+                  track.removePropertyChangeListener("color", this); //$NON-NLS-1$
+                  track.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
+                  track.removePropertyChangeListener("data", this); //$NON-NLS-1$
+                  TrackView view = trackViews.get(track);
+                  if (view != null) {
+                      view.dispose();
+                      trackViews.remove(track);
+                  }
+              }
+              refresh();
+              TFrame frame = trackerPanel.getTFrame();
+              if (frame != null) frame.repaint();
+              // select a newly added track
+              track = (TTrack) e.getNewValue();
+              if (track != null) setSelectedTrack(track);
+              break;
+          }
+          case "clear": {     // tracks have been cleared //$NON-NLS-1$
+              for (Integer n : TTrack.activeTracks.keySet()) {
+                  TTrack track = TTrack.activeTracks.get(n);
+                  track.removePropertyChangeListener("stepnumber", this); //$NON-NLS-1$
+                  track.removePropertyChangeListener("image", this); //$NON-NLS-1$
+                  track.removePropertyChangeListener("name", this); //$NON-NLS-1$
+                  track.removePropertyChangeListener("color", this); //$NON-NLS-1$
+                  track.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
+                  track.removePropertyChangeListener("data", this); //$NON-NLS-1$
+                  TrackView view = trackViews.get(track);
+                  if (view != null) {
+                      view.dispose();
+                      trackViews.remove(track);
+                  }
+              }
+              refresh();
+              TFrame frame = trackerPanel.getTFrame();
+              if (frame != null) frame.repaint();
+              break;
+          }
+          case "transform": {             // coords have changed //$NON-NLS-1$
+              TTrack track = getSelectedTrack();
+              if (track != null && getTrackView(track) != null) {
+                  // if track is a particle model, ignore if coords are adjusting
+                  if (track instanceof ParticleModel) {
+                      ImageCoordSystem coords = trackerPanel.getCoords();
+                      if (coords.isAdjusting()) return;
+                  }
+                  TrackView trackView = getTrackView(track);
+                  TPoint pt = trackerPanel.getSelectedPoint();
+                  Step step = track.getStep(pt, trackerPanel);
+                  trackView.refresh(step == null ? trackerPanel.getFrameNumber() : step.getFrameNumber());
+              }
+              break;
+          }
+          case "data": {             // data has changed //$NON-NLS-1$
+              TTrack track = getSelectedTrack();
+              if (track != null && getTrackView(track) != null) {
+                  TrackView trackView = getTrackView(track);
+                  trackView.refresh(trackerPanel.getFrameNumber());
+              }
+              break;
+          }
+          case "function":
+          case "radian_angles":  // angle units have changed //$NON-NLS-1$
+              // refresh views of all tracks
+              for (TTrack track : trackerPanel.getTracks()) {
+                  if (getTrackView(track) != null) {
+                      TrackView trackView = getTrackView(track);
+                      trackView.refreshGUI();
+                      trackView.refresh(trackerPanel.getFrameNumber());
+                  }
+              }
+              break;
+          case "stepnumber":
+          case "image": { // video image has changed //$NON-NLS-1$
+              TTrack track = getSelectedTrack();
+              if (track != null && getTrackView(track) != null) {
+                  TrackView trackView = getTrackView(track);
+                  trackView.refresh(trackerPanel.getFrameNumber());
+              }
+              break;
+          }
+          case "color":
+          case "name":
+          case "footprint":  //$NON-NLS-1$
+              // track property has changed
+              refresh();
+              break;
       }
-    	refresh();
-    	TFrame frame = trackerPanel.getTFrame();
-    	if (frame != null) frame.repaint();
-      // select a newly added track
-      track = (TTrack)e.getNewValue();
-      if (track != null) setSelectedTrack(track);
-    }
-    else if (name.equals("clear")) {     // tracks have been cleared //$NON-NLS-1$
-      for (Integer n: TTrack.activeTracks.keySet()) {
-      	TTrack track = TTrack.activeTracks.get(n);
-        track.removePropertyChangeListener("stepnumber", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("image", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("name", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("color", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("footprint", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("data", this); //$NON-NLS-1$
-        TrackView view = trackViews.get(track);
-        if (view != null) {
-        	view.dispose();
-        	trackViews.remove(track);
-        }
-      }
-      refresh();
-    	TFrame frame = trackerPanel.getTFrame();
-    	if (frame != null) frame.repaint();
-    }
-    else if (name.equals("transform")) {             // coords have changed //$NON-NLS-1$      
-    	TTrack track = getSelectedTrack();
-      if (track != null && getTrackView(track) != null) {
-      	// if track is a particle model, ignore if coords are adjusting
-      	if (track instanceof ParticleModel) {
-      		ImageCoordSystem coords = trackerPanel.getCoords();
-      		if (coords.isAdjusting()) return;
-      	}
-        TrackView trackView = getTrackView(track);
-        TPoint pt = trackerPanel.getSelectedPoint();
-        Step step = track.getStep(pt, trackerPanel);
-        trackView.refresh(step==null? trackerPanel.getFrameNumber(): step.getFrameNumber());
-      }
-    }
-    else if (name.equals("data")) {             // data has changed //$NON-NLS-1$
-      TTrack track = getSelectedTrack();
-      if (track != null && getTrackView(track) != null) {
-        TrackView trackView = getTrackView(track);
-        trackView.refresh(trackerPanel.getFrameNumber());
-      }
-    }
-    else if (name.equals("function") // DataFunction has changed //$NON-NLS-1$
-    		|| name.equals("radian_angles")) { // angle units have changed //$NON-NLS-1$
-      // refresh views of all tracks
-      for (TTrack track: trackerPanel.getTracks()) {
-    		if (getTrackView(track) != null) {
-          TrackView trackView = getTrackView(track);
-          trackView.refreshGUI();
-          trackView.refresh(trackerPanel.getFrameNumber());
-        }
-    	}
-    }
-    else if (name.equals("stepnumber") || //$NON-NLS-1$
-             name.equals("image")) { // video image has changed //$NON-NLS-1$
-      TTrack track = getSelectedTrack();
-      if (track != null && getTrackView(track) != null) {
-        TrackView trackView = getTrackView(track);
-        trackView.refresh(trackerPanel.getFrameNumber());
-      }
-    }
-    else if (name.equals("color") || //$NON-NLS-1$
-             name.equals("name") || //$NON-NLS-1$
-             name.equals("footprint")) { //$NON-NLS-1$
-    	// track property has changed
-      refresh();
-    }
   }
 
   /**

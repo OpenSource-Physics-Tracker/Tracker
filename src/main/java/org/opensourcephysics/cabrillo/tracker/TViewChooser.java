@@ -51,7 +51,7 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
 
     // instance fields
     protected TrackerPanel trackerPanel;
-    protected ArrayList<TView> views = new ArrayList<TView>();
+    protected ArrayList<TView> views = new ArrayList<>();
     protected TView selectedView;
     protected JPanel viewPanel;
     protected JToolBar toolbar;
@@ -91,17 +91,15 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
                     if (view == null) return;
                     JPopupMenu popup = new JPopupMenu();
                     JMenuItem helpItem = new JMenuItem(TrackerRes.getString("Dialog.Button.Help") + "..."); //$NON-NLS-1$ //$NON-NLS-2$
-                    helpItem.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            if (view instanceof PageTView) {
-                                trackerPanel.getTFrame().showHelp("textview", 0); //$NON-NLS-1$
-                            } else if (view instanceof TableTView) {
-                                trackerPanel.getTFrame().showHelp("datatable", 0); //$NON-NLS-1$
-                            } else if (view instanceof PlotTView) {
-                                trackerPanel.getTFrame().showHelp("plot", 0); //$NON-NLS-1$
-                            } else if (view instanceof WorldTView) {
-                                trackerPanel.getTFrame().showHelp("GUI", 0); //$NON-NLS-1$
-                            }
+                    helpItem.addActionListener(e1 -> {
+                        if (view instanceof PageTView) {
+                            trackerPanel.getTFrame().showHelp("textview", 0); //$NON-NLS-1$
+                        } else if (view instanceof TableTView) {
+                            trackerPanel.getTFrame().showHelp("datatable", 0); //$NON-NLS-1$
+                        } else if (view instanceof PlotTView) {
+                            trackerPanel.getTFrame().showHelp("plot", 0); //$NON-NLS-1$
+                        } else if (view instanceof WorldTView) {
+                            trackerPanel.getTFrame().showHelp("GUI", 0); //$NON-NLS-1$
                         }
                     });
                     popup.add(helpItem);
@@ -116,19 +114,15 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
         chooserButton = new TButton() {
             protected JPopupMenu getPopup() {
                 // inner popup menu listener class
-                ActionListener listener = new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        // select the named view
-                        String name = e.getActionCommand();
-                        setSelectedView(getView(name));
-                    }
+                ActionListener listener = e -> {
+                    // select the named view
+                    String name = e.getActionCommand();
+                    setSelectedView(getView(name));
                 };
                 // add view items to popup
                 popup.removeAll();
                 JMenuItem item;
-                Iterator<TView> it = getViews().iterator();
-                while (it.hasNext()) {
-                    TView view = it.next();
+                for (TView view : getViews()) {
                     String name = view.getViewName();
                     item = new JMenuItem(name, new ResizableIcon(view.getViewIcon()));
                     item.setActionCommand(name);
@@ -145,16 +139,14 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
         maximizeButton = new TButton(maxIcon, restoreIcon);
         maximizeButton.setBorder(BorderFactory.createCompoundBorder(etched, empty));
         maximizeButton.setToolTipText(TrackerRes.getString("TViewChooser.Maximize.Tooltip")); //$NON-NLS-1$
-        maximizeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (!maximized) {
-                    maximize();
-                } else restore();
-                maximizeButton.setSelected(maximized);
-                maximizeButton.setToolTipText(maximized ?
-                        TrackerRes.getString("TViewChooser.Restore.Tooltip") : //$NON-NLS-1$
-                        TrackerRes.getString("TViewChooser.Maximize.Tooltip")); //$NON-NLS-1$
-            }
+        maximizeButton.addActionListener(e -> {
+            if (!maximized) {
+                maximize();
+            } else restore();
+            maximizeButton.setSelected(maximized);
+            maximizeButton.setToolTipText(maximized ?
+                    TrackerRes.getString("TViewChooser.Restore.Tooltip") : //$NON-NLS-1$
+                    TrackerRes.getString("TViewChooser.Maximize.Tooltip")); //$NON-NLS-1$
         });
         createDefaultViews();
         refresh();
@@ -192,20 +184,6 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
     }
 
     /**
-     * Adds a view of the tracker panel at a specified index
-     *
-     * @param index the list index desired
-     * @param view  the view being added
-     */
-    public void addView(int index, TView view) {
-        if (view.getTrackerPanel() != trackerPanel) return;
-        if (getView(view.getClass()) != null) return;
-        views.add(index, view);
-        view.cleanup();
-        refreshViewPanel();
-    }
-
-    /**
      * Removes a view from this chooser
      *
      * @param view the view requesting to be removed
@@ -232,9 +210,7 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
      * @return the view
      */
     public TView getView(String viewName) {
-        Iterator<TView> it = getViews().iterator();
-        while (it.hasNext()) {
-            TView view = it.next();
+        for (TView view : getViews()) {
             if (view.getViewName().equals(viewName)) return view;
         }
         return null;
@@ -247,11 +223,7 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
      * @return a collection of views
      */
     public Collection<TView> getViews(Class<? extends TView> type) {
-        Collection<TView> list = new ArrayList<TView>();
-        for (TView view : list) {
-            if (type.isInstance(view)) list.add(view);
-        }
-        return list;
+        return new ArrayList<>();
     }
 
     /**
@@ -321,18 +293,22 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
      */
     public void propertyChange(PropertyChangeEvent e) {
         String name = e.getPropertyName();
-        if (name.equals("track")) {  // track added/removed //$NON-NLS-1$
-            for (TView view : getViews()) {
-                view.propertyChange(e);
-            }
-            refreshToolbar();
-        } else if (name.equals("clear")) {  // tracks cleared //$NON-NLS-1$
-            for (TView view : getViews()) {
-                view.propertyChange(e);
-            }
-            refreshToolbar();
-        } else if (name.equals("trackview")) {    // trackview has changed //$NON-NLS-1$
-            refreshToolbar();
+        switch (name) {
+            case "track":   // track added/removed //$NON-NLS-1$
+                for (TView view : getViews()) {
+                    view.propertyChange(e);
+                }
+                refreshToolbar();
+                break;
+            case "clear":   // tracks cleared //$NON-NLS-1$
+                for (TView view : getViews()) {
+                    view.propertyChange(e);
+                }
+                refreshToolbar();
+                break;
+            case "trackview":     // trackview has changed //$NON-NLS-1$
+                refreshToolbar();
+                break;
         }
     }
 
@@ -483,9 +459,7 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
      */
     private void refreshViewPanel() {
         viewPanel.removeAll();
-        Iterator<TView> it = getViews().iterator();
-        while (it.hasNext()) {
-            TView view = it.next();
+        for (TView view : getViews()) {
             String name = view.getViewName();
             viewPanel.add((JComponent) view, name);
         }
@@ -494,7 +468,7 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
             setSelectedView(selectedView);
             // otherwise select the first view in the list
         else {
-            it = getViews().iterator();
+            Iterator<TView> it = getViews().iterator();
             if (it.hasNext()) {
                 setSelectedView(it.next());
             }

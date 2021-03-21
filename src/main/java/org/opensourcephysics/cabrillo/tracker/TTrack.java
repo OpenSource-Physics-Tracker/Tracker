@@ -64,7 +64,7 @@ public abstract class TTrack implements Interactive,
     protected static boolean skippedStepWarningOn = true;
     protected static TrackNameDialog nameDialog;
     protected static int nextID = 1;
-    protected static HashMap<Integer, TTrack> activeTracks = new HashMap<Integer, TTrack>();
+    protected static HashMap<Integer, TTrack> activeTracks = new HashMap<>();
     protected static FontRenderContext frc
             = new FontRenderContext(null,   // no AffineTransform
             false,  // no antialiasing
@@ -84,20 +84,20 @@ public abstract class TTrack implements Interactive,
     protected Footprint defaultFootprint;
     protected Color[] defaultColors = new Color[]{Color.red};
     protected StepArray steps = new StepArray();
-    protected Collection<TrackerPanel> panels = new HashSet<TrackerPanel>();
+    protected Collection<TrackerPanel> panels = new HashSet<>();
     public PropertyChangeSupport support;
-    protected HashMap<String, Object> properties = new HashMap<String, Object>();
+    protected HashMap<String, Object> properties = new HashMap<>();
     protected DatasetManager data;
-    protected HashMap<TrackerPanel, double[]> worldBounds = new HashMap<TrackerPanel, double[]>();
+    protected HashMap<TrackerPanel, double[]> worldBounds = new HashMap<>();
     protected Point2D point = new Point2D.Double();
-    protected ArrayList<Component> toolbarTrackComponents = new ArrayList<Component>();
-    protected ArrayList<Component> toolbarPointComponents = new ArrayList<Component>();
+    protected ArrayList<Component> toolbarTrackComponents = new ArrayList<>();
+    protected ArrayList<Component> toolbarPointComponents = new ArrayList<>();
     protected TTrackTextLineLabel xLabel, yLabel, magLabel, angleLabel;
     protected JLabel tLabel, stepLabel, tValueLabel, stepValueLabel;
     protected NumberField tField, xField, yField, magField;
     protected DecimalField angleField;
     protected NumberField[] positionFields;
-    protected Map<String, NumberField[]> numberFields = new TreeMap<String, NumberField[]>();
+    protected Map<String, NumberField[]> numberFields = new TreeMap<>();
     protected Border fieldBorder;
     protected Component tSeparator, xSeparator, ySeparator, magSeparator,
             angleSeparator, stepSeparator;
@@ -117,7 +117,6 @@ public abstract class TTrack implements Interactive,
     protected JMenuItem descriptionItem;
     protected JMenuItem dataBuilderItem;
     protected JSpinner xSpinner, ySpinner;
-    protected Font labelFont = new Font("arial", Font.PLAIN, 12); //$NON-NLS-1$
     public TrackerPanel trackerPanel;
     protected XMLProperty dataProp;
     protected Object[][] constantsLoadedFromXML;
@@ -125,10 +124,10 @@ public abstract class TTrack implements Interactive,
     protected boolean dataValid; // true if data is valid
     protected boolean refreshDataLater;
     protected int[] preferredColumnOrder;
-    protected ArrayList<Integer> dataFrames = new ArrayList<Integer>();
+    protected ArrayList<Integer> dataFrames = new ArrayList<>();
     protected String partName, hint;
     protected int stepSizeWhenFirstMarked;
-    protected TreeSet<Integer> keyFrames = new TreeSet<Integer>();
+    protected TreeSet<Integer> keyFrames = new TreeSet<>();
     // for autotracking
     protected boolean autoTrackerMarking;
     protected int targetIndex;
@@ -136,12 +135,12 @@ public abstract class TTrack implements Interactive,
     protected TTrack[] attachments;
     protected String[] attachmentNames; // used when loading attachments
     // user-editable text columns shown in DataTable view
-    protected Map<String, String[]> textColumnEntries = new TreeMap<String, String[]>();
-    protected ArrayList<String> textColumnNames = new ArrayList<String>();
+    protected Map<String, String[]> textColumnEntries = new TreeMap<>();
+    protected ArrayList<String> textColumnNames = new ArrayList<>();
     // mouse listener for number fields
     protected MouseAdapter formatMouseListener, formatAngleMouseListener;
     protected String[] customNumberFormats;
-    private int ID; // unique ID number
+    private final int ID; // unique ID number
 
     // For autoskipping while autotracking
     public boolean skippedStepWarningSuppress = false;
@@ -192,7 +191,9 @@ public abstract class TTrack implements Interactive,
                         if (numberFields.get(name)[0] == field) {
                             fieldName = new String[]{name};
                             String s = NumberFormatDialog.getVariableDimensions(TTrack.this.getClass(), name);
-                            hasUnits = s.contains("L") || s.contains("M") || s.contains("T"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                            if (s != null) {
+                                hasUnits = s.contains("L") || s.contains("M") || s.contains("T"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                            }
                             break;
                         }
                     }
@@ -203,11 +204,9 @@ public abstract class TTrack implements Interactive,
                         if (trackerPanel.isEnabled("number.formats")) { //$NON-NLS-1$
                             JMenuItem item = new JMenuItem();
                             final String[] selected = fieldName;
-                            item.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent e) {
-                                    NumberFormatDialog dialog = NumberFormatDialog.getNumberFormatDialog(trackerPanel, TTrack.this, selected);
-                                    dialog.setVisible(true);
-                                }
+                            item.addActionListener(e14 -> {
+                                NumberFormatDialog dialog = NumberFormatDialog.getNumberFormatDialog(trackerPanel, TTrack.this, selected);
+                                dialog.setVisible(true);
                             });
                             item.setText(TrackerRes.getString("Popup.MenuItem.Formats") + "..."); //$NON-NLS-1$ //$NON-NLS-2$
                             numberMenu.add(item);
@@ -215,11 +214,9 @@ public abstract class TTrack implements Interactive,
 
                         if (hasUnits && trackerPanel.isEnabled("number.units")) { //$NON-NLS-1$
                             JMenuItem item = new JMenuItem();
-                            item.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent e) {
-                                    UnitsDialog dialog = trackerPanel.getUnitsDialog();
-                                    dialog.setVisible(true);
-                                }
+                            item.addActionListener(e12 -> {
+                                UnitsDialog dialog = trackerPanel.getUnitsDialog();
+                                dialog.setVisible(true);
                             });
                             item.setText(TrackerRes.getString("Popup.MenuItem.Units") + "..."); //$NON-NLS-1$ //$NON-NLS-2$
                             numberMenu.add(item);
@@ -230,11 +227,7 @@ public abstract class TTrack implements Interactive,
                     if (hasLengthUnit && hasMassUnit) {
                         JMenuItem item = new JMenuItem();
                         final boolean vis = trackerPanel.isUnitsVisible();
-                        item.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
-                                trackerPanel.setUnitsVisible(!vis);
-                            }
-                        });
+                        item.addActionListener(e15 -> trackerPanel.setUnitsVisible(!vis));
                         item.setText(vis ? TrackerRes.getString("TTrack.MenuItem.HideUnits") : //$NON-NLS-1$
                                 TrackerRes.getString("TTrack.MenuItem.ShowUnits")); //$NON-NLS-1$
                         if (popup.getComponentCount() > 0) popup.addSeparator();
@@ -253,7 +246,7 @@ public abstract class TTrack implements Interactive,
                     NumberField field = e == null ? angleField : (NumberField) e.getSource();
                     String fieldName = null;
                     for (String name : getNumberFields().keySet()) {
-                        if (numberFields.get(name)[0] == e.getSource()) {
+                        if (e != null && numberFields.get(name)[0] == e.getSource()) {
                             fieldName = name;
                             break;
                         }
@@ -261,11 +254,9 @@ public abstract class TTrack implements Interactive,
                     JPopupMenu popup = new JPopupMenu();
                     JMenuItem item = new JMenuItem();
                     final boolean radians = field.getConversionFactor() == 1;
-                    item.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            TFrame frame = trackerPanel.getTFrame();
-                            frame.setAnglesInRadians(!radians);
-                        }
+                    item.addActionListener(e13 -> {
+                        TFrame frame = trackerPanel.getTFrame();
+                        frame.setAnglesInRadians(!radians);
                     });
                     item.setText(radians ?
                             TrackerRes.getString("TTrack.AngleField.Popup.Degrees") : //$NON-NLS-1$
@@ -276,11 +267,9 @@ public abstract class TTrack implements Interactive,
                     if (trackerPanel.isEnabled("number.formats")) { //$NON-NLS-1$
                         item = new JMenuItem();
                         final String[] selected = new String[]{fieldName};
-                        item.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
-                                NumberFormatDialog dialog = NumberFormatDialog.getNumberFormatDialog(trackerPanel, TTrack.this, selected);
-                                dialog.setVisible(true);
-                            }
+                        item.addActionListener(e1 -> {
+                            NumberFormatDialog dialog = NumberFormatDialog.getNumberFormatDialog(trackerPanel, TTrack.this, selected);
+                            dialog.setVisible(true);
                         });
                         item.setText(TrackerRes.getString("TTrack.MenuItem.NumberFormat")); //$NON-NLS-1$
                         popup.add(item);
@@ -332,137 +321,97 @@ public abstract class TTrack implements Interactive,
         deleteStepItem = new JMenuItem();
         clearStepsItem = new JMenuItem();
         colorItem = new JMenuItem();
-        colorItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Color color = getColor();
-                Color newColor = chooseColor(color, TrackerRes.getString("TTrack.Dialog.Color.Title")); //$NON-NLS-1$
-                if (newColor != color) {
-                    XMLControl control = new XMLControlElement(new TrackProperties(TTrack.this));
-                    setColor(newColor);
-                    Undo.postTrackDisplayEdit(TTrack.this, control);
-                }
+        colorItem.addActionListener(e -> {
+            Color color = getColor();
+            Color newColor = chooseColor(color, TrackerRes.getString("TTrack.Dialog.Color.Title")); //$NON-NLS-1$
+            if (newColor != color) {
+                XMLControl control = new XMLControlElement(new TrackProperties(TTrack.this));
+                setColor(newColor);
+                Undo.postTrackDisplayEdit(TTrack.this, control);
             }
         });
 
         nameItem = new JMenuItem();
-        nameItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                getNameDialog(TTrack.this).setVisible(true);
-            }
-        });
+        nameItem.addActionListener(e -> getNameDialog(TTrack.this).setVisible(true));
         footprintMenu = new JMenu();
         descriptionItem = new JMenuItem();
-        descriptionItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (trackerPanel != null) {
-                    TFrame frame = trackerPanel.getTFrame();
-                    if (frame != null) {
-                        if (frame.notesDialog.isVisible()) {
-                            frame.notesDialog.setVisible(true);
-                        } else frame.getToolBar(trackerPanel).notesButton.doClick();
-                    }
+        descriptionItem.addActionListener(e -> {
+            if (trackerPanel != null) {
+                TFrame frame = trackerPanel.getTFrame();
+                if (frame != null) {
+                    if (frame.notesDialog.isVisible()) {
+                        frame.notesDialog.setVisible(true);
+                    } else frame.getToolBar(trackerPanel).notesButton.doClick();
                 }
             }
         });
         dataBuilderItem = new JMenuItem();
-        dataBuilderItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (trackerPanel != null) {
-                    trackerPanel.getDataBuilder().setSelectedPanel(getName());
-                    trackerPanel.getDataBuilder().setVisible(true);
-                }
+        dataBuilderItem.addActionListener(e -> {
+            if (trackerPanel != null) {
+                trackerPanel.getDataBuilder().setSelectedPanel(getName());
+                trackerPanel.getDataBuilder().setVisible(true);
             }
         });
-        visibleItem.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                setVisible(visibleItem.isSelected());
-                TTrack.this.repaint();
-            }
+        visibleItem.addItemListener(e -> {
+            setVisible(visibleItem.isSelected());
+            TTrack.this.repaint();
         });
-        trailVisibleItem.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                setTrailVisible(trailVisibleItem.isSelected());
-                if (!TTrack.this.isTrailVisible()) {
-                    // clear selected point on panels if nec
-                    Iterator<TrackerPanel> it = panels.iterator();
-                    TrackerPanel panel;
-                    while (it.hasNext()) {
-                        panel = it.next();
-                        Step step = panel.getSelectedStep();
-                        if (step != null && step.getTrack() == TTrack.this) {
-                            if (!(step.getFrameNumber() == panel.getFrameNumber())) {
-                                panel.setSelectedPoint(null);
-                                panel.selectedSteps.clear();
-                            }
+        trailVisibleItem.addItemListener(e -> {
+            setTrailVisible(trailVisibleItem.isSelected());
+            if (!TTrack.this.isTrailVisible()) {
+                // clear selected point on panels if nec
+                Iterator<TrackerPanel> it = panels.iterator();
+                TrackerPanel panel;
+                while (it.hasNext()) {
+                    panel = it.next();
+                    Step step = panel.getSelectedStep();
+                    if (step != null && step.getTrack() == TTrack.this) {
+                        if (!(step.getFrameNumber() == panel.getFrameNumber())) {
+                            panel.setSelectedPoint(null);
+                            panel.selectedSteps.clear();
                         }
                     }
                 }
-                TTrack.this.repaint();
             }
+            TTrack.this.repaint();
         });
-        markByDefaultItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setMarkByDefault(markByDefaultItem.isSelected());
+        markByDefaultItem.addActionListener(e -> setMarkByDefault(markByDefaultItem.isSelected()));
+        autoAdvanceItem.addActionListener(e -> setAutoAdvance(autoAdvanceItem.isSelected()));
+        lockedItem.addActionListener(e -> setLocked(lockedItem.isSelected()));
+        deleteTrackItem.addActionListener(e -> delete());
+        deleteStepItem.addActionListener(e -> trackerPanel.deletePoint(trackerPanel.getSelectedPoint()));
+        clearStepsItem.addActionListener(e -> {
+            if (isLocked()) return;
+            XMLControl control = new XMLControlElement(TTrack.this);
+            for (int n = 0; n < getSteps().length; n++) {
+                steps.setStep(n, null);
             }
+            for (String columnName : textColumnNames) {
+                textColumnEntries.put(columnName, new String[0]);
+            }
+            Undo.postTrackEdit(TTrack.this, control);
+            if (TTrack.this instanceof PointMass) {
+                PointMass p = (PointMass) TTrack.this;
+                p.updateDerivatives();
+            }
+            AutoTracker autoTracker = trackerPanel.getAutoTracker();
+            if (autoTracker.getTrack() == TTrack.this)
+                autoTracker.reset();
+            autoTracker.getWizard().setVisible(false);
+            firePropertyChange("steps", null, null); //$NON-NLS-1$
+            trackerPanel.repaint();
         });
-        autoAdvanceItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setAutoAdvance(autoAdvanceItem.isSelected());
-            }
-        });
-        lockedItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setLocked(lockedItem.isSelected());
-            }
-        });
-        deleteTrackItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                delete();
-            }
-        });
-        deleteStepItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                trackerPanel.deletePoint(trackerPanel.getSelectedPoint());
-            }
-        });
-        clearStepsItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (isLocked()) return;
-                XMLControl control = new XMLControlElement(TTrack.this);
-                for (int n = 0; n < getSteps().length; n++) {
-                    steps.setStep(n, null);
-                }
-                for (String columnName : textColumnNames) {
-                    textColumnEntries.put(columnName, new String[0]);
-                }
-                Undo.postTrackEdit(TTrack.this, control);
-                if (TTrack.this instanceof PointMass) {
-                    PointMass p = (PointMass) TTrack.this;
-                    p.updateDerivatives();
-                }
-                AutoTracker autoTracker = trackerPanel.getAutoTracker();
-                if (autoTracker.getTrack() == TTrack.this)
-                    autoTracker.reset();
-                autoTracker.getWizard().setVisible(false);
-                firePropertyChange("steps", null, null); //$NON-NLS-1$
-                trackerPanel.repaint();
-            }
-        });
-        footprintListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String footprintName = e.getActionCommand();
-                if (getFootprint().getName().equals(footprintName)) return;
-                XMLControl control = new XMLControlElement(new TrackProperties(TTrack.this));
-                setFootprint(footprintName);
-                Undo.postTrackDisplayEdit(TTrack.this, control);
-            }
+        footprintListener = e -> {
+            String footprintName = e.getActionCommand();
+            if (getFootprint().getName().equals(footprintName)) return;
+            XMLControl control = new XMLControlElement(new TrackProperties(TTrack.this));
+            setFootprint(footprintName);
+            Undo.postTrackDisplayEdit(TTrack.this, control);
         };
-        circleFootprintListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                footprintListener.actionPerformed(e);
-                CircleFootprint cfp = (CircleFootprint) getFootprint();
-                cfp.showProperties(TTrack.this);
-            }
+        circleFootprintListener = e -> {
+            footprintListener.actionPerformed(e);
+            CircleFootprint cfp = (CircleFootprint) getFootprint();
+            cfp.showProperties(TTrack.this);
         };
 
     }
@@ -473,9 +422,9 @@ public abstract class TTrack implements Interactive,
      * @param visible <code>true</code> to show this track
      */
     public void setVisible(boolean visible) {
-        Boolean prev = new Boolean(this.visible);
+        Boolean prev = this.visible;
         this.visible = visible;
-        support.firePropertyChange("visible", prev, new Boolean(visible)); //$NON-NLS-1$
+        support.firePropertyChange("visible", prev, Boolean.valueOf(visible)); //$NON-NLS-1$
         if (trackerPanel != null) trackerPanel.repaint();
     }
 
@@ -510,9 +459,7 @@ public abstract class TTrack implements Interactive,
         if (postEdit) {
             Undo.postTrackDelete(this); // posts undoable edit
         }
-        Iterator<TrackerPanel> it = panels.iterator();
-        while (it.hasNext()) {
-            TrackerPanel panel = it.next();
+        for (TrackerPanel panel : panels) {
             panel.removeTrack(this);
         }
         erase();
@@ -573,7 +520,7 @@ public abstract class TTrack implements Interactive,
      */
     public void setLocked(boolean locked) {
         this.locked = locked;
-        support.firePropertyChange("locked", null, new Boolean(locked)); //$NON-NLS-1$
+        support.firePropertyChange("locked", null, locked); //$NON-NLS-1$
     }
 
     /**
@@ -641,8 +588,7 @@ public abstract class TTrack implements Interactive,
      */
     public void setColor(Color color) {
         if (color == null) color = defaultColors[0];
-        for (int i = 0; i < footprints.length; i++)
-            footprints[i].setColor(color);
+        for (Footprint value : footprints) value.setColor(color);
         erase();
         if (trackerPanel != null) {
             trackerPanel.changed = true;
@@ -695,11 +641,7 @@ public abstract class TTrack implements Interactive,
     public Color chooseColor(final Color color, String title) {
         final JColorChooser chooser = new JColorChooser();
         chooser.setColor(color);
-        ActionListener cancelListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                chooser.setColor(color);
-            }
-        };
+        ActionListener cancelListener = e -> chooser.setColor(color);
         JDialog dialog = JColorChooser.createDialog(null, title, true,
                 chooser, null, cancelListener);
         FontSizer.setFonts(dialog, FontSizer.getLevel());
@@ -843,11 +785,11 @@ public abstract class TTrack implements Interactive,
      * @param choices the array of Footprints available to this track
      */
     public void setFootprints(Footprint[] choices) {
-        Collection<Footprint> valid = new ArrayList<Footprint>();
-        for (int i = 0; i < choices.length; i++) {
-            if (choices[i] != null && choices[i].getLength() <= getFootprintLength()) {
-                if (getFootprint() != null) choices[i].setColor(getColor());
-                valid.add(choices[i]);
+        Collection<Footprint> valid = new ArrayList<>();
+        for (Footprint choice : choices) {
+            if (choice != null && choice.getLength() <= getFootprintLength()) {
+                if (getFootprint() != null) choice.setColor(getColor());
+                valid.add(choice);
             }
         }
         if (valid.size() > 0) {
@@ -889,20 +831,6 @@ public abstract class TTrack implements Interactive,
     }
 
     /**
-     * Adds a new footprint to the current choices.
-     *
-     * @param footprint the footprint
-     */
-    public void addFootprint(Footprint footprint) {
-        if (footprint.getLength() == getFootprintLength()) {
-            Footprint[] prints = new Footprint[footprints.length + 1];
-            System.arraycopy(footprints, 0, prints, 0, footprints.length);
-            prints[footprints.length] = footprint;
-            footprints = prints;
-        }
-    }
-
-    /**
      * Sets the footprint to the specified choice.
      *
      * @param name the name of the desired footprint
@@ -914,16 +842,16 @@ public abstract class TTrack implements Interactive,
             props = name.substring(n + 1);
             name = name.substring(0, n);
         }
-        for (int i = 0; i < footprints.length; i++) {
-            if (name.equals(footprints[i].getName())) {
-                footprint = footprints[i];
+        for (Footprint value : footprints) {
+            if (name.equals(value.getName())) {
+                footprint = value;
                 if (footprint instanceof CircleFootprint) {
                     ((CircleFootprint) footprint).setProperties(props);
                 }
                 Step[] stepArray = steps.array;
-                for (int j = 0; j < stepArray.length; j++)
-                    if (stepArray[j] != null)
-                        stepArray[j].setFootprint(footprint);
+                for (Step step : stepArray)
+                    if (step != null)
+                        step.setFootprint(footprint);
                 repaint();
                 if (trackerPanel != null) {
                     trackerPanel.changed = true;
@@ -996,7 +924,6 @@ public abstract class TTrack implements Interactive,
      *
      * @param w       the icon width
      * @param h       the icon height
-     * @param context
      * @return the icon
      */
     public Icon getIcon(int w, int h, String context) {
@@ -1046,7 +973,7 @@ public abstract class TTrack implements Interactive,
                 }
             }
             Undo.postTrackEdit(this, control);
-            support.firePropertyChange("step", null, new Integer(n)); //$NON-NLS-1$
+            support.firePropertyChange("step", null, n); //$NON-NLS-1$
         }
         return step;
     }
@@ -1071,20 +998,20 @@ public abstract class TTrack implements Interactive,
     public Step getNextVisibleStep(Step step, TrackerPanel trackerPanel) {
         Step[] steps = getSteps();
         boolean found = false;
-        for (int i = 0; i < steps.length; i++) {
+        for (Step value : steps) {
             // return first step after found
-            if (found && steps[i] != null &&
-                    isStepVisible(steps[i], trackerPanel)) return steps[i];
+            if (found && value != null &&
+                    isStepVisible(value, trackerPanel)) return value;
             // find specified step
-            if (steps[i] == step) found = true;
+            if (value == step) found = true;
         }
         // cycle back to beginning if next step not yet identified
         if (found) {
-            for (int i = 0; i < steps.length; i++) {
+            for (Step value : steps) {
                 // return first visible step
-                if (steps[i] != null && steps[i] != step &&
-                        isStepVisible(steps[i], trackerPanel))
-                    return steps[i];
+                if (value != null && value != step &&
+                        isStepVisible(value, trackerPanel))
+                    return value;
             }
         }
         return null;
@@ -1129,11 +1056,10 @@ public abstract class TTrack implements Interactive,
     public Step getStep(TPoint point, TrackerPanel trackerPanel) {
         if (point == null) return null;
         Step[] stepArray = steps.array;
-        for (int j = 0; j < stepArray.length; j++)
-            if (stepArray[j] != null) {
-                TPoint[] points = stepArray[j].getPoints();
-                for (int i = 0; i < points.length; i++)
-                    if (points[i] == point) return stepArray[j];
+        for (Step step : stepArray)
+            if (step != null) {
+                TPoint[] points = step.getPoints();
+                for (TPoint tPoint : points) if (tPoint == point) return step;
             }
         return null;
     }
@@ -1264,8 +1190,7 @@ public abstract class TTrack implements Interactive,
      */
     public boolean isEmpty() {
         Step[] array = steps.array;
-        for (int n = 0; n < array.length; n++)
-            if (array[n] != null) return false;
+        for (Step step : array) if (step != null) return false;
         return true;
     }
 
@@ -1312,36 +1237,36 @@ public abstract class TTrack implements Interactive,
             if (dataProp != null) {
                 XMLControl[] children = dataProp.getChildControls();
                 outer:
-                for (int i = 0; i < children.length; i++) {
+                for (XMLControl child : children) {
                     // compare function name with existing datasets to avoid duplications
-                    String name = children[i].getString("function_name"); //$NON-NLS-1$
+                    String name = child.getString("function_name"); //$NON-NLS-1$
                     for (Dataset next : data.getDatasets()) {
                         if (next instanceof DataFunction && next.getYColumnName().equals(name)) {
                             continue outer;
                         }
                     }
                     DataFunction f = new DataFunction(data);
-                    children[i].loadObject(f);
+                    child.loadObject(f);
                     f.setXColumnVisible(false);
                     data.addDataset(f);
                 }
                 dataProp = null;
             }
             if (constantsLoadedFromXML != null) {
-                for (int i = 0; i < constantsLoadedFromXML.length; i++) {
-                    String name = (String) constantsLoadedFromXML[i][0];
-                    double val = (Double) constantsLoadedFromXML[i][1];
-                    String expression = (String) constantsLoadedFromXML[i][2];
-                    String desc = constantsLoadedFromXML[i].length < 4 ? null : (String) constantsLoadedFromXML[i][3];
+                for (Object[] objects : constantsLoadedFromXML) {
+                    String name = (String) objects[0];
+                    double val = (Double) objects[1];
+                    String expression = (String) objects[2];
+                    String desc = objects.length < 4 ? null : (String) objects[3];
                     data.setConstant(name, val, expression, desc);
                 }
                 constantsLoadedFromXML = null;
             }
             // refresh dataFunctions
             ArrayList<Dataset> datasets = data.getDatasets();
-            for (int i = 0; i < datasets.size(); i++) {
-                if (datasets.get(i) instanceof DataFunction) {
-                    ((DataFunction) datasets.get(i)).refreshFunctionData();
+            for (Dataset dataset : datasets) {
+                if (dataset instanceof DataFunction) {
+                    ((DataFunction) dataset).refreshFunctionData();
                 }
             }
             DataTool tool = DataTool.getTool();
@@ -1361,7 +1286,6 @@ public abstract class TTrack implements Interactive,
      * @param trackerPanel the tracker panel
      */
     protected void refreshData(DatasetManager data, TrackerPanel trackerPanel) {
-        /** empty block */
     }
 
     /**
@@ -1371,10 +1295,9 @@ public abstract class TTrack implements Interactive,
      * @param data         the DatasetManager
      * @param trackerPanel the tracker panel
      * @param startFrame   the start frame
-     * @param stepCount    the step count
      */
     protected void refreshData(DatasetManager data, TrackerPanel trackerPanel,
-                               int startFrame, int stepCount) {
+                               int startFrame) {
         refreshData(data, trackerPanel);
     }
 
@@ -1424,14 +1347,14 @@ public abstract class TTrack implements Interactive,
      * @return a list of column indices in preferred order
      */
     public ArrayList<Integer> getPreferredDataOrder() {
-        ArrayList<Integer> orderedData = new ArrayList<Integer>();
+        ArrayList<Integer> orderedData = new ArrayList<>();
         ArrayList<Dataset> datasets = data.getDatasets();
         if (preferredColumnOrder != null) {
             // first add preferred indices
-            for (int i = 0; i < preferredColumnOrder.length; i++) {
-                if (!orderedData.contains(preferredColumnOrder[i]) // prevent duplicates
-                        && preferredColumnOrder[i] < datasets.size()) // prevent invalid indices
-                    orderedData.add(preferredColumnOrder[i]);
+            for (int j : preferredColumnOrder) {
+                if (!orderedData.contains(j) // prevent duplicates
+                        && j < datasets.size()) // prevent invalid indices
+                    orderedData.add(j);
             }
         }
         // add indices not yet in array
@@ -1460,7 +1383,7 @@ public abstract class TTrack implements Interactive,
             double[] vals = dataset.getXPoints();
             for (int i = 0; i < vals.length; i++) {
                 if (xyValues[0] == vals[i]) {
-                    return i < dataFrames.size() ? dataFrames.get(i).intValue() : -1;
+                    return i < dataFrames.size() ? dataFrames.get(i) : -1;
                 }
             }
         } else {
@@ -1472,7 +1395,7 @@ public abstract class TTrack implements Interactive,
                 for (int i = 0; i < xVals.length; i++) {
                     if (xyValues[0] == xVals[i]) {
                         // found matching value
-                        int frame = i < dataFrames.size() ? dataFrames.get(i).intValue() : -1;
+                        int frame = i < dataFrames.size() ? dataFrames.get(i) : -1;
                         // if yVar value is given, verify it matches as well
                         if (yVar != null && xyValues.length > 1) {
                             n = data.getDatasetIndex(yVar);
@@ -1553,11 +1476,7 @@ public abstract class TTrack implements Interactive,
         if (CoordAxes.class.isAssignableFrom(trackType)) {
             vars = CoordAxes.dataVariables;
         }
-        ArrayList<String> list = new ArrayList<String>();
-        for (String var : vars) {
-            list.add(var);
-        }
-        return list;
+        return new ArrayList<>(Arrays.asList(vars));
     }
 
     /**
@@ -1597,10 +1516,8 @@ public abstract class TTrack implements Interactive,
         if (CoordAxes.class.isAssignableFrom(trackType)) {
             vars = CoordAxes.dataVariables; // not an error--same variables
         }
-        ArrayList<String> list = new ArrayList<String>();
-        for (String var : vars) {
-            list.add(var);
-        }
+        ArrayList<String> list = new ArrayList<>();
+        Collections.addAll(list, vars);
         return list;
     }
 
@@ -1610,8 +1527,7 @@ public abstract class TTrack implements Interactive,
      * @return an ArrayList of names. May be empty.
      */
     protected static ArrayList<String> getAllVariables(Class<? extends TTrack> trackType) {
-        ArrayList<String> list = new ArrayList<String>();
-        list.addAll(getDataVariables(trackType));
+        ArrayList<String> list = new ArrayList<>(getDataVariables(trackType));
         for (String next : getNumberFieldVariables(trackType)) {
             if (!list.contains(next)) {
                 list.add(next);
@@ -1695,7 +1611,7 @@ public abstract class TTrack implements Interactive,
         if (CoordAxes.class.isAssignableFrom(trackType)) {
             return CoordAxes.formatMap;
         }
-        return new HashMap<String, ArrayList<String>>();
+        return new HashMap<>();
     }
 
     /**
@@ -1743,7 +1659,7 @@ public abstract class TTrack implements Interactive,
         if (CoordAxes.class.isAssignableFrom(trackType)) {
             return CoordAxes.formatDescriptionMap;
         }
-        return new HashMap<String, String>();
+        return new HashMap<>();
     }
 
     /**
@@ -1759,14 +1675,13 @@ public abstract class TTrack implements Interactive,
      * Adds a new text column.
      *
      * @param name the name
-     * @return true if a new column was added
      */
-    public boolean addTextColumn(String name) {
+    public void addTextColumn(String name) {
         // only add new, non-null names
-        if (name == null || name.trim().equals("")) return false; //$NON-NLS-1$
+        if (name == null || name.trim().equals("")) return; //$NON-NLS-1$
         name = name.trim();
         for (String next : textColumnNames) {
-            if (next.equals(name)) return false;
+            if (next.equals(name)) return;
         }
         XMLControl control = new XMLControlElement(this);
         textColumnNames.add(name);
@@ -1774,7 +1689,6 @@ public abstract class TTrack implements Interactive,
         Undo.postTrackEdit(this, control);
         trackerPanel.changed = true;
         this.firePropertyChange("text_column", null, name); //$NON-NLS-1$
-        return true;
     }
 
     /**
@@ -1878,7 +1792,7 @@ public abstract class TTrack implements Interactive,
         }
 
         String prev = entries[frameNumber];
-        if (prev == text || (prev != null && prev.equals(text))) return false;
+        if (prev.equals(text)) return false;
         // change text entry and fire property change
         entries[frameNumber] = text;
         Undo.postTrackEdit(this, control);
@@ -1941,15 +1855,13 @@ public abstract class TTrack implements Interactive,
      */
     protected void refreshAttachmentsLater() {
         // use timer with 2 second delay
-        Timer timer = new Timer(2000, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // save changed state
-                boolean changed = trackerPanel != null && trackerPanel.changed;
-                refreshAttachments();
-                if (trackerPanel != null) {
-                    // restore changed state
-                    trackerPanel.changed = changed;
-                }
+        Timer timer = new Timer(2000, e -> {
+            // save changed state
+            boolean changed = trackerPanel != null && trackerPanel.changed;
+            refreshAttachments();
+            if (trackerPanel != null) {
+                // restore changed state
+                trackerPanel.changed = changed;
             }
         });
         timer.setRepeats(false);
@@ -1964,8 +1876,8 @@ public abstract class TTrack implements Interactive,
 
         // unfix the track if it has attachments
         boolean hasAttachments = false;
-        for (int i = 0; i < attachments.length; i++) {
-            hasAttachments = hasAttachments || attachments[i] != null;
+        for (TTrack attachment : attachments) {
+            hasAttachments = hasAttachments || attachment != null;
         }
         if (hasAttachments) {
             if (this instanceof TapeMeasure) {
@@ -2053,16 +1965,16 @@ public abstract class TTrack implements Interactive,
         footprintMenu.removeAll();
         Footprint[] fp = getFootprints();
         JMenuItem item;
-        for (int i = 0; i < fp.length; i++) {
-            item = new JMenuItem(fp[i].getDisplayName(), fp[i].getIcon(21, 16));
-            item.setActionCommand(fp[i].getName());
-            if (fp[i] instanceof CircleFootprint) {
-                item.setText(fp[i].getDisplayName() + "..."); //$NON-NLS-1$
+        for (Footprint value : fp) {
+            item = new JMenuItem(value.getDisplayName(), value.getIcon(21, 16));
+            item.setActionCommand(value.getName());
+            if (value instanceof CircleFootprint) {
+                item.setText(value.getDisplayName() + "..."); //$NON-NLS-1$
                 item.addActionListener(circleFootprintListener);
             } else {
                 item.addActionListener(footprintListener);
             }
-            if (fp[i] == footprint) {
+            if (value == footprint) {
                 item.setBorder(BorderFactory.createLineBorder(item.getBackground().darker()));
             }
             footprintMenu.add(item);
@@ -2129,8 +2041,8 @@ public abstract class TTrack implements Interactive,
             tooltip = TrackerRes.getString("TTrack.NumberField.Format.Tooltip.OSX"); //$NON-NLS-1$
         }
         for (NumberField[] fields : getNumberFields().values()) {
-            for (int i = 0; i < fields.length; i++) {
-                fields[i].setToolTipText(tooltip);
+            for (NumberField field : fields) {
+                field.setToolTipText(tooltip);
             }
         }
         tField.setUnits(trackerPanel.getUnits(this, "t")); //$NON-NLS-1$
@@ -2173,8 +2085,7 @@ public abstract class TTrack implements Interactive,
      */
     public void erase() {
         Step[] stepArray = steps.array;
-        for (int j = 0; j < stepArray.length; j++)
-            if (stepArray[j] != null) stepArray[j].erase();
+        for (Step step : stepArray) if (step != null) step.erase();
         if (trackerPanel != null && trackerPanel.autoTracker != null) {
             AutoTracker autoTracker = trackerPanel.getAutoTracker();
             if (autoTracker.getWizard().isVisible()
@@ -2189,8 +2100,7 @@ public abstract class TTrack implements Interactive,
      */
     public void remark() {
         Step[] stepArray = steps.array;
-        for (int j = 0; j < stepArray.length; j++)
-            if (stepArray[j] != null) stepArray[j].remark();
+        for (Step step : stepArray) if (step != null) step.remark();
     }
 
     /**
@@ -2210,8 +2120,7 @@ public abstract class TTrack implements Interactive,
      */
     public void erase(TrackerPanel trackerPanel) {
         Step[] stepArray = steps.array;
-        for (int j = 0; j < stepArray.length; j++)
-            if (stepArray[j] != null) stepArray[j].erase(trackerPanel);
+        for (Step step : stepArray) if (step != null) step.erase(trackerPanel);
         if (trackerPanel.autoTracker != null) {
             AutoTracker autoTracker = trackerPanel.getAutoTracker();
             if (autoTracker.getWizard().isVisible()
@@ -2228,8 +2137,7 @@ public abstract class TTrack implements Interactive,
      */
     public void remark(TrackerPanel trackerPanel) {
         Step[] stepArray = steps.array;
-        for (int j = 0; j < stepArray.length; j++)
-            if (stepArray[j] != null) stepArray[j].remark(trackerPanel);
+        for (Step step : stepArray) if (step != null) step.remark(trackerPanel);
     }
 
     /**
@@ -2251,9 +2159,7 @@ public abstract class TTrack implements Interactive,
      * @param step the step
      */
     public void repaint(Step step) {
-        Iterator<TrackerPanel> it = panels.iterator();
-        while (it.hasNext())
-            step.repaint(it.next());
+        for (TrackerPanel panel : panels) step.repaint(panel);
     }
 
     /**
@@ -2300,7 +2206,7 @@ public abstract class TTrack implements Interactive,
             DrawingPanel panel, int xpix, int ypix) {
         if (!(panel instanceof TrackerPanel) || !visible) return null;
         TrackerPanel trackerPanel = (TrackerPanel) panel;
-        Interactive iad = null;
+        Interactive iad;
         int n = trackerPanel.getFrameNumber();
         int stepSize = trackerPanel.getPlayer().getVideoClip().getStepSize();
         if (trailVisible) {
@@ -2320,7 +2226,7 @@ public abstract class TTrack implements Interactive,
             if (step != null &&
                     trackerPanel.getPlayer().getVideoClip().includesFrame(n)) {
                 iad = step.findInteractive(trackerPanel, xpix, ypix);
-                if (iad != null) return iad;
+                return iad;
             }
         }
         return null;
@@ -2350,14 +2256,16 @@ public abstract class TTrack implements Interactive,
      *
      * @param x the x position
      */
-    public void setX(double x) {/** implemented by subclasses */}
+    public void setX(double x) {
+    }
 
     /**
      * Empty setY method.
      *
      * @param y the y position
      */
-    public void setY(double y) {/** implemented by subclasses */}
+    public void setY(double y) {
+    }
 
     /**
      * Empty setXY method.
@@ -2365,7 +2273,8 @@ public abstract class TTrack implements Interactive,
      * @param x the x position
      * @param y the y position
      */
-    public void setXY(double x, double y) {/** implemented by subclasses */}
+    public void setXY(double x, double y) {
+    }
 
     /**
      * Sets whether this responds to mouse hits.
@@ -2512,22 +2421,29 @@ public abstract class TTrack implements Interactive,
         String name = e.getPropertyName();
         if (e.getSource() instanceof TrackerPanel) {
             TrackerPanel trackerPanel = (TrackerPanel) e.getSource();
-            if (name.equals("transform") //$NON-NLS-1$
-                    || name.equals("coords")) { //$NON-NLS-1$
-                if (!(this instanceof PointMass)) {
+            switch (name) {
+                case "transform":
+                case "coords":  //$NON-NLS-1$
+                    if (!(this instanceof PointMass)) {
+                        dataValid = false;
+                    }
+                    erase();
+                    trackerPanel.repaint();
+                    break;
+                case "magnification":  //$NON-NLS-1$
+                    erase();
+                    trackerPanel.repaint();
+                    break;
+                case "imagespace":
+//$NON-NLS-1$
+                    erase(trackerPanel);
+                    break;
+                case "data":  //$NON-NLS-1$
                     dataValid = false;
-                }
-                erase();
-                trackerPanel.repaint();
-            } else if (name.equals("magnification")) { //$NON-NLS-1$
-                erase();
-                trackerPanel.repaint();
-            } else if (name.equals("imagespace")) //$NON-NLS-1$
-                erase(trackerPanel);
-            else if (name.equals("data")) { //$NON-NLS-1$
-                dataValid = false;
-            } else if (name.equals("radian_angles")) { // angle format has changed //$NON-NLS-1$
-                setAnglesInRadians((Boolean) e.getNewValue());
+                    break;
+                case "radian_angles":  // angle format has changed //$NON-NLS-1$
+                    setAnglesInRadians((Boolean) e.getNewValue());
+                    break;
             }
         }
     }
@@ -2630,12 +2546,12 @@ public abstract class TTrack implements Interactive,
         bounds = new double[4];
         Rectangle2D rect = new Rectangle2D.Double();
         Step[] array = steps.array;
-        for (int n = 0; n < array.length; n++) {
-            if (array[n] != null) {
-                TPoint[] points = array[n].getPoints();
-                for (int i = 0; i < points.length; i++) {
-                    if (points[i] == null) continue;
-                    rect.add(points[i].getWorldPosition(panel));
+        for (Step step : array) {
+            if (step != null) {
+                TPoint[] points = step.getPoints();
+                for (TPoint tPoint : points) {
+                    if (tPoint == null) continue;
+                    rect.add(tPoint.getWorldPosition(panel));
                 }
             }
         }
@@ -2756,11 +2672,9 @@ public abstract class TTrack implements Interactive,
             skippedStepWarningCheckbox = new JCheckBox();
             skippedStepWarningCheckbox.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30));
             closeButton = new JButton();
-            closeButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    skippedStepWarningOn = !skippedStepWarningCheckbox.isSelected();
-                    skippedStepWarningDialog.setVisible(false);
-                }
+            closeButton.addActionListener(e -> {
+                skippedStepWarningOn = !skippedStepWarningCheckbox.isSelected();
+                skippedStepWarningDialog.setVisible(false);
             });
             JPanel buttonbar = new JPanel();
             buttonbar.add(skippedStepWarningCheckbox);
@@ -2947,7 +2861,7 @@ public abstract class TTrack implements Interactive,
             if (track.trackerPanel != null) {
                 DatasetManager data = track.getData(track.trackerPanel);
                 Iterator<Dataset> it = data.getDatasets().iterator();
-                ArrayList<Dataset> list = new ArrayList<Dataset>();
+                ArrayList<Dataset> list = new ArrayList<>();
                 while (it.hasNext()) {
                     Dataset dataset = it.next();
                     if (dataset instanceof DataFunction) {
@@ -2968,7 +2882,7 @@ public abstract class TTrack implements Interactive,
                         }
                         control.setValue("constants", paramArray); //$NON-NLS-1$
                     }
-                    DataFunction[] f = list.toArray(new DataFunction[0]);
+                    DataFunction[] f = (DataFunction[]) list.toArray(new Dataset[0]);
                     control.setValue("data_functions", f); //$NON-NLS-1$
                 }
             }
@@ -3037,9 +2951,8 @@ public abstract class TTrack implements Interactive,
             }
             // data functions and constants
             track.constantsLoadedFromXML = (Object[][]) control.getObject("constants"); //$NON-NLS-1$
-            Iterator<Object> it = control.getPropertyContent().iterator();
-            while (it.hasNext()) {
-                XMLProperty prop = (XMLProperty) it.next();
+            for (Object o : control.getPropertyContent()) {
+                XMLProperty prop = (XMLProperty) o;
                 if (prop.getPropertyName().equals("data_functions")) { //$NON-NLS-1$
                     track.dataProp = prop;
                 }
@@ -3064,7 +2977,9 @@ public abstract class TTrack implements Interactive,
             nameDialog.setLocation(x, y);
         }
         // prepare dialog
-        nameDialog.setTrack(track);
+        if (nameDialog != null) {
+            nameDialog.setTrack(track);
+        }
         return nameDialog;
     }
 

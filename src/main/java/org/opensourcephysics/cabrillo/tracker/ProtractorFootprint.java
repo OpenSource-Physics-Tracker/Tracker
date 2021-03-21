@@ -48,22 +48,22 @@ import org.opensourcephysics.tools.FontSizer;
 public class ProtractorFootprint implements Footprint, Cloneable {
 
 	// static constants
-  @SuppressWarnings("javadoc")
-	public static final float[] DOTTED_LINE = new float[] {1, 6};
+  public static final float[] DOTTED_LINE = new float[] {1, 6};
 	public static final float[] STIPPLED_LINE = new float[] {2, 2};
   private static final ProtractorFootprint CIRCLE_3, CIRCLE_5, 
   		CIRCLE_3_BOLD, CIRCLE_5_BOLD;
 
 	// static fields
   protected static int arcRadius = 24;
-  private static Collection<ProtractorFootprint> footprints 
-			= new HashSet<ProtractorFootprint>();
-  private static Shape hitShape = new Ellipse2D.Double(-6, -6, 12, 12);
-  private static Shape arrowhead;
-  private static Line2D line1 = new Line2D.Double(), line2 = new Line2D.Double();
-  private static Point p = new Point();
-  private static AffineTransform transform = new AffineTransform();
-  private static Arc2D arc = new Arc2D.Double(-arcRadius, -arcRadius, 
+  private static final Collection<ProtractorFootprint> footprints
+			= new HashSet<>();
+  private static final Shape hitShape = new Ellipse2D.Double(-6, -6, 12, 12);
+  private static final Shape arrowhead;
+  private static final Line2D line1 = new Line2D.Double();
+    private static final Line2D line2 = new Line2D.Double();
+  private static final Point p = new Point();
+  private static final AffineTransform transform = new AffineTransform();
+  private static final Arc2D arc = new Arc2D.Double(-arcRadius, -arcRadius,
   		2*arcRadius, 2*arcRadius, 0, 0, Arc2D.OPEN);
 
   // instance fields
@@ -422,7 +422,7 @@ public class ProtractorFootprint implements Footprint, Cloneable {
    */
   public static Footprint getFootprint(String name) {
     for (ProtractorFootprint footprint: footprints) {
-      if (name == footprint.getName()) try {
+      if (name.equals(footprint.getName())) try {
         return (ProtractorFootprint)footprint.clone();
       } catch(CloneNotSupportedException ex) {ex.printStackTrace();}
     }

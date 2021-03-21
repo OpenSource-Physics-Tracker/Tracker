@@ -53,7 +53,7 @@ public class WorldTView extends TrackerPanel implements TView {
   protected JMenuItem printItem;
   protected JMenuItem helpItem;
   protected JButton worldViewButton;
-  protected ArrayList<Component> toolbarComponents = new ArrayList<Component>();
+  protected ArrayList<Component> toolbarComponents = new ArrayList<>();
 
   /**
    * Constructs a WorldTView of the specified TrackerPanel
@@ -89,12 +89,10 @@ public class WorldTView extends TrackerPanel implements TView {
     printItem = new JMenuItem(printAction);
     // help item
     helpItem = new JMenuItem();
-    helpItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        TFrame frame = trackerPanel.getTFrame();
-        if (frame != null) {
-	        frame.showHelp("world", 0); //$NON-NLS-1$
-        }
+    helpItem.addActionListener(e -> {
+      TFrame frame = trackerPanel.getTFrame();
+      if (frame != null) {
+          frame.showHelp("world", 0); //$NON-NLS-1$
       }
     });
     addMouseListener(new MouseAdapter() {
@@ -148,9 +146,7 @@ public class WorldTView extends TrackerPanel implements TView {
     		}
     	}
     }
-    Iterator<Drawable> it = getDrawables().iterator();
-    while (it.hasNext()) {
-      Object next = it.next();
+    for (Object next : getDrawables()) {
       if (next instanceof TTrack) {
         TTrack track = (TTrack) next;
         track.erase(this);
@@ -213,7 +209,8 @@ public class WorldTView extends TrackerPanel implements TView {
 
   @Override
   public void finalize() {
-  	OSPLog.finest(getClass().getSimpleName()+" recycled by garbage collector"); //$NON-NLS-1$
+    super.finalize();
+    OSPLog.finest(getClass().getSimpleName()+" recycled by garbage collector"); //$NON-NLS-1$
   }
 
   /**
@@ -297,38 +294,40 @@ public class WorldTView extends TrackerPanel implements TView {
    */
   public void propertyChange(PropertyChangeEvent e) {
     String name = e.getPropertyName();
-    if (name.equals("track")) {           // track has been added or removed //$NON-NLS-1$
-      if (e.getOldValue()!=null) { // track removed
-      	TTrack removed = (TTrack)e.getOldValue();
-      	removed.removePropertyChangeListener("color", this); //$NON-NLS-1$
-      	removed.removePropertyChangeListener("visible", this); //$NON-NLS-1$
-      }
-      refresh();
-    }
-    else if (name.equals("clear")) {           // tracks have been cleared //$NON-NLS-1$
-      for (Integer n: TTrack.activeTracks.keySet()) {
-      	TTrack track = TTrack.activeTracks.get(n);
-        track.removePropertyChangeListener("color", this); //$NON-NLS-1$
-        track.removePropertyChangeListener("visible", this); //$NON-NLS-1$
-      }
-      refresh();
-    }
-    else if (name.equals("stepnumber") ||   // stepnumber has changed //$NON-NLS-1$
-             name.equals("color") ||        // track color changed //$NON-NLS-1$
-             name.equals("visible") ||      // tape/axes visibility changed //$NON-NLS-1$
-             name.equals("image") ||        // video image has changed //$NON-NLS-1$
-             name.equals("video") ||        // video has changed //$NON-NLS-1$
-             name.equals("videoVisible")) { // video visibility has changed //$NON-NLS-1$
-      repaint();
-    }
-    else if (name.equals("transform")) {    // coords have changed //$NON-NLS-1$
-      refresh();
-    }
-    else if (name.equals("size")) {         // image size has changed //$NON-NLS-1$
-      refresh();
-    }
-    else if (name.equals("data")) {         // data has changed //$NON-NLS-1$
-      refresh();
+    switch (name) {
+      case "track":            // track has been added or removed //$NON-NLS-1$
+        if (e.getOldValue() != null) { // track removed
+          TTrack removed = (TTrack) e.getOldValue();
+          removed.removePropertyChangeListener("color", this); //$NON-NLS-1$
+          removed.removePropertyChangeListener("visible", this); //$NON-NLS-1$
+        }
+        refresh();
+        break;
+      case "clear":            // tracks have been cleared //$NON-NLS-1$
+        for (Integer n : TTrack.activeTracks.keySet()) {
+          TTrack track = TTrack.activeTracks.get(n);
+          track.removePropertyChangeListener("color", this); //$NON-NLS-1$
+          track.removePropertyChangeListener("visible", this); //$NON-NLS-1$
+        }
+        refresh();
+        break;
+      case "stepnumber":
+      case "color":
+      case "visible":
+      case "image":
+      case "video":
+      case "videoVisible":  // video visibility has changed //$NON-NLS-1$
+        repaint();
+        break;
+      case "transform":     // coords have changed //$NON-NLS-1$
+        refresh();
+        break;
+      case "size":          // image size has changed //$NON-NLS-1$
+        refresh();
+        break;
+      case "data":          // data has changed //$NON-NLS-1$
+        refresh();
+        break;
     }
   }
 
@@ -449,7 +448,8 @@ public class WorldTView extends TrackerPanel implements TView {
      * @param control the control to save to
      * @param obj the TrackerPanel object to save
      */
-    public void saveObject(XMLControl control, Object obj) {/** empty block */}
+    public void saveObject(XMLControl control, Object obj) {
+    }
 
     /**
      * Creates an object.

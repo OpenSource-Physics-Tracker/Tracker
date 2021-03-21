@@ -136,8 +136,6 @@ public class TMat implements Measurable, Trackable, PropertyChangeListener {
    * @return <code>true</code> if this mat is visible
    */
   public boolean isVisible() {
-//    boolean noVid = (trackerPanel.getVideo() == null || !trackerPanel.getVideo().isVisible());
-//    return noVid && visible;
     return visible;
   }
 

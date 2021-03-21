@@ -39,9 +39,9 @@ public class ReferenceFrame extends ImageCoordSystem
                             implements PropertyChangeListener {
 
   // instance fields
-  private PointMass originTrack;
-  private ImageCoordSystem coords; // parent coords
-  private boolean lockEnabled = false;
+  private final PointMass originTrack;
+  private final ImageCoordSystem coords; // parent coords
+  private final boolean lockEnabled;
   private boolean originLocked;
 
   /**
@@ -119,7 +119,7 @@ public class ReferenceFrame extends ImageCoordSystem
     else if (name.equals("transform")) {  // from ImageCoordSystem //$NON-NLS-1$
       Integer integer = (Integer)e.getNewValue();
       if (integer != null) {
-        int n = integer.intValue();
+        int n = integer;
         setScaleXY(n, coords.getScaleX(n), coords.getScaleY(n));
         setCosineSine(n, coords.getCosine(n),  coords.getSine(n));
         if (originTrack.isEmpty() && n == 0) setOrigins();

@@ -63,28 +63,28 @@ public class RGBRegion extends TTrack {
   	formatVariables = new String[] {"t", "xy", "RGB", "luma"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ 
   	
   	// assemble format map
-		formatMap = new HashMap<String, ArrayList<String>>();		
-		ArrayList<String> list = new ArrayList<String>();
+		formatMap = new HashMap<>();
+		ArrayList<String> list = new ArrayList<>();
 		list.add(dataVariables[0]); 
 		formatMap.put(formatVariables[0], list);
 		
-		list = new ArrayList<String>();
+		list = new ArrayList<>();
 		list.add(dataVariables[1]); 
 		list.add(dataVariables[2]); 
 		formatMap.put(formatVariables[1], list);
 		
-		list = new ArrayList<String>();
+		list = new ArrayList<>();
 		list.add(dataVariables[3]); 
 		list.add(dataVariables[4]); 
 		list.add(dataVariables[5]); 
 		formatMap.put(formatVariables[2], list);
 		
-		list = new ArrayList<String>();
+		list = new ArrayList<>();
 		list.add(dataVariables[6]); 
 		formatMap.put(formatVariables[3], list);
 		
 		// assemble format description map
-		formatDescriptionMap = new HashMap<String, String>();
+		formatDescriptionMap = new HashMap<>();
 		formatDescriptionMap.put(formatVariables[0], TrackerRes.getString("PointMass.Data.Description.0")); //$NON-NLS-1$ 
 		formatDescriptionMap.put(formatVariables[1], TrackerRes.getString("PointMass.Position.Name")); //$NON-NLS-1$ 
 		formatDescriptionMap.put(formatVariables[2], TrackerRes.getString("LineProfile.Description.RGB")); //$NON-NLS-1$ 
@@ -99,11 +99,10 @@ public class RGBRegion extends TTrack {
   protected JLabel radiusLabel;
 	protected int maxRadius = defaultMaxRadius;
   protected IntegerField radiusField;
-  protected boolean firstTimeRadiusUnfixed = true;
-  protected ArrayList<RGBStep> validSteps = new ArrayList<RGBStep>();
+    protected ArrayList<RGBStep> validSteps = new ArrayList<>();
   protected boolean dataHidden = false;
   protected boolean loading;
-  protected TreeSet<Integer> radiusKeyFrames = new TreeSet<Integer>();
+  protected TreeSet<Integer> radiusKeyFrames = new TreeSet<>();
 
   /**
    * Constructs a RGBRegion.
@@ -115,8 +114,8 @@ public class RGBRegion extends TTrack {
     setName(TrackerRes.getString("RGBRegion.New.Name")); //$NON-NLS-1$
     // assign default plot variables
     setProperty("yVarPlot0", dataVariables[6]); //$NON-NLS-1$
-    setProperty("yMinPlot0", new Double(0)); //$NON-NLS-1$
-    setProperty("yMaxPlot0", new Double(255)); //$NON-NLS-1$
+    setProperty("yMinPlot0", (double) 0); //$NON-NLS-1$
+    setProperty("yMaxPlot0", 255.0); //$NON-NLS-1$
     // assign default table variables: x, y and luma
     setProperty("tableVar0", "0"); //$NON-NLS-1$ //$NON-NLS-2$
     setProperty("tableVar1", "1"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -145,26 +144,16 @@ public class RGBRegion extends TTrack {
       }
     };
     radiusField.addFocusListener(radiusFocusListener);
-    radiusField.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-      	radiusFocusListener.focusLost(null);
-        radiusField.selectAll();
-        radiusField.requestFocusInWindow();
-      }
+    radiusField.addActionListener(e -> {
+        radiusFocusListener.focusLost(null);
+      radiusField.selectAll();
+      radiusField.requestFocusInWindow();
     });
     radiusField.addMouseListener(formatMouseListener);
     fixedPositionItem = new JCheckBoxMenuItem(TrackerRes.getString("RGBRegion.MenuItem.Fixed")); //$NON-NLS-1$
-    fixedPositionItem.addItemListener(new ItemListener() {
-      public void itemStateChanged(ItemEvent e) {
-        setFixedPosition(fixedPositionItem.isSelected());
-      }
-    });
+    fixedPositionItem.addItemListener(e -> setFixedPosition(fixedPositionItem.isSelected()));
     fixedRadiusItem = new JCheckBoxMenuItem(TrackerRes.getString("RGBRegion.MenuItem.FixedRadius")); //$NON-NLS-1$
-    fixedRadiusItem.addItemListener(new ItemListener() {
-      public void itemStateChanged(ItemEvent e) {
-        setFixedRadius(fixedRadiusItem.isSelected());
-      }
-    });
+    fixedRadiusItem.addItemListener(e -> setFixedRadius(fixedRadiusItem.isSelected()));
     radiusField.setBorder(fieldBorder);
     // position action
     Action positionAction = new AbstractAction() {
@@ -294,7 +283,7 @@ public class RGBRegion extends TTrack {
     radiusField.setIntValue(r);
     
     RGBStep step = (RGBStep)getStep(n); // target step
-    RGBStep keyStep = step; // key step is target if radius not fixed
+    RGBStep keyStep; // key step is target if radius not fixed
     if (step!=null && step.radius != r) {
       // deselect selected point to trigger possible undo, then reselect it
       TPoint selection = trackerPanel.getSelectedPoint();
@@ -395,7 +384,8 @@ public class RGBRegion extends TTrack {
    *
    * @param visible ignored
    */
-  public void setTrailVisible(boolean visible) {/** empty block */}
+  public void setTrailVisible(boolean visible) {
+  }
 
   /**
    * Gets the autoAdvance property. Overrides TTrack method.
@@ -509,11 +499,11 @@ public class RGBRegion extends TTrack {
     	next.clear();
     }
     Step[] steps = getSteps();
-    for (int i = 0; i < steps.length; i++) {
-    	if (steps[i] == null) continue;
-    	steps[i].dataVisible = false;
-    	((RGBStep)steps[i]).dataValid = false;
-    }
+      for (Step step : steps) {
+          if (step == null) continue;
+          step.dataVisible = false;
+          ((RGBStep) step).dataValid = false;
+      }
   }
   	
   /**
@@ -521,10 +511,10 @@ public class RGBRegion extends TTrack {
    */
   protected void hideData() {
     Step[] steps = getSteps();
-    for (int i = 0; i < steps.length; i++) {
-    	if (steps[i] == null) continue;
-    	steps[i].dataVisible = false;
-    }
+      for (Step step : steps) {
+          if (step == null) continue;
+          step.dataVisible = false;
+      }
     dataHidden = true;
   }
   	
@@ -580,20 +570,19 @@ public class RGBRegion extends TTrack {
     validSteps.clear();
     VideoPlayer player = trackerPanel.getPlayer();
     VideoClip clip = player.getVideoClip();
-    for (int n = 0; n < stepArray.length; n++) {
-    	RGBStep next = (RGBStep)stepArray[n];
-      if (next == null || !next.dataValid
-      			|| next.getRGBData(trackerPanel) == null) 
-      	continue;
-      // get the frame number of the step
-      TPoint p = next.getPosition();
-      int stepFrame = p.getFrameNumber(trackerPanel);
-      // step is valid if frame is included in the clip
-      if (clip.includesFrame(stepFrame)) {
-      	validSteps.add(next);
+      for (Step value : stepArray) {
+          RGBStep next = (RGBStep) value;
+          if (next == null || !next.dataValid
+                  || next.getRGBData(trackerPanel) == null)
+              continue;
+          // get the frame number of the step
+          TPoint p = next.getPosition();
+          int stepFrame = p.getFrameNumber(trackerPanel);
+          // step is valid if frame is included in the clip
+          if (clip.includesFrame(stepFrame)) {
+              validSteps.add(next);
+          } else next.dataVisible = false;
       }
-      else next.dataVisible = false;
-    }
     RGBStep[] valid = validSteps.toArray(new RGBStep[0]);
 	  int len = valid.length;
 	  // get the valid data
@@ -604,7 +593,7 @@ public class RGBRegion extends TTrack {
 	    // get the frame number of the step
 	    TPoint p = valid[n].getPosition();
 	    int stepFrame = p.getFrameNumber(trackerPanel);
-	    dataFrames.add(new Integer(stepFrame));
+	    dataFrames.add(stepFrame);
 	    // get the step number and time
 	    int stepNumber = clip.frameToStep(stepFrame);
 	    double t = player.getStepTime(stepNumber)/1000.0;
@@ -714,28 +703,7 @@ public class RGBRegion extends TTrack {
    */
   public ArrayList<Component> getToolbarPointComponents(TrackerPanel trackerPanel,
                                              TPoint point) {
-  	
-    ArrayList<Component> list = super.getToolbarPointComponents(trackerPanel, point);
-//    if (getStep(point, trackerPanel)==null) return list;
-//
-//  	xLabel.setText(dataVariables[1]); 
-//  	yLabel.setText(dataVariables[2]); 
-//    xField.setUnits(trackerPanel.getUnits(this, dataVariables[1]));
-//    yField.setUnits(trackerPanel.getUnits(this, dataVariables[2]));
-//
-//    xField.setEnabled(!isLocked());
-//    yField.setEnabled(!isLocked());
-//    list.add(stepSeparator);
-//    list.add(stepLabel);
-//    list.add(stepValueLabel);
-//    list.add(tSeparator);
-//    list.add(xLabel);
-//    list.add(xField);
-//    list.add(xSeparator);
-//    list.add(yLabel);
-//    list.add(yField);
-//    list.add(ySeparator);
-    return list;
+    return super.getToolbarPointComponents(trackerPanel, point);
   }
 
   @Override
@@ -772,8 +740,7 @@ public class RGBRegion extends TTrack {
 		      yField.setValue(p.getY());
   	    }
   	    radiusField.setEnabled(!isLocked() && step != null);
-	      stepValueLabel.setText((Integer)e.getNewValue()+":"); //$NON-NLS-1$
-//        support.firePropertyChange(e); // to views
+	      stepValueLabel.setText(e.getNewValue() +":"); //$NON-NLS-1$
       }
       else if (name.equals("image")) { //$NON-NLS-1$
       	dataValid = false;
@@ -955,7 +922,7 @@ public class RGBRegion extends TTrack {
 	      	last = region.trackerPanel.getPlayer().getVideoClip().getEndFrameNumber();
 	      }
 	      double[][] rgb = new double[last+1][];
-	      double[] stepRGB = new double[5];
+	      double[] stepRGB;
 	      for (int n = first; n <= last; n++) {
 	      	// save RGB and pixel count data for all valid frames in clip
 	        if (n>steps.length-1 || steps[n] == null) continue;
@@ -977,8 +944,7 @@ public class RGBRegion extends TTrack {
      * @return the newly created object
      */
     public Object createObject(XMLControl control) {
-    	RGBRegion region = new RGBRegion();
-      return region;
+        return new RGBRegion();
     }
 
     /**
@@ -1003,7 +969,7 @@ public class RGBRegion extends TTrack {
       region.keyFrames.clear();
       region.radiusKeyFrames.clear();
       Object dataObj = control.getObject("framedata"); //$NON-NLS-1$
-      FrameData[] data = null;
+      FrameData[] data;
       if (dataObj instanceof FrameData) { // legacy
       	data = new FrameData[] {(FrameData)dataObj};
       }
@@ -1059,7 +1025,8 @@ public class RGBRegion extends TTrack {
     double x, y;
     int r;
     
-    FrameData() {/** empty block */}
+    FrameData() {
+    }
     
     FrameData(RGBStep s) {
       x = s.getPosition().getX();

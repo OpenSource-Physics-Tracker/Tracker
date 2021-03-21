@@ -24,24 +24,29 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.lang.reflect.Constructor;
-import java.rmi.RemoteException;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import org.opensourcephysics.cabrillo.tracker.vector.Vector;
+import org.opensourcephysics.controls.XML;
+import org.opensourcephysics.controls.XMLControl;
+import org.opensourcephysics.controls.XMLControlElement;
+import org.opensourcephysics.display.*;
+import org.opensourcephysics.display.axes.CartesianInteractive;
+import org.opensourcephysics.media.core.TPoint;
+import org.opensourcephysics.media.core.VideoClip;
+import org.opensourcephysics.media.core.VideoPlayer;
+import org.opensourcephysics.tools.*;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
-
-import org.opensourcephysics.cabrillo.tracker.vector.Vector;
-import org.opensourcephysics.display.*;
-import org.opensourcephysics.tools.*;
-import org.opensourcephysics.controls.*;
-import org.opensourcephysics.display.axes.*;
-import org.opensourcephysics.media.core.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeListener;
+import java.lang.reflect.Constructor;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * This is a plotting panel for a track
@@ -58,30 +63,29 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
   protected int trackID;
   protected DatasetManager data;
   protected HighlightableDataset dataset = new HighlightableDataset();
-  protected ArrayList<TTrack> guests = new ArrayList<TTrack>();
+  protected ArrayList<TTrack> guests = new ArrayList<>();
   protected HashMap<TTrack, HighlightableDataset> guestDatasets 
-  		= new HashMap<TTrack, HighlightableDataset>();
+  		= new HashMap<>();
   protected JRadioButtonMenuItem[] xChoices, yChoices;
   protected ButtonGroup xGroup, yGroup;
   protected int xIndex = -1, yIndex = 0;
   protected JPopupMenu xPopup, yPopup, popup;
-  protected Action dataFunctionListener, guestListener;
-  protected JMenuItem copyImageItem, dataBuilderItem, dataToolItem;
+  protected Action dataFunctionListener;
+    protected JMenuItem copyImageItem, dataBuilderItem, dataToolItem;
   protected JMenuItem showXZeroItem, showYZeroItem;
   protected JMenuItem selectPointsItem, deselectPointsItem;
   protected JMenuItem algorithmItem, printItem, helpItem, mergeYScalesItem;
   protected JCheckBoxMenuItem linesItem, pointsItem;
   protected JMenuItem guestsItem;
   protected String xLabel, yLabel, title;
-  protected TreeSet<Integer> highlightIndices = new TreeSet<Integer>(); // indices of highlighted points
+  protected TreeSet<Integer> highlightIndices = new TreeSet<>(); // indices of highlighted points
   protected ItemListener xListener, yListener;
   protected PlotTrackView plotTrackView;
   protected boolean isCustom;
   protected Font font = new JTextField().getFont();
   protected Rectangle hitRect = new Rectangle(24, 24);
   protected ClickableAxes plotAxes;
-  protected boolean isZoomMode;
-  protected PlotMouseListener mouseListener;
+    protected PlotMouseListener mouseListener;
   protected PropertyChangeListener playerListener;
   protected Step clickedStep;
   protected TCoordinateStringBuilder coordStringBuilder;
@@ -110,40 +114,34 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
     blMessageBox.setMessageFont(font);
     
     // make listeners for the button states
-    xListener = new ItemListener() {
-      public void itemStateChanged(ItemEvent e) {
-      	if (e.getStateChange() == ItemEvent.SELECTED) {
-	        JMenuItem item = (JMenuItem)e.getSource();
-	        setXVariable(item.getText());
-	        plotData();
-	        isCustom = true;
-          trackerPanel.changed = true;
-      	}
-      }
-    };
-    yListener = new ItemListener() {
-      public void itemStateChanged(ItemEvent e) {
-      	if (e.getStateChange() == ItemEvent.SELECTED) {
+    xListener = e -> {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
           JMenuItem item = (JMenuItem)e.getSource();
-          setYVariable(item.getText());
+          setXVariable(item.getText());
           plotData();
           isCustom = true;
-          trackerPanel.changed = true;
-      	}
-      }
+        trackerPanel.changed = true;
+        }
     };
-		playerListener = new PropertyChangeListener() {
-		  public void propertyChange(PropertyChangeEvent e) {
-		  	if (clickedStep == null) return;
-        TPoint pt = clickedStep.getDefaultPoint();
-      	plotTrackView.trackerPanel.setSelectedPoint(pt);
-      	if (pt!=null) {
-      		pt.showCoordinates(plotTrackView.trackerPanel);
-      	}
-        clickedStep = null;
-        repaint();
-		  }
-		};
+    yListener = e -> {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+        JMenuItem item = (JMenuItem)e.getSource();
+        setYVariable(item.getText());
+        plotData();
+        isCustom = true;
+        trackerPanel.changed = true;
+        }
+    };
+		playerListener = e -> {
+            if (clickedStep == null) return;
+      TPoint pt = clickedStep.getDefaultPoint();
+        plotTrackView.trackerPanel.setSelectedPoint(pt);
+        if (pt!=null) {
+            pt.showCoordinates(plotTrackView.trackerPanel);
+        }
+      clickedStep = null;
+      repaint();
+        };
     // create radio buttons and popups to set x and y variables
     createVarChoices();
     // create clickable axes
@@ -185,9 +183,8 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
 	            		&& plotTrackView.trackerPanel.selectingPanel==plotTrackView.trackerPanel) {
 	            	plotTrackView.trackerPanel.deletePoint(plotTrackView.trackerPanel.selectedPoint);
 	            }
-            return;
 
-      	}
+        }
       }
     });
   }
@@ -198,17 +195,15 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
       control.readXML(job.getXML());
     } catch (RemoteException ex) {ex.printStackTrace();}
     ArrayList<Dataset> datasets = this.getObjectOfClass(Dataset.class);
-    Iterator<Dataset> it = control.getObjects(Dataset.class).iterator();
-    while (it.hasNext()) {
-      Dataset newData = it.next();
-      int id = newData.getID();
-      for (int i = 0, n = datasets.size(); i < n; i++) {
-        if (datasets.get(i).getID() == id) {
-          copyProperties(newData, datasets.get(i));
-          break;
-        }
+      for (Dataset newData : control.getObjects(Dataset.class)) {
+          int id = newData.getID();
+          for (Dataset value : datasets) {
+              if (value.getID() == id) {
+                  copyProperties(newData, value);
+                  break;
+              }
+          }
       }
-    }
     repaint();
   }
 
@@ -344,7 +339,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
     else if (!autoscaleXMin && autoscaleXMax) {
       scaleXMax();
     }
-    else if (autoscaleXMin && autoscaleXMax) {
+    else if (autoscaleXMin) {
       scaleX(list);
     }
     if (autoscaleYMin && !autoscaleYMax) {
@@ -353,7 +348,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
     else if (!autoscaleYMin && autoscaleYMax) {
       scaleYMax();
     }
-    else if (autoscaleYMin && autoscaleYMax) {
+    else if (autoscaleYMin) {
       scaleY(list);
     }
   }
@@ -438,13 +433,13 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
     try {
 			Class<?> type = Class.forName("org.opensourcephysics.frames.ImageFrame"); //$NON-NLS-1$
 			Constructor<?>[] constructors = type.getConstructors();
-			for(int i = 0; i<constructors.length; i++) {
-			  Class<?>[] parameters = constructors[i].getParameterTypes();
-			  if(parameters.length==1 && parameters[0]==MeasuredImage.class) {
-			    frame = (OSPFrame) constructors[i].newInstance(new Object[] {mi});
-			    break;
-			  }
-			}
+        for (Constructor<?> constructor : constructors) {
+            Class<?>[] parameters = constructor.getParameterTypes();
+            if (parameters.length == 1 && parameters[0] == MeasuredImage.class) {
+                frame = (OSPFrame) constructor.newInstance(new Object[]{mi});
+                break;
+            }
+        }
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -474,216 +469,202 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
 	    // lines menu item
 	    linesItem = new JCheckBoxMenuItem();
 	    linesItem.setSelected(true);
-	    linesItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-	        dataset.setConnected(linesItem.isSelected());
-	        for (TTrack next: guests) {
-	        	HighlightableDataset nextDataset = guestDatasets.get(next);
-	        	nextDataset.setConnected(linesItem.isSelected());
-	        }
-	        isCustom = true;
-	        repaint();
-	      }
-	    });
+	    linesItem.addActionListener(e -> {
+          dataset.setConnected(linesItem.isSelected());
+          for (TTrack next: guests) {
+              HighlightableDataset nextDataset = guestDatasets.get(next);
+              nextDataset.setConnected(linesItem.isSelected());
+          }
+          isCustom = true;
+          repaint();
+        });
 	    // points menu item
 	    pointsItem = new JCheckBoxMenuItem();
 	    pointsItem.setSelected(true);
-	    pointsItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-	        if (pointsItem.isSelected()) {
-	          dataset.setMarkerShape(Dataset.SQUARE);
-		        for (TTrack next: guests) {
-		        	HighlightableDataset nextDataset = guestDatasets.get(next);
-		        	nextDataset.setMarkerShape(Dataset.SQUARE);
-		        }
-	        }
-	        else {
-	          dataset.setMarkerShape(Dataset.NO_MARKER);
-		        for (TTrack next: guests) {
-		        	HighlightableDataset nextDataset = guestDatasets.get(next);
-		        	nextDataset.setMarkerShape(Dataset.NO_MARKER);
-		        }
-	        }
-	        isCustom = true;
-	        repaint();
-	      }
-	    });
+	    pointsItem.addActionListener(e -> {
+          if (pointsItem.isSelected()) {
+            dataset.setMarkerShape(Dataset.SQUARE);
+              for (TTrack next: guests) {
+                  HighlightableDataset nextDataset = guestDatasets.get(next);
+                  nextDataset.setMarkerShape(Dataset.SQUARE);
+              }
+          }
+          else {
+            dataset.setMarkerShape(Dataset.NO_MARKER);
+              for (TTrack next: guests) {
+                  HighlightableDataset nextDataset = guestDatasets.get(next);
+                  nextDataset.setMarkerShape(Dataset.NO_MARKER);
+              }
+          }
+          isCustom = true;
+          repaint();
+        });
 	    // showZero menu items
 	    showXZeroItem = new JMenuItem();
-	    showXZeroItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-	        showZeroOnAxis("x"); //$NON-NLS-1$
-	      }
-	    });
+	    showXZeroItem.addActionListener(e -> {
+          showZeroOnAxis("x"); //$NON-NLS-1$
+        });
 	    showYZeroItem = new JMenuItem();
-	    showYZeroItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-	        showZeroOnAxis("y"); //$NON-NLS-1$
-	      }
-	    });
+	    showYZeroItem.addActionListener(e -> {
+          showZeroOnAxis("y"); //$NON-NLS-1$
+        });
 	    printItem = new JMenuItem();
-	    printItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-	      	// find TViewChooser that owns this view and print it
-	      	TViewChooser chooser = getOwner();
-	        if (chooser != null) {
-	          new TrackerIO.ComponentImage(chooser).print();
-	        }
-	      }
-	    });
+	    printItem.addActionListener(e -> {
+            // find TViewChooser that owns this view and print it
+            TViewChooser chooser = getOwner();
+          if (chooser != null) {
+            new TrackerIO.ComponentImage(chooser).print();
+          }
+        });
 	    // dataTool item
 	    dataToolItem = new JMenuItem();
-	    dataToolItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-		      DataTool tool = DataTool.getTool();
-		      DataToolTab tab = tool.getTab(data);
-	        tool.setUseChooser(false);
-	        tool.setSaveChangesOnClose(false);
-	      	DatasetManager toSend = new DatasetManager();
-	        DataRefreshTool refresher = DataRefreshTool.getTool(data);
-	      	toSend.setID(data.getID());
-	        TTrack track = TTrack.getTrack(trackID);
-	      	toSend.setName(track.getName());
-	      	int i = 0;
-	    	  // always include linked independent variable first
-	      	Dataset nextIn = data.getDataset(0);
-		    	String xColName = nextIn.getXColumnName();
-	      	XMLControlElement control = new XMLControlElement(nextIn);
-		    	Dataset nextOut = toSend.getDataset(i++); // first dataset to send
-		    	control.loadObject(nextOut, true, true); // contains indep var
-		    	nextOut.setYColumnVisible(false);
-		    	nextOut.setConnected(false);
-		    	nextOut.setMarkerShape(Dataset.NO_MARKER);
-		    	double[] tArray = nextOut.getXPoints();
-		    	if (!guests.isEmpty()) {
-		      	// expand tArray by collecting all values in a TreeSet
-		      	TreeSet<Double> tSet = new TreeSet<Double>();
-		      	for (double t: tArray) {
-		      		tSet.add(t);
-		      	}
-			      for (TTrack guest: guests) {
-			      	DatasetManager guestData = guest.getData(guest.trackerPanel);
-			      	Dataset nextGuestIn = guestData.getDataset(0);
-			      	double[] guestTArray = nextGuestIn.getXPoints();
-			      	for (double t: guestTArray) {
-			      		tSet.add(t);
-			      	}
-			      }
-			      tArray = new double[tSet.size()];
-		      	Double[] temp = tSet.toArray(new Double[tArray.length]);
-		      	for (int k=0; k<tArray.length; k++) {
-		      		tArray[k] = temp[k];
-		      	}
-		      	// finished expanding tArray
-		      	// pad nextOut with NaNs
-		      	padDataset(nextOut, tArray);
-		    	}
-	        // add the x and y datasets
-	        if (xIndex >= 0) {
-	        	nextIn = data.getDataset(xIndex);
-	  	    	xColName = nextIn.getYColumnName();
-	          control = new XMLControlElement(nextIn);
-	          nextOut = toSend.getDataset(i++); // second dataset to send (if not indep var)
-	  	    	control.loadObject(nextOut, true, true);
-	  	    	nextOut.setMarkerColor(track.getColor());
-	  	    	nextOut.setLineColor(track.getColor().darker());
-	  	    	nextOut.setConnected(true);
-	  	    	nextOut.setXColumnVisible(false);
-			    	if (!guests.isEmpty()) {
-			      	// pad nextOut with NaNs
-			      	padDataset(nextOut, tArray);
-			    	}
-	        }
-	        nextIn = data.getDataset(yIndex);
-	      	String yColName = nextIn.getYColumnName();
-		      if (yIndex != xIndex) {
-		        control = new XMLControlElement(nextIn);
-		        nextOut = toSend.getDataset(i++); // next dataset to send
-			    	control.loadObject(nextOut, true, true);
-			    	nextOut.setMarkerColor(track.getColor());
-			    	nextOut.setLineColor(track.getColor().darker());
-			    	nextOut.setConnected(true);
-			    	nextOut.setXColumnVisible(false);
-			    	if (!guests.isEmpty()) {
-			      	// pad nextOut with NaNs
-			      	padDataset(nextOut, tArray);
-			    	}			    	
-		      }
-		      // if this plot has guests, send their data too
-		      for (TTrack guest: guests) {
-		      	DatasetManager guestData = guest.getData(guest.trackerPanel);
-		      	refresher.addData(guestData);
-		        if (xIndex >= 0) {
-		        	nextIn = guestData.getDataset(xIndex);
-		          control = new XMLControlElement(nextIn);
-		          nextOut = toSend.getDataset(i++);
-		  	    	control.loadObject(nextOut, true, true);
-		  	    	nextOut.setMarkerColor(guest.getColor());
-		  	    	nextOut.setLineColor(guest.getColor().darker());
-		  	    	nextOut.setConnected(true);
-		  	    	nextOut.setXColumnVisible(false);		  	    	
-		  	    	if (tab!=null) {
-		  	    		String newName = tab.getColumnName(nextOut.getID());
-		  	    		if (newName!=null) {
-		  	    			nextOut.setXYColumnNames(nextOut.getXColumnName(), newName);
-		  	    		}
-		  	    	}
-		  	    	else {
-		  	    		String newName = nextOut.getYColumnName()+"_{"+guest.getName()+"}"; //$NON-NLS-1$ //$NON-NLS-2$
-	  	    			nextOut.setXYColumnNames(nextOut.getXColumnName(), newName);
-		  	    	}
-			      	// pad nextOut with NaNs
-			      	padDataset(nextOut, tArray);
-		        }
-			      if (yIndex != xIndex) {
-			        nextIn = guestData.getDataset(yIndex);
-			        control = new XMLControlElement(nextIn);
-			        nextOut = toSend.getDataset(i++);
-				    	control.loadObject(nextOut, true, true);
-				    	nextOut.setMarkerColor(guest.getColor());
-				    	nextOut.setLineColor(guest.getColor().darker());
-				    	nextOut.setConnected(true);
-				    	nextOut.setXColumnVisible(false);
-		  	    	if (tab!=null) {
-		  	    		String newName = tab.getColumnName(nextOut.getID());
-		  	    		if (newName!=null) {
-		  	    			nextOut.setXYColumnNames(nextOut.getXColumnName(), newName);
-		  	    		}
-		  	    	}
-		  	    	else {
-		  	    		String newName = nextOut.getYColumnName()+"_{"+guest.getName()+"}"; //$NON-NLS-1$ //$NON-NLS-2$
-	  	    			nextOut.setXYColumnNames(nextOut.getXColumnName(), newName);
-		  	    	}
-			      	// pad nextOut with NaNs
-			      	padDataset(nextOut, tArray);
-			      }		      	
-		      }
-	        // get data tool and send it the job
-	        try {
-	          tool.send(new LocalJob(toSend), refresher);
-	          tab = tool.getTab(toSend);
-	          if (tab != null) {
-	          	tab.setWorkingColumns(xColName, yColName);
-	          }
-	          tool.setVisible(true);
-	        }
-	        catch(RemoteException ex) {ex.printStackTrace();}
-	      }
-	    });
+	    dataToolItem.addActionListener(e -> {
+            DataTool tool = DataTool.getTool();
+            DataToolTab tab = tool.getTab(data);
+          tool.setUseChooser(false);
+          tool.setSaveChangesOnClose(false);
+            DatasetManager toSend = new DatasetManager();
+          DataRefreshTool refresher = DataRefreshTool.getTool(data);
+            toSend.setID(data.getID());
+          TTrack track = TTrack.getTrack(trackID);
+            toSend.setName(track.getName());
+            int i = 0;
+            // always include linked independent variable first
+            Dataset nextIn = data.getDataset(0);
+              String xColName = nextIn.getXColumnName();
+            XMLControlElement control = new XMLControlElement(nextIn);
+              Dataset nextOut = toSend.getDataset(i++); // first dataset to send
+              control.loadObject(nextOut, true, true); // contains indep var
+              nextOut.setYColumnVisible(false);
+              nextOut.setConnected(false);
+              nextOut.setMarkerShape(Dataset.NO_MARKER);
+              double[] tArray = nextOut.getXPoints();
+              if (!guests.isEmpty()) {
+                // expand tArray by collecting all values in a TreeSet
+                TreeSet<Double> tSet = new TreeSet<>();
+                for (double t: tArray) {
+                    tSet.add(t);
+                }
+                for (TTrack guest: guests) {
+                    DatasetManager guestData = guest.getData(guest.trackerPanel);
+                    Dataset nextGuestIn = guestData.getDataset(0);
+                    double[] guestTArray = nextGuestIn.getXPoints();
+                    for (double t: guestTArray) {
+                        tSet.add(t);
+                    }
+                }
+                tArray = new double[tSet.size()];
+                Double[] temp = tSet.toArray(new Double[tArray.length]);
+                for (int k=0; k<tArray.length; k++) {
+                    tArray[k] = temp[k];
+                }
+                // finished expanding tArray
+                // pad nextOut with NaNs
+                padDataset(nextOut, tArray);
+              }
+          // add the x and y datasets
+          if (xIndex >= 0) {
+              nextIn = data.getDataset(xIndex);
+                xColName = nextIn.getYColumnName();
+            control = new XMLControlElement(nextIn);
+            nextOut = toSend.getDataset(i++); // second dataset to send (if not indep var)
+                control.loadObject(nextOut, true, true);
+                nextOut.setMarkerColor(track.getColor());
+                nextOut.setLineColor(track.getColor().darker());
+                nextOut.setConnected(true);
+                nextOut.setXColumnVisible(false);
+                  if (!guests.isEmpty()) {
+                    // pad nextOut with NaNs
+                    padDataset(nextOut, tArray);
+                  }
+          }
+          nextIn = data.getDataset(yIndex);
+            String yColName = nextIn.getYColumnName();
+            if (yIndex != xIndex) {
+              control = new XMLControlElement(nextIn);
+              nextOut = toSend.getDataset(i++); // next dataset to send
+                  control.loadObject(nextOut, true, true);
+                  nextOut.setMarkerColor(track.getColor());
+                  nextOut.setLineColor(track.getColor().darker());
+                  nextOut.setConnected(true);
+                  nextOut.setXColumnVisible(false);
+                  if (!guests.isEmpty()) {
+                    // pad nextOut with NaNs
+                    padDataset(nextOut, tArray);
+                  }
+            }
+            // if this plot has guests, send their data too
+            for (TTrack guest: guests) {
+                DatasetManager guestData = guest.getData(guest.trackerPanel);
+                refresher.addData(guestData);
+              if (xIndex >= 0) {
+                  nextIn = guestData.getDataset(xIndex);
+                control = new XMLControlElement(nextIn);
+                nextOut = toSend.getDataset(i++);
+                    control.loadObject(nextOut, true, true);
+                    nextOut.setMarkerColor(guest.getColor());
+                    nextOut.setLineColor(guest.getColor().darker());
+                    nextOut.setConnected(true);
+                    nextOut.setXColumnVisible(false);
+                    if (tab!=null) {
+                        String newName = tab.getColumnName(nextOut.getID());
+                        if (newName!=null) {
+                            nextOut.setXYColumnNames(nextOut.getXColumnName(), newName);
+                        }
+                    }
+                    else {
+                        String newName = nextOut.getYColumnName()+"_{"+guest.getName()+"}"; //$NON-NLS-1$ //$NON-NLS-2$
+                        nextOut.setXYColumnNames(nextOut.getXColumnName(), newName);
+                    }
+                    // pad nextOut with NaNs
+                    padDataset(nextOut, tArray);
+              }
+                if (yIndex != xIndex) {
+                  nextIn = guestData.getDataset(yIndex);
+                  control = new XMLControlElement(nextIn);
+                  nextOut = toSend.getDataset(i++);
+                      control.loadObject(nextOut, true, true);
+                      nextOut.setMarkerColor(guest.getColor());
+                      nextOut.setLineColor(guest.getColor().darker());
+                      nextOut.setConnected(true);
+                      nextOut.setXColumnVisible(false);
+                    if (tab!=null) {
+                        String newName = tab.getColumnName(nextOut.getID());
+                        if (newName!=null) {
+                            nextOut.setXYColumnNames(nextOut.getXColumnName(), newName);
+                        }
+                    }
+                    else {
+                        String newName = nextOut.getYColumnName()+"_{"+guest.getName()+"}"; //$NON-NLS-1$ //$NON-NLS-2$
+                        nextOut.setXYColumnNames(nextOut.getXColumnName(), newName);
+                    }
+                    // pad nextOut with NaNs
+                    padDataset(nextOut, tArray);
+                }
+            }
+          // get data tool and send it the job
+          try {
+            tool.send(new LocalJob(toSend), refresher);
+            tab = tool.getTab(toSend);
+            if (tab != null) {
+                tab.setWorkingColumns(xColName, yColName);
+            }
+            tool.setVisible(true);
+          }
+          catch(RemoteException ex) {ex.printStackTrace();}
+        });
 	    // algorithm item
 	    algorithmItem = new JMenuItem();
-	    algorithmItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-	      	DerivativeAlgorithmDialog dialog = trackerPanel.getAlgorithmDialog();
-	      	TTrack track = TTrack.getTrack(trackID);
-	      	if (track instanceof PointMass) {
-	      		dialog.setTargetMass((PointMass)track);
-	      	}
-	      	FontSizer.setFonts(dialog, FontSizer.getLevel());
-	      	dialog.pack();
-	      	dialog.setVisible(true);
-	      }
-	    });
+	    algorithmItem.addActionListener(e -> {
+            DerivativeAlgorithmDialog dialog = trackerPanel.getAlgorithmDialog();
+            TTrack track = TTrack.getTrack(trackID);
+            if (track instanceof PointMass) {
+                dialog.setTargetMass((PointMass)track);
+            }
+            FontSizer.setFonts(dialog, FontSizer.getLevel());
+            dialog.pack();
+            dialog.setVisible(true);
+        });
 	    // copy image item
 	    Action copyImageAction = new AbstractAction() {
 	      public void actionPerformed(ActionEvent e) {
@@ -707,34 +688,28 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
 	    dataBuilderItem.addActionListener(dataFunctionListener);
 	    // help item
 	    helpItem = new JMenuItem();
-	    helpItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-	        Container c = getTopLevelAncestor();
-	        if (c instanceof TFrame) {
-	          TFrame frame = (TFrame)c;
-		        frame.showHelp("plot", 0); //$NON-NLS-1$
-	        }
-	      }
-	    });
+	    helpItem.addActionListener(e -> {
+          Container c = getTopLevelAncestor();
+          if (c instanceof TFrame) {
+            TFrame frame = (TFrame)c;
+              frame.showHelp("plot", 0); //$NON-NLS-1$
+          }
+        });
 	    // mergeYAxesItem
 	    mergeYScalesItem = new JMenuItem();
-	    mergeYScalesItem.addActionListener(new ActionListener() {
-	      public void actionPerformed(ActionEvent e) {
-	      	int n = plotTrackView.mainView.getComponentCount();
-	      	if (n==2)
-	      		plotTrackView.syncYAxes(plotTrackView.plots[0], plotTrackView.plots[1]);
-	      	if (n==3)
-	      		plotTrackView.syncYAxes(plotTrackView.plots);
-	      }
-	    });
+	    mergeYScalesItem.addActionListener(e -> {
+            int n = plotTrackView.mainView.getComponentCount();
+            if (n==2)
+                plotTrackView.syncYAxes(plotTrackView.plots[0], plotTrackView.plots[1]);
+            if (n==3)
+                plotTrackView.syncYAxes(plotTrackView.plots);
+        });
   	}
     // guests item
     guestsItem = new JMenuItem();
-    guestsItem.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        PlotGuestDialog dialog = trackerPanel.getPlotGuestDialog(TrackPlottingPanel.this);
-        dialog.setVisible(true);
-      }
+    guestsItem.addActionListener(e -> {
+      PlotGuestDialog dialog = trackerPanel.getPlotGuestDialog(TrackPlottingPanel.this);
+      dialog.setVisible(true);
     });
     
     Action selectAction = new AbstractAction() {
@@ -753,7 +728,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
         double[] xPoints = dataset.getXPoints();
         double[] yPoints = dataset.getYPoints();
         TTrack track = TTrack.getTrack(trackID);
-        TreeSet<Integer> frames = new TreeSet<Integer>();
+        TreeSet<Integer> frames = new TreeSet<>();
         for (int i=0; i<xPoints.length; i++) {
         	if (Double.isNaN(xPoints[i]) || Double.isNaN(yPoints[i])) continue;
         	if (xPoints[i]>=xmin && xPoints[i]<=xmax && yPoints[i]>=ymin && yPoints[i]<=ymax) {
@@ -965,18 +940,18 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
   	TFrame frame = trackerPanel.getTFrame();
   	if (frame == null) return null;
   	Container[] views = frame.getViews(trackerPanel);
-  	for (int i = 0; i < views.length; i++) {
-      if (views[i] instanceof TViewChooser) {
-        TViewChooser chooser = (TViewChooser)views[i];
-        if (chooser.getSelectedView() instanceof PlotTView) {
-        	PlotTView plotView = (PlotTView)chooser.getSelectedView();
-        	TrackView view = plotView.getTrackView(plotView.getSelectedTrack());
-        	if (view != null && view.equals(plotTrackView)) {
-        		return chooser;
-        	}
-        }
+      for (Container container : views) {
+          if (container instanceof TViewChooser) {
+              TViewChooser chooser = (TViewChooser) container;
+              if (chooser.getSelectedView() instanceof PlotTView) {
+                  PlotTView plotView = (PlotTView) chooser.getSelectedView();
+                  TrackView view = plotView.getTrackView(plotView.getSelectedTrack());
+                  if (view != null && view.equals(plotTrackView)) {
+                      return chooser;
+                  }
+              }
+          }
       }
-  	}
   	return null;
   }
   
@@ -1019,13 +994,8 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
     
     // refresh guest datasets
 	  // first eliminate any guests that may have been deleted
-    for (Iterator<TTrack> it = guests.iterator(); it.hasNext();) {    	
-    	// check if guest still exists in tracker panel
-    	TTrack next = it.next();
-    	if (next!=null && trackerPanel.getTrack(next.getName())==null) {
-    		it.remove();
-    	}
-    }
+      // check if guest still exists in tracker panel
+      guests.removeIf(next -> next != null && trackerPanel.getTrack(next.getName()) == null);
     // now plot guests
     for (TTrack next: guests) {
     	DatasetManager nextData = next.getData(next.trackerPanel);
@@ -1084,9 +1054,8 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
     if (xIndex > -1)
       xMean = getMean(xData.getYPoints());
     // append data to dataset
-    Double x = null, y = null;
-    if (xMean != Double.NaN) {
-    	int n = yData.getRowCount();
+    Double x, y;
+      int n = yData.getRowCount();
       for (int i = 0; i < n; i++) {
         y = (Double)yData.getValueAt(i, 1);
         if (xIndex == -1)
@@ -1098,7 +1067,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
         		x *= 180/Math.PI;
         	}
         	if (yIsAngle && degrees) {
-        		y *= 180/Math.PI;        		
+        		y *= 180/Math.PI;
         	}
           hds.append(x, y);
         }
@@ -1106,13 +1075,12 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
         	if (xIsAngle && degrees) {
         		x *= 180/Math.PI;
         	}
-          hds.append(x.doubleValue(), Double.NaN);
+          hds.append(x, Double.NaN);
         }
         else {
           hds.append(xMean, Double.NaN);
         }
       }
-    }
   }
 
   /**
@@ -1132,11 +1100,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
   
   /**
    * Sets preferred min/max values. Overrides DrawingPanel method.
-   * 
-   * @param xmin
-   * @param xmax
-   * @param ymin
-   * @param ymax
+   *
    * @param invalidateImage invalidates image if min/max have changed
    */
   public void setPreferredMinMax(double xmin, double xmax, double ymin, double ymax, 
@@ -1150,9 +1114,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
   
   /**
    * Sets preferred min/max x values. Overrides DrawingPanel method.
-   * 
-   * @param xmin
-   * @param xmax
+   *
    */
   public void setPreferredMinMaxX(double xmin, double xmax) {
   	trackerPanel.changed = true;
@@ -1164,9 +1126,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
   
   /**
    * Sets preferred min/max y values. Overrides DrawingPanel method.
-   * 
-   * @param ymin
-   * @param ymax
+   *
    */
   public void setPreferredMinMaxY(double ymin, double ymax) {
   	trackerPanel.changed = true;
@@ -1206,7 +1166,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
     // find the desired menu item
     for (int i = 0; i < xChoices.length; i++) {
   		String var = xChoices[i].getText();
-  		if (name.indexOf(DEFINED_AS) == -1) {
+  		if (!name.contains(DEFINED_AS)) {
   			// name doesn't include description, so strip from menu item
     		int n = var.indexOf(DEFINED_AS);
     		if (n > -1) var = var.substring(0, n);
@@ -1235,14 +1195,14 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
   protected String getXVariable() {
   	if (xChoices == null) return null;
     // find the selected menu item
-  	for (int i = 0; i < xChoices.length; i++) {
-      if (xChoices[i].isSelected()) {
-    		String var = xChoices[i].getText();
-    		int n = var.indexOf(DEFINED_AS);
-    		if (n > -1) var = var.substring(0, n);
-        return var;
+      for (JRadioButtonMenuItem xChoice : xChoices) {
+          if (xChoice.isSelected()) {
+              String var = xChoice.getText();
+              int n = var.indexOf(DEFINED_AS);
+              if (n > -1) var = var.substring(0, n);
+              return var;
+          }
       }
-    }
   	return null;
   }
 
@@ -1256,7 +1216,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
     // find the desired menu item
     for (int i = 0; i < yChoices.length; i++) {
   		String var = yChoices[i].getText();
-  		if (name.indexOf(DEFINED_AS) == -1) {
+  		if (!name.contains(DEFINED_AS)) {
   			// name doesn't include description, so strip from menu item
     		int n = var.indexOf(DEFINED_AS);
     		if (n > -1) var = var.substring(0, n);
@@ -1284,14 +1244,14 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
   protected String getYVariable() {
   	if (yChoices == null) return null;
     // find the selected menu item
-  	for (int i = 0; i < yChoices.length; i++) {
-      if (yChoices[i].isSelected()) {
-    		String var = yChoices[i].getText();
-    		int n = var.indexOf(DEFINED_AS);
-    		if (n > -1) var = var.substring(0, n);
-        return var;
+      for (JRadioButtonMenuItem yChoice : yChoices) {
+          if (yChoice.isSelected()) {
+              String var = yChoice.getText();
+              int n = var.indexOf(DEFINED_AS);
+              if (n > -1) var = var.substring(0, n);
+              return var;
+          }
       }
-    }
   	return null;
   }
 
@@ -1329,20 +1289,20 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
   private double getMean(double[] data) {
     double sum = 0.0;
     int count = 0;
-    for (int i = 0; i < data.length; i++) {
-      if (Double.isNaN(data[i])) {
-        continue;
+      for (double datum : data) {
+          if (Double.isNaN(datum)) {
+              continue;
+          }
+          count++;
+          sum += datum;
       }
-      count++;
-      sum += data[i];
-    }
     return sum / count;
   }
   
   protected void createVarChoices() {
     // find the selected menu item
     int datasetCount = data.getDatasets().size();
-    boolean smaller = yChoices == null? false: datasetCount < yChoices.length;
+    boolean smaller = yChoices != null && datasetCount < yChoices.length;
   	String xName = getXVariable();
   	String yName = getYVariable();
     xGroup = new ButtonGroup();
@@ -1356,7 +1316,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
     boolean foundY = false, foundX = false;
     String name = track.getDataName(0); // linked x-variable
     name = TeXParser.removeSubscripting(name);
-    if (name == xName) foundX = true;
+    if (name.equals(xName)) foundX = true;
     name += DEFINED_AS+track.getDataDescription(0);
     // add radio button items to array, popup and button group
     xChoices[0] = new JRadioButtonMenuItem(name);
@@ -1429,7 +1389,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
   private void padDataset(Dataset dataset, double[] newXArray) {
   	double[] xArray = dataset.getXPoints(); 
   	double[] yArray = dataset.getYPoints();
-  	Map<Double, Double> valueMap = new HashMap<Double, Double>();
+  	Map<Double, Double> valueMap = new HashMap<>();
   	for (int k=0; k<xArray.length; k++) {
   		valueMap.put(xArray[k], yArray[k]);
   	}
@@ -1437,7 +1397,7 @@ public class TrackPlottingPanel extends PlottingPanel implements Tool {
   	double[] newYArray = new double[newXArray.length];
   	for (int k=0; k<newXArray.length; k++) {
   		double x = newXArray[k];
-  		newYArray[k] = valueMap.keySet().contains(x)? valueMap.get(x): Double.NaN;
+  		newYArray[k] = valueMap.getOrDefault(x, Double.NaN);
   	}
   	dataset.clear();
   	dataset.append(newXArray, newYArray);

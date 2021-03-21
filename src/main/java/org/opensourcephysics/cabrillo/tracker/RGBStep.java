@@ -51,7 +51,7 @@ public class RGBStep extends Step {
   protected Position position;
   protected RGBRegion rgbRegion;
   protected int radius;
-  protected Map<TrackerPanel, Shape> hitShapes = new HashMap<TrackerPanel, Shape>();
+  protected Map<TrackerPanel, Shape> hitShapes = new HashMap<>();
 	protected double[] rgbData = new double[5];
 	protected boolean dataValid = false;
 	protected BasicStroke stroke;
@@ -193,8 +193,7 @@ public class RGBStep extends Step {
    * @return the bounding rectangle
    */
   public Rectangle getBounds(TrackerPanel trackerPanel) {
-    Rectangle bounds = getMark(trackerPanel).getBounds(false);
-    return bounds;
+      return getMark(trackerPanel).getBounds(false);
   }
 
   /**
@@ -214,7 +213,7 @@ public class RGBStep extends Step {
   public Object clone() {
     RGBStep step = (RGBStep)super.clone();
     if (step != null) {
-      step.hitShapes = new HashMap<TrackerPanel, Shape>();
+      step.hitShapes = new HashMap<>();
       step.points[0] = step.position = step.new Position(
       			position.getX(), position.getY());
       step.position.setStepEditTrigger(true);
@@ -255,24 +254,23 @@ public class RGBStep extends Step {
 	        		pt.getX()-radius, pt.getY()-radius,
 	        		2*radius, 2*radius);
 	      int h = 2*radius + 1;
-	      int w = h;
-        // locate starting pixel
+            // locate starting pixel
         int x0 = (int)pt.getX()-radius;
         int y0 = (int)pt.getY()-radius;
         Point2D centerPt = new Point2D.Double();
 	      try {
-	        int[] pixels = new int[h*w];
+	        int[] pixels = new int[h* h];
 	        int n = 0, r = 0, g = 0, b = 0;
 	        // fill pixels array with pixel data
-	        image.getRaster().getDataElements(x0, y0, w, h, pixels);
+	        image.getRaster().getDataElements(x0, y0, h, h, pixels);
 	        // step thru pixels horizontally
-	        for (int i = 0; i < w; i++) {
+	        for (int i = 0; i < h; i++) {
 	          // step vertically
 	          for (int j = 0; j < h; j++) {
 	          	// include pixel if center is inside region
 	          	centerPt.setLocation(x0+i+.5, y0+j+.5);
 	          	if (region.contains(centerPt)) {
-		            int pixel = pixels[i + j*w];
+		            int pixel = pixels[i + j* h];
 		            n++; // pixel count
 		            r += (pixel >> 16) & 0xff; // red
 		            g += (pixel >> 8) & 0xff; // green
@@ -333,7 +331,7 @@ public class RGBStep extends Step {
         dataValid = false; // this step's data is invalid      
     	}      
       repaint();
-      track.support.firePropertyChange("step", null, new Integer(n)); //$NON-NLS-1$
+      track.support.firePropertyChange("step", null, n); //$NON-NLS-1$
     }
 
     /**

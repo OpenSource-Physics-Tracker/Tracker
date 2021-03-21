@@ -39,9 +39,9 @@ public abstract class TrackView extends JScrollPane
                                 implements PropertyChangeListener {
 
   // instance fields
-  private int trackID;
+  private final int trackID;
   protected TrackerPanel trackerPanel;
-  protected ArrayList<Component> toolbarComponents = new ArrayList<Component>();
+  protected ArrayList<Component> toolbarComponents = new ArrayList<>();
   protected TrackChooserTView parent;
 
   // constructor
@@ -103,27 +103,28 @@ public abstract class TrackView extends JScrollPane
    */
   public void propertyChange(PropertyChangeEvent e) {
     String name = e.getPropertyName();
-    if (name.equals("step")) { // from track //$NON-NLS-1$
-    	Integer i = (Integer)e.getNewValue();
-      refresh(i);
-    }
-    else if (name.equals("steps")) { // from particle model tracks //$NON-NLS-1$
-      refresh(trackerPanel.getFrameNumber());
-    }
-    else if (name.equals("selectedpoint")) { // from tracker panel //$NON-NLS-1$
-      Step step = trackerPanel.getSelectedStep();
-    	TTrack track = getTrack();
-      if (step != null && trackerPanel.getSelectedTrack() == track) {
-        refresh(step.getFrameNumber());
-      }
-      else {
+    switch (name) {
+      case "step":  // from track //$NON-NLS-1$
+        Integer i = (Integer) e.getNewValue();
+        refresh(i);
+        break;
+      case "steps":  // from particle model tracks //$NON-NLS-1$
         refresh(trackerPanel.getFrameNumber());
-      }
+        break;
+      case "selectedpoint":  // from tracker panel //$NON-NLS-1$
+        Step step = trackerPanel.getSelectedStep();
+        TTrack track = getTrack();
+        if (step != null && trackerPanel.getSelectedTrack() == track) {
+          refresh(step.getFrameNumber());
+        } else {
+          refresh(trackerPanel.getFrameNumber());
+        }
+        break;
     }
   }
   
   protected boolean isRefreshEnabled() {
-  	return trackerPanel.isAutoRefresh && parent.isTrackViewDisplayed(getTrack());
+  	return !trackerPanel.isAutoRefresh || !parent.isTrackViewDisplayed(getTrack());
   }
 
 }

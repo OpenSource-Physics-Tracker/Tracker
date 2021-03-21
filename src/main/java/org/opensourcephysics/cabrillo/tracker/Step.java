@@ -73,7 +73,7 @@ public abstract class Step implements Cloneable {
   protected Point[] screenPoints;          // for transform conversions
   protected boolean valid;								 // invalid until drawn except for point mass
   protected Map<TrackerPanel, Mark> marks  // tracker panel to Mark
-  		= new HashMap<TrackerPanel, Mark>();
+  		= new HashMap<>();
   protected int defaultIndex = 0; 				 // array index of default TPoint
   protected boolean dataVisible = true;		 // true if visible in plots, tables
 
@@ -198,27 +198,21 @@ public abstract class Step implements Cloneable {
    * Erases this on all tracker panels.
    */
   public void erase() {
-    Iterator<TrackerPanel> it = marks.keySet().iterator();
-    while (it.hasNext())
-      erase(it.next());
+    for (TrackerPanel trackerPanel : marks.keySet()) erase(trackerPanel);
   }
 
   /**
    * Remarks this on all tracker panels.
    */
   public void remark() {
-    Iterator<TrackerPanel> it = marks.keySet().iterator();
-    while (it.hasNext())
-      remark(it.next());
+    for (TrackerPanel trackerPanel : marks.keySet()) remark(trackerPanel);
   }
 
   /**
    * Repaints this on all tracker panels.
    */
   public void repaint() {
-    Iterator<TrackerPanel> it = marks.keySet().iterator();
-    while (it.hasNext())
-      repaint(it.next());
+    for (TrackerPanel trackerPanel : marks.keySet()) repaint(trackerPanel);
   }
   
   /**
@@ -294,7 +288,7 @@ public abstract class Step implements Cloneable {
    */
   protected Mark getMark(TrackerPanel trackerPanel) {
     Mark mark = marks.get(trackerPanel);
-    TPoint selection = null;
+    TPoint selection;
     if (mark == null) {
       selection = trackerPanel.getSelectedPoint();
       Point p = null;
@@ -302,9 +296,7 @@ public abstract class Step implements Cloneable {
       for (int n = 0; n < points.length; n++) {
       	if (!valid) continue;
       	// determine if point is valid (ie not NaN)
-      	valid = valid 
-      			&& !Double.isNaN(points[n].getX()) 
-      			&& !Double.isNaN(points[n].getY());
+      	valid = !Double.isNaN(points[n].getX()) && !Double.isNaN(points[n].getY());
         screenPoints[n] = points[n].getScreenPosition(trackerPanel);
         if (valid && selection == points[n]) 
         	p = screenPoints[n];
@@ -370,7 +362,7 @@ public abstract class Step implements Cloneable {
       Step step = (Step)super.clone();
       step.points = new TPoint[points.length];
       step.screenPoints = new Point[points.length];
-      step.marks = new HashMap<TrackerPanel, Mark>();
+      step.marks = new HashMap<>();
       return step;
     } catch(CloneNotSupportedException ex) {ex.printStackTrace();}
     return null;
@@ -398,7 +390,7 @@ public abstract class Step implements Cloneable {
   /**
    * An inner superclass of all handles.
    */
-  public class Handle extends TPoint {
+  public static class Handle extends TPoint {
 
     /**
      * Constructs a Handle with specified image coordinates.

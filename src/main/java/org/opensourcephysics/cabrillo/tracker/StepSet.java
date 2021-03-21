@@ -40,11 +40,11 @@ public class StepSet extends HashSet<Step> {
 	TrackerPanel trackerPanel;
 	boolean changed;
 	String trackUndoXML;
-	HashSet<String[]> undoStepStates = new HashSet<String[]>(); // stepState is {track name, frame number, xml step state}
-	HashSet<Step> removedSteps = new HashSet<Step>(); // steps removed after being changed (undo steps states retained)
+	HashSet<String[]> undoStepStates = new HashSet<>(); // stepState is {track name, frame number, xml step state}
+	HashSet<Step> removedSteps = new HashSet<>(); // steps removed after being changed (undo steps states retained)
 	boolean saveUndoStates = false;
 	boolean isModified = false;
-	HashSet<TTrack> tracks = new HashSet<TTrack>();
+	HashSet<TTrack> tracks = new HashSet<>();
 	
   /**
    * Constructs a StepSet.
@@ -207,7 +207,7 @@ public class StepSet extends HashSet<Step> {
   			tracks.add(step.getTrack());
   		}
   	}
-  	return tracks.toArray(new TTrack[tracks.size()]);
+  	return tracks.toArray(new TTrack[0]);
 	}
 	
   /**
@@ -285,7 +285,7 @@ public class StepSet extends HashSet<Step> {
       		Step step = track.getStep(n);
       		if (step!=null) {
       			String xml = next[2];
-            if(xml.indexOf(XML.CDATA_PRE)!=-1) {
+            if(xml.contains(XML.CDATA_PRE)) {
             	xml = xml.substring(xml.indexOf(XML.CDATA_PRE)+XML.CDATA_PRE.length(), xml.indexOf(XML.CDATA_POST));
             }
       			XMLControl stepControl = new XMLControlElement(xml);

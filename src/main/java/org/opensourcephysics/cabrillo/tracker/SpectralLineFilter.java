@@ -46,8 +46,8 @@ public class SpectralLineFilter extends Filter
     implements PropertyChangeListener {
 
   // static fields
-  private static Map<TrackerPanel, SpectralLineFilter> filters 
-  		= new HashMap<TrackerPanel, SpectralLineFilter>();
+  private static final Map<TrackerPanel, SpectralLineFilter> filters
+  		= new HashMap<>();
 
   // instance fields
   private BufferedImage source, output;
@@ -59,7 +59,7 @@ public class SpectralLineFilter extends Filter
   protected Line2D line = new Line2D.Double();
   protected Color color = Color.white;
   protected BasicStroke stroke = new BasicStroke();
-  protected Collection<Double> wavelengths = new ArrayList<Double>();
+  protected Collection<Double> wavelengths = new ArrayList<>();
   private Inspector inspector;
 
   /**
@@ -167,9 +167,7 @@ public class SpectralLineFilter extends Filter
     output.getRaster().setDataElements(0, 0, w, h, pixels);
     int n = vidPanel.getFrameNumber();
     AffineTransform transform = vidPanel.getCoords().getToImageTransform(n);
-    Iterator<Double> it = wavelengths.iterator();
-    while (it.hasNext()) {
-      double lambda = it.next().doubleValue();
+    for (double lambda : wavelengths) {
       end1.setXY(lambda, -200);
       transform.transform(end1, end1);
       end2.setXY(lambda, 200);
@@ -189,45 +187,45 @@ public class SpectralLineFilter extends Filter
     wavelengths.clear();
     switch(element) {
       case 1: // Hydrogen
-        wavelengths.add(new Double(410.2));
-        wavelengths.add(new Double(434.1));
-        wavelengths.add(new Double(486.1));
-        wavelengths.add(new Double(656.3));
+        wavelengths.add(410.2);
+        wavelengths.add(434.1);
+        wavelengths.add(486.1);
+        wavelengths.add(656.3);
         break;
       case 2: // Helium
-        wavelengths.add(new Double(447.1));
-        wavelengths.add(new Double(471.3));
-        wavelengths.add(new Double(492.2));
-        wavelengths.add(new Double(501.6));
-        wavelengths.add(new Double(587.6));
-        wavelengths.add(new Double(667.8));
-        wavelengths.add(new Double(706));
+        wavelengths.add(447.1);
+        wavelengths.add(471.3);
+        wavelengths.add(492.2);
+        wavelengths.add(501.6);
+        wavelengths.add(587.6);
+        wavelengths.add(667.8);
+        wavelengths.add(706.0);
         break;
       case 10: // Neon
-        wavelengths.add(new Double(540.1));
-        wavelengths.add(new Double(585.2));
-        wavelengths.add(new Double(588.2));
-        wavelengths.add(new Double(603.0));
-        wavelengths.add(new Double(607.4));
-        wavelengths.add(new Double(616.4));
-        wavelengths.add(new Double(621.7));
-        wavelengths.add(new Double(626.6));
-        wavelengths.add(new Double(633.4));
-        wavelengths.add(new Double(638.3));
-        wavelengths.add(new Double(640.2));
-        wavelengths.add(new Double(650.6));
-        wavelengths.add(new Double(659.9));
-        wavelengths.add(new Double(692.9));
-        wavelengths.add(new Double(703.2));
+        wavelengths.add(540.1);
+        wavelengths.add(585.2);
+        wavelengths.add(588.2);
+        wavelengths.add(603.0);
+        wavelengths.add(607.4);
+        wavelengths.add(616.4);
+        wavelengths.add(621.7);
+        wavelengths.add(626.6);
+        wavelengths.add(633.4);
+        wavelengths.add(638.3);
+        wavelengths.add(640.2);
+        wavelengths.add(650.6);
+        wavelengths.add(659.9);
+        wavelengths.add(692.9);
+        wavelengths.add(703.2);
         break;
       case 80: // Mercury
-        wavelengths.add(new Double(435.8));
-        wavelengths.add(new Double(546.1));
-        wavelengths.add(new Double(577.0));
-        wavelengths.add(new Double(579.1));
-        wavelengths.add(new Double(404.7));
-        wavelengths.add(new Double(407.8));
-        wavelengths.add(new Double(491.6));
+        wavelengths.add(435.8);
+        wavelengths.add(546.1);
+        wavelengths.add(577.0);
+        wavelengths.add(579.1);
+        wavelengths.add(404.7);
+        wavelengths.add(407.8);
+        wavelengths.add(491.6);
         break;
    }
     support.firePropertyChange("image", null, null); //$NON-NLS-1$
@@ -273,9 +271,9 @@ public class SpectralLineFilter extends Filter
       item = new ChemicalElement(TrackerRes.getString("SpectralLineFilter.Hg"), 80); //$NON-NLS-1$
       dropdown.addItem(item);
       dropdown.setSelectedIndex(0);
-      dropdown.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          ChemicalElement element = (ChemicalElement)dropdown.getSelectedItem();
+      dropdown.addActionListener(e -> {
+        ChemicalElement element = (ChemicalElement)dropdown.getSelectedItem();
+        if (element != null) {
           setWavelengths(element.z);
         }
       });
@@ -318,7 +316,8 @@ public class SpectralLineFilter extends Filter
      * @param control the control to save to
      * @param obj the filter to save
      */
-    public void saveObject(XMLControl control, Object obj) {/** not yet implemented */}
+    public void saveObject(XMLControl control, Object obj) {
+    }
 
     /**
      * Creates a new filter.

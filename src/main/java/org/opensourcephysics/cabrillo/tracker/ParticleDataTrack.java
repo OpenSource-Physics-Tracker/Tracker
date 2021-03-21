@@ -1229,7 +1229,7 @@ public class ParticleDataTrack extends ParticleModel implements DataTrack {
   			PositionStep step = createPositionStep(this, i, point.getX(), point.getY());
     		step.setFootprint(getFootprint());	  			
         steps.setStep(i, step);
-        refreshData(data, trackerPanel, firstFrameInVideoClip, 1);
+        refreshData(data, trackerPanel, firstFrameInVideoClip);
   		}	  			
   	}
   	

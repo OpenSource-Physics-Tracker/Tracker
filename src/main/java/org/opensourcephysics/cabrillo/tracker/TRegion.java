@@ -36,13 +36,13 @@ import org.opensourcephysics.media.core.TPoint;
  */
 public class TRegion extends Polygon {
 
-  // instance fields
-  private float brightLimit = 0.5f;
-  private int width, height; // image dimensions
-  private int w=100, h=100; // scan area dimensions
-  private int[] pixels; // image pixels as integers
-  private float[] hsb = new float[3];
-  private int x0, y0;
+    private final int width;
+    private final int height; // image dimensions
+  private final int w=100;
+    private final int[] pixels; // image pixels as integers
+  private final float[] hsb = new float[3];
+  private final int x0;
+    private final int y0;
 
   /**
    * Constructs a region starting from a specified image pixel position.
@@ -83,8 +83,10 @@ public class TRegion extends Polygon {
     int y = y0;
     int rightLimit = Math.min(width, x0+w/2);
     int leftLimit = Math.max(0, x0-w/2);
-    int topLimit = Math.max(0, y0-h/2);
-    int bottomLimit = Math.min(height, y0+h/2);
+      // scan area dimensions
+      int h = 100;
+      int topLimit = Math.max(0, y0- h /2);
+    int bottomLimit = Math.min(height, y0+ h /2);
     // scanning left to right, move up/down line by line until an inside pixel is found
     int n = 1;
     while (!foundInside) {
@@ -132,9 +134,9 @@ public class TRegion extends Polygon {
     int b = (pixel) & 0xff; // blue
     // convert to hsb
     Color.RGBtoHSB(r, g, b, hsb);
-    if (hsb[2] >= brightLimit)
-      return true;
-    return false;
+      // instance fields
+      float brightLimit = 0.5f;
+      return hsb[2] >= brightLimit;
   }
 
   /**
@@ -180,7 +182,7 @@ public class TRegion extends Polygon {
 	 *
    * For every point there is an upper-left, upper-right, lower-left, and lower-right
    * diagonally adjacent pixel.
-   * 
+   *
    * @param x the x-component of the point
    * @param y the y-component of the point
    * @param startingDirection the direction to move looking for an outside pixel

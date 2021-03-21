@@ -1343,7 +1343,7 @@ public class Tracker {
             Object mainclass = att.getValue("Main-Class");
             isTracker = mainclass.toString().endsWith("org.opensourcephysics.cabrillo.tracker.Tracker");
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
         // determine if relaunch is needed
