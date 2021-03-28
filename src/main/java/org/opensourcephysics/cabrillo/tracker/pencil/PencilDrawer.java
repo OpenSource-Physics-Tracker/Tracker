@@ -24,18 +24,6 @@
  */
 package org.opensourcephysics.cabrillo.tracker.pencil;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-
-import javax.swing.ImageIcon;
-
 import org.opensourcephysics.cabrillo.tracker.Tracker;
 import org.opensourcephysics.cabrillo.tracker.TrackerPanel;
 import org.opensourcephysics.cabrillo.tracker.TrackerRes;
@@ -43,6 +31,13 @@ import org.opensourcephysics.display.GUIUtils;
 import org.opensourcephysics.display.Interactive;
 import org.opensourcephysics.display.InteractivePanel;
 import org.opensourcephysics.tools.FontSizer;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 /**
  * A PencilDrawer draws and manages PencilScenes for a TrackerPanel.
@@ -52,10 +47,25 @@ import org.opensourcephysics.tools.FontSizer;
 public class PencilDrawer {
 
     static Color[][] colors;
-    static Cursor pencilCursor;
-    static BasicStroke lightStroke, heavyStroke;
 
-    private static final HashMap<TrackerPanel, PencilDrawer> drawers = new HashMap<>();
+    static Cursor pencilCursor;
+
+    static BasicStroke lightStroke;
+    static BasicStroke heavyStroke;
+
+    private PencilDrawing newDrawing;
+
+    private boolean drawingsVisible = true;
+
+    public ArrayList<PencilScene> scenes = new ArrayList<>();
+
+    public PencilControl drawingControl;
+
+    TrackerPanel trackerPanel;
+
+    Color color = colors[0][0];
+
+    private static final HashMap<TrackerPanel, PencilDrawer> DRAWERS = new HashMap<>();
 
     static {
         lightStroke = new BasicStroke(2);
@@ -69,13 +79,6 @@ public class PencilDrawer {
                 new Color(255, 180, 0), new Color(160, 0, 160), new Color(0, 160, 160), new Color(180, 180, 255)};
         colors = new Color[][]{baseColors, moreColors};
     }
-
-    private PencilDrawing newDrawing;
-    private boolean drawingsVisible = true;
-    TrackerPanel trackerPanel;
-    public ArrayList<PencilScene> scenes = new ArrayList<>();
-    Color color = colors[0][0];
-    public PencilControl drawingControl;
 
     /**
      * Constructs a PencilDrawer.
@@ -93,10 +96,10 @@ public class PencilDrawer {
      * @return the PencilDrawer
      */
     public static PencilDrawer getDrawer(TrackerPanel panel) {
-        PencilDrawer drawer = drawers.get(panel);
+        PencilDrawer drawer = DRAWERS.get(panel);
         if (drawer == null) {
             drawer = new PencilDrawer(panel);
-            drawers.put(panel, drawer);
+            DRAWERS.put(panel, drawer);
         }
         return drawer;
     }
@@ -119,7 +122,7 @@ public class PencilDrawer {
      * @return true if drawings exist
      */
     public static boolean hasDrawings(TrackerPanel panel) {
-        PencilDrawer drawer = drawers.get(panel);
+        PencilDrawer drawer = DRAWERS.get(panel);
         if (drawer == null || drawer.scenes.isEmpty()) return false;
         for (PencilScene scene : drawer.scenes) {
             if (!scene.getDrawings().isEmpty()) return true;
@@ -134,10 +137,10 @@ public class PencilDrawer {
      * @param panel the TrackerPanel
      */
     public static void dispose(TrackerPanel panel) {
-        PencilDrawer drawer = drawers.get(panel);
+        PencilDrawer drawer = DRAWERS.get(panel);
         if (drawer != null) {
             drawer.dispose();
-            drawers.remove(panel);
+            DRAWERS.remove(panel);
         }
     }
 
@@ -292,12 +295,12 @@ public class PencilDrawer {
      */
     public PencilScene getSceneAtFrame(int frame) {
         for (PencilScene scene : scenes) {
-            if (scene.startframe == frame) {
+            if (scene.startFrame == frame) {
                 return scene;
             }
         }
         for (PencilScene scene : scenes) {
-            if (scene.startframe < frame && scene.endframe >= frame) {
+            if (scene.startFrame < frame && scene.endFrame >= frame) {
                 return scene;
             }
         }
@@ -421,5 +424,4 @@ public class PencilDrawer {
             drawingControl.refreshGUI();
         }
     }
-
 }

@@ -31,26 +31,25 @@ package org.opensourcephysics.cabrillo.tracker;
  */
 public interface Derivative {
 
-  /**
-   * Evaluates the derivative(s).
-   * 
-   * Input data:
-   *    data[0] = parameters (int[] {spill, start, stepsize, count})
-   *    data[1] = xData (double[])
-   *    data[2] = yData (double[])
-   *    data[3] = validData (boolean[])
-   *    
-   * Returned result:
-   *    result[0] = firstDerivX (double[]) may be null
-   *    result[1] = firstDerivY (double[]) may be null
-   *    result[2] = secondDerivX (double[]) may be null
-   *    result[3] = secondDerivY (double[]) may be null
-   *    
-   * Note: result values may be NaN if no derivative could be determined
-   *
-   * @param data the input data
-   * @return Object[] result
-   */
-  Object[] evaluate(Object[] data);
-
+    /**
+     * Evaluates the derivative(s).
+     * <p>
+     * Input data:
+     * data[0] = parameters (int[] {spill, start, stepsize, count})
+     * data[1] = xData (double[])
+     * data[2] = yData (double[])
+     * data[3] = validData (boolean[])
+     * <p>
+     * Returned result:
+     * result[0] = firstDerivX (double[]) may be null
+     * result[1] = firstDerivY (double[]) may be null
+     * result[2] = secondDerivX (double[]) may be null
+     * result[3] = secondDerivY (double[]) may be null
+     * <p>
+     * Note: result values may be NaN if no derivative could be determined
+     *
+     * @param data the input data
+     * @return Object[] result
+     */
+    Object[] evaluate(Object[] data);
 }

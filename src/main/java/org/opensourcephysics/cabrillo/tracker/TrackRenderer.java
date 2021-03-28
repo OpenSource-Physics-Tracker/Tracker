@@ -24,11 +24,10 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.awt.*;
+import org.opensourcephysics.tools.FontSizer;
 
 import javax.swing.*;
-
-import org.opensourcephysics.tools.FontSizer;
+import java.awt.*;
 
 /**
  * A custom renderer to show track name and icon in dropdown list items
@@ -37,32 +36,31 @@ import org.opensourcephysics.tools.FontSizer;
  */
 public class TrackRenderer extends JLabel implements ListCellRenderer {
 
-	TrackRenderer() {
-    setOpaque(true);
-    setHorizontalAlignment(LEFT);
-    setVerticalAlignment(CENTER);
-    setBorder(BorderFactory.createEmptyBorder(1, 4, 1, 0));
-  }
-	
-  public Component getListCellRendererComponent(JList list,
-                                                Object value,
-                                                int index,
-                                                boolean isSelected,
-                                                boolean cellHasFocus) {
-    if (isSelected) {
-      setBackground(list.getSelectionBackground());
-      setForeground(list.getSelectionForeground());
-    } else {
-      setBackground(list.getBackground());
-      setForeground(list.getForeground());
+    TrackRenderer() {
+        setOpaque(true);
+        setHorizontalAlignment(LEFT);
+        setVerticalAlignment(CENTER);
+        setBorder(BorderFactory.createEmptyBorder(1, 4, 1, 0));
     }
-    if (value != null) {
-      Object[] array = (Object[])value;
-      setText((String)array[1]);
-      setIcon((Icon)array[0]);
-      FontSizer.setFonts(this, FontSizer.getLevel());
-    }
-    return this;
-  }
-}
 
+    public Component getListCellRendererComponent(JList list,
+                                                  Object value,
+                                                  int index,
+                                                  boolean isSelected,
+                                                  boolean cellHasFocus) {
+        if (isSelected) {
+            setBackground(list.getSelectionBackground());
+            setForeground(list.getSelectionForeground());
+        } else {
+            setBackground(list.getBackground());
+            setForeground(list.getForeground());
+        }
+        if (value != null) {
+            Object[] array = (Object[]) value;
+            setText((String) array[1]);
+            setIcon((Icon) array[0]);
+            FontSizer.setFonts(this, FontSizer.getLevel());
+        }
+        return this;
+    }
+}

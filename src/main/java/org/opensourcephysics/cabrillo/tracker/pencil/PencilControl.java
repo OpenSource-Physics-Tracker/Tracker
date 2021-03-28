@@ -48,9 +48,61 @@ import java.util.Collections;
  */
 public class PencilControl extends JDialog {
 
+    private static final Color LIGHT_GREY = new Color(230, 230, 230);
+
+    private final PencilDrawer drawer;
+    private final TrackerPanel trackerPanel;
+    private final Dimension canvasSize = new Dimension(120, 90);
+    private final PropertyChangeListener stepListener;
+    private final PropertyChangeListener tabListener;
+    private final PropertyChangeListener clipListener;
+    private final int buttonWidth = 14;
+    private final UndoableEditSupport undoSupport;
+    private final UndoManager undoManager;
+
+    static Icon undoIcon;
+    static Icon redoIcon;
+    static Icon undoDisabledIcon;
+    static Icon redoDisabledIcon;
+
     static PencilScene dummyScene = new PencilScene();
-    static Icon undoIcon, redoIcon, undoDisabledIcon, redoDisabledIcon;
-    private static final Color lightgrey = new Color(230, 230, 230);
+
+    private JTextField captionField;
+
+    private PencilScene selectedScene;
+
+    private JComboBox sceneDropdown;
+
+    private DrawingPanel canvas;
+
+    private JLabel drawingLabel;
+    private JLabel framesLabel;
+    private JLabel captionLabel;
+    private JLabel toLabel;
+
+    private JSpinner endFrameSpinner;
+    private JSpinner startFrameSpinner;
+
+    private JButton deleteSceneButton;
+    private JButton newSceneButton;
+    private JButton undoButton;
+    private JButton redoButton;
+    private JButton clearAllButton;
+    private JButton closeButton;
+    private JButton helpButton;
+
+    private ColorButton[][] colorButtons;
+
+    private boolean refreshing;
+    private boolean isVisible;
+
+    private AbstractAction postCaptionEditAction;
+
+    private String prevCaptionText;
+
+    JSpinner fontSizeSpinner;
+
+    JCheckBox heavyCheckbox;
 
     static {
         undoIcon = new ResizableIcon("/images/undo.gif");
@@ -58,31 +110,6 @@ public class PencilControl extends JDialog {
         undoDisabledIcon = new ResizableIcon("/images/undo_disabled.gif");
         redoDisabledIcon = new ResizableIcon("/images/redo_disabled.gif");
     }
-
-    private final PencilDrawer drawer;
-    private final TrackerPanel trackerPanel;
-    private PencilScene selectedScene;
-    private JComboBox sceneDropdown;
-    private DrawingPanel canvas;
-    private JLabel drawingLabel, captionLabel, framesLabel, toLabel;
-    private JSpinner startFrameSpinner, endFrameSpinner;
-    private JTextField captionField;
-    private JButton newSceneButton, deleteSceneButton;
-    private JButton undoButton, redoButton, clearAllButton, closeButton, helpButton;
-    private ColorButton[][] colorButtons;
-    private final Dimension canvasSize = new Dimension(120, 90);
-    private boolean refreshing;
-    private final PropertyChangeListener stepListener;
-    private final PropertyChangeListener tabListener;
-    private final PropertyChangeListener clipListener;
-    private final int buttonWidth = 14;
-    private boolean isVisible;
-    private final UndoableEditSupport undoSupport;
-    private final UndoManager undoManager;
-    private AbstractAction postCaptionEditAction;
-    private String prevCaptionText;
-    JSpinner fontSizeSpinner;
-    JCheckBox heavyCheckbox;
 
     /**
      * Constructs a PencilControl for a specified PencilDrawer.
@@ -541,11 +568,11 @@ public class PencilControl extends JDialog {
             int first = trackerPanel.getPlayer().getVideoClip().getFirstFrameNumber();
             int last = trackerPanel.getPlayer().getVideoClip().getLastFrameNumber();
             // scene start frame can't be less than clip start frame
-            selectedScene.startframe = Math.max(first, selectedScene.startframe);
-            SpinnerNumberModel model = new SpinnerNumberModel(selectedScene.startframe, first, last, 1); // init, min, max, step
+            selectedScene.startFrame = Math.max(first, selectedScene.startFrame);
+            SpinnerNumberModel model = new SpinnerNumberModel(selectedScene.startFrame, first, last, 1); // init, min, max, step
             startFrameSpinner.setModel(model);
-            int end = selectedScene.endframe == Integer.MAX_VALUE ? last : selectedScene.endframe;
-            model = new SpinnerNumberModel(end, selectedScene.startframe, last, 1); // init, min, max, step
+            int end = selectedScene.endFrame == Integer.MAX_VALUE ? last : selectedScene.endFrame;
+            model = new SpinnerNumberModel(end, selectedScene.startFrame, last, 1); // init, min, max, step
             endFrameSpinner.setModel(model);
             heavyCheckbox.setSelected(selectedScene.isHeavy());
             drawer.color = selectedScene.getCaption().color;
@@ -558,7 +585,7 @@ public class PencilControl extends JDialog {
             for (ColorButton b : colorButton) {
                 b.setToolTipText(TrackerRes.getString("PencilControlDialog.Button.Color.Tooltip"));
                 b.setBorder(b.color == drawer.color && enabled ? BorderFactory.createLineBorder(Color.GRAY, 2) :
-                        BorderFactory.createLineBorder(lightgrey, 2));
+                        BorderFactory.createLineBorder(LIGHT_GREY, 2));
                 b.icon.setColor(enabled ? b.color : Color.LIGHT_GRAY);
                 b.setEnabled(enabled);
             }
@@ -639,7 +666,7 @@ public class PencilControl extends JDialog {
         if (scene == null) return;
         if (!scene.includesFrame(trackerPanel.getFrameNumber())) {
             // set step number to show scene
-            int stepNum = trackerPanel.getPlayer().getVideoClip().frameToStep(scene.startframe);
+            int stepNum = trackerPanel.getPlayer().getVideoClip().frameToStep(scene.startFrame);
             trackerPanel.getPlayer().setStepNumber(stepNum);
         }
     }
@@ -930,5 +957,4 @@ public class PencilControl extends JDialog {
         }
 
     }
-
 }

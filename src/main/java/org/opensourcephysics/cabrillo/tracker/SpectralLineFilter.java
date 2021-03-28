@@ -42,302 +42,312 @@ import org.opensourcephysics.media.core.*;
  * @author Douglas Brown
  * @version 1.0
  */
-public class SpectralLineFilter extends Filter
-    implements PropertyChangeListener {
+public class SpectralLineFilter extends Filter implements PropertyChangeListener {
 
-  // static fields
-  private static final Map<TrackerPanel, SpectralLineFilter> filters
-  		= new HashMap<>();
+    private static final Map<TrackerPanel, SpectralLineFilter> filters = new HashMap<>();
 
-  // instance fields
-  private BufferedImage source, output;
-  private int[] pixels;
-  private int w, h;
-  private Graphics2D g;
-//  private TrackerPanel trackerPanel;
-  protected TPoint end1, end2;
-  protected Line2D line = new Line2D.Double();
-  protected Color color = Color.white;
-  protected BasicStroke stroke = new BasicStroke();
-  protected Collection<Double> wavelengths = new ArrayList<>();
-  private Inspector inspector;
+    private BufferedImage source;
+    private BufferedImage output;
 
-  /**
-   * Constructs a SpectralLineFilter object.
-   */
-  public SpectralLineFilter() {
-    end1 = new TPoint();
-    end2 = new TPoint();
-    setWavelengths(1); // Hydrogen by default
-  	hasInspector = true;
-  }
+    private int[] pixels;
 
-  /**
-   * Sets the tracker panel whose coords determine where the lines are drawn.
-   *
-   * @param panel a tracker panel
-   */
-  public void setTrackerPanel(TrackerPanel panel) {
-    if (vidPanel != null)
-    	vidPanel.removePropertyChangeListener("transform", this); //$NON-NLS-1$
-    vidPanel = panel;
-    vidPanel.addPropertyChangeListener("transform", this); //$NON-NLS-1$
-    getInspector().setVisible(true);
-  }
+    private int w;
+    private int h;
 
-  /**
-   * Applies the filter to a source image and returns the result.
-   *
-   * @param sourceImage the source image
-   * @return the filtered image
-   */
-  public BufferedImage getFilteredImage(BufferedImage sourceImage) {
-    if (!isEnabled()) return sourceImage;
-    if (sourceImage != source) initialize(sourceImage);
-    drawLines();
-    return output;
-  }
+    private Graphics2D g;
 
-  /**
-   * Implements abstract Filter method.
-   *
-   * @return the inspector
-   */
-  public JDialog getInspector() {
-  	if (inspector == null) inspector = new Inspector();
-  	if (inspector.isModal() && vidPanel != null) {
-  		Frame f = JOptionPane.getFrameForComponent(vidPanel);
-    	if (frame != f) {
-    		frame = f;
-      	inspector = new Inspector();
-    	}
+    protected TPoint end1;
+    protected TPoint end2;
+
+    protected Line2D line = new Line2D.Double();
+
+    protected Color color = Color.white;
+
+    protected BasicStroke stroke = new BasicStroke();
+
+    protected Collection<Double> wavelengths = new ArrayList<>();
+
+    private Inspector inspector;
+
+    /**
+     * Constructs a SpectralLineFilter object.
+     */
+    public SpectralLineFilter() {
+        end1 = new TPoint();
+        end2 = new TPoint();
+        setWavelengths(1); // Hydrogen by default
+        hasInspector = true;
     }
-    return inspector;
-  }
 
-  /**
-   * Responds to property change events. Implements PropertyChangeListener.
-   *
-   * @param e the property change event
-   */
-  public void propertyChange(PropertyChangeEvent e) {
-    // fires "image" property change event whenever the coords change
-    support.firePropertyChange("image", null, null); //$NON-NLS-1$
-  }
-
-  /**
-   * Gets the spectral line filter for the specified tracker panel.
-   *
-   * @param panel a tracker panel
-   * @return the filter
-   */
-  public static SpectralLineFilter getFilter(TrackerPanel panel) {
-    SpectralLineFilter filter = filters.get(panel);
-    if (filter == null) {
-      filter = new SpectralLineFilter();
-      filter.setTrackerPanel(panel);
-      filters.put(panel, filter);
+    /**
+     * Sets the tracker panel whose coords determine where the lines are drawn.
+     *
+     * @param panel a tracker panel
+     */
+    public void setTrackerPanel(TrackerPanel panel) {
+        if (vidPanel != null)
+            vidPanel.removePropertyChangeListener("transform", this); //$NON-NLS-1$
+        vidPanel = panel;
+        vidPanel.addPropertyChangeListener("transform", this); //$NON-NLS-1$
+        getInspector().setVisible(true);
     }
-    return filter;
-  }
+
+    /**
+     * Applies the filter to a source image and returns the result.
+     *
+     * @param sourceImage the source image
+     * @return the filtered image
+     */
+    public BufferedImage getFilteredImage(BufferedImage sourceImage) {
+        if (!isEnabled()) return sourceImage;
+        if (sourceImage != source) initialize(sourceImage);
+        drawLines();
+        return output;
+    }
+
+    /**
+     * Implements abstract Filter method.
+     *
+     * @return the inspector
+     */
+    public JDialog getInspector() {
+        if (inspector == null) inspector = new Inspector();
+        if (inspector.isModal() && vidPanel != null) {
+            Frame f = JOptionPane.getFrameForComponent(vidPanel);
+            if (frame != f) {
+                frame = f;
+                inspector = new Inspector();
+            }
+        }
+        return inspector;
+    }
+
+    /**
+     * Responds to property change events. Implements PropertyChangeListener.
+     *
+     * @param e the property change event
+     */
+    public void propertyChange(PropertyChangeEvent e) {
+        // fires "image" property change event whenever the coords change
+        support.firePropertyChange("image", null, null); //$NON-NLS-1$
+    }
+
+    /**
+     * Gets the spectral line filter for the specified tracker panel.
+     *
+     * @param panel a tracker panel
+     * @return the filter
+     */
+    public static SpectralLineFilter getFilter(TrackerPanel panel) {
+        SpectralLineFilter filter = filters.get(panel);
+        if (filter == null) {
+            filter = new SpectralLineFilter();
+            filter.setTrackerPanel(panel);
+            filters.put(panel, filter);
+        }
+        return filter;
+    }
 
 //_____________________________ private methods _______________________
 
-  /**
-   * Initializes the image.
-   *
-   * @param image a new source image
-   */
-  private void initialize(BufferedImage image) {
-    source = image; // assumes image is TYPE_INT_RGB
-    w = source.getWidth();
-    h = source.getHeight();
-    output = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-    g = output.createGraphics();
-    g.setPaint(color);
-    pixels = new int[w * h];
-  }
-
-  /**
-   * Draws the lines on the image.
-   */
-  private void drawLines() {
-    if (vidPanel == null) return;
-    source.getRaster().getDataElements(0, 0, w, h, pixels);
-    output.getRaster().setDataElements(0, 0, w, h, pixels);
-    int n = vidPanel.getFrameNumber();
-    AffineTransform transform = vidPanel.getCoords().getToImageTransform(n);
-    for (double lambda : wavelengths) {
-      end1.setXY(lambda, -200);
-      transform.transform(end1, end1);
-      end2.setXY(lambda, 200);
-      transform.transform(end2, end2);
-      line.setLine(end1, end2);
-      Shape shape = stroke.createStrokedShape(line);
-      g.fill(shape);
-    }
-  }
-
-  /**
-   * Sets the spectral line wavelengths for a specified element.
-   *
-   * @param element the atomic number of the element
-   */
-  private void setWavelengths(int element) {
-    wavelengths.clear();
-    switch(element) {
-      case 1: // Hydrogen
-        wavelengths.add(410.2);
-        wavelengths.add(434.1);
-        wavelengths.add(486.1);
-        wavelengths.add(656.3);
-        break;
-      case 2: // Helium
-        wavelengths.add(447.1);
-        wavelengths.add(471.3);
-        wavelengths.add(492.2);
-        wavelengths.add(501.6);
-        wavelengths.add(587.6);
-        wavelengths.add(667.8);
-        wavelengths.add(706.0);
-        break;
-      case 10: // Neon
-        wavelengths.add(540.1);
-        wavelengths.add(585.2);
-        wavelengths.add(588.2);
-        wavelengths.add(603.0);
-        wavelengths.add(607.4);
-        wavelengths.add(616.4);
-        wavelengths.add(621.7);
-        wavelengths.add(626.6);
-        wavelengths.add(633.4);
-        wavelengths.add(638.3);
-        wavelengths.add(640.2);
-        wavelengths.add(650.6);
-        wavelengths.add(659.9);
-        wavelengths.add(692.9);
-        wavelengths.add(703.2);
-        break;
-      case 80: // Mercury
-        wavelengths.add(435.8);
-        wavelengths.add(546.1);
-        wavelengths.add(577.0);
-        wavelengths.add(579.1);
-        wavelengths.add(404.7);
-        wavelengths.add(407.8);
-        wavelengths.add(491.6);
-        break;
-   }
-    support.firePropertyChange("image", null, null); //$NON-NLS-1$
-  }
-
-  /**
-   * Inner Inspector class to control filter parameters
-   */
-  private class Inspector extends JDialog {
-
     /**
-     * Constructs the Inspector.
-     */
-    public Inspector() {
-      super(frame, !(frame instanceof org.opensourcephysics.display.OSPFrame));
-      setTitle(TrackerRes.getString("SpectralLineFilter.Title")); //$NON-NLS-1$
-      setResizable(false);
-      setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-      addComponentListener(new ComponentAdapter() {
-        public void componentShown(ComponentEvent e) {
-          SpectralLineFilter.this.setEnabled(true);
-        }
-        public void componentHidden(ComponentEvent e) {
-          SpectralLineFilter.this.setEnabled(false);
-        }
-      });
-      createGUI();
-      pack();
-    }
-
-    /**
-     * Creates the visible components.
-     */
-    void createGUI() {
-      // create dropdown
-      final JComboBox dropdown = new JComboBox();
-      Object item = new ChemicalElement(TrackerRes.getString("SpectralLineFilter.H"), 1); //$NON-NLS-1$
-      dropdown.addItem(item);
-      item = new ChemicalElement(TrackerRes.getString("SpectralLineFilter.He"), 2); //$NON-NLS-1$
-      dropdown.addItem(item);
-      item = new ChemicalElement(TrackerRes.getString("SpectralLineFilter.Ne"), 10); //$NON-NLS-1$
-      dropdown.addItem(item);
-      item = new ChemicalElement(TrackerRes.getString("SpectralLineFilter.Hg"), 80); //$NON-NLS-1$
-      dropdown.addItem(item);
-      dropdown.setSelectedIndex(0);
-      dropdown.addActionListener(e -> {
-        ChemicalElement element = (ChemicalElement)dropdown.getSelectedItem();
-        if (element != null) {
-          setWavelengths(element.z);
-        }
-      });
-      // add components to content pane
-      JPanel buttonbar = new JPanel(new FlowLayout());
-      setContentPane(buttonbar);
-      buttonbar.add(dropdown);
-    }
-
-    class ChemicalElement {
-      String name;
-      int z;
-      ChemicalElement(String element, int atomicNumber) {
-        name = element;
-        z = atomicNumber;
-      }
-      public String toString() {
-        return name;
-      }
-    }
-  }
-
-  /**
-   * Returns an XML.ObjectLoader to save and load filter data.
-   *
-   * @return the object loader
-   */
-  public static XML.ObjectLoader getLoader() {
-    return new Loader();
-  }
-
-  /**
-   * A class to save and load filter data.
-   */
-  static class Loader implements XML.ObjectLoader {
-
-    /**
-     * Saves data to an XMLControl.
+     * Initializes the image.
      *
-     * @param control the control to save to
-     * @param obj the filter to save
+     * @param image a new source image
      */
-    public void saveObject(XMLControl control, Object obj) {
+    private void initialize(BufferedImage image) {
+        source = image; // assumes image is TYPE_INT_RGB
+        w = source.getWidth();
+        h = source.getHeight();
+        output = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        g = output.createGraphics();
+        g.setPaint(color);
+        pixels = new int[w * h];
     }
 
     /**
-     * Creates a new filter.
-     *
-     * @param control the control
-     * @return the new filter
+     * Draws the lines on the image.
      */
-    public Object createObject(XMLControl control) {
-      return new SpectralLineFilter();
+    private void drawLines() {
+        if (vidPanel == null) return;
+        source.getRaster().getDataElements(0, 0, w, h, pixels);
+        output.getRaster().setDataElements(0, 0, w, h, pixels);
+        int n = vidPanel.getFrameNumber();
+        AffineTransform transform = vidPanel.getCoords().getToImageTransform(n);
+        for (double lambda : wavelengths) {
+            end1.setXY(lambda, -200);
+            transform.transform(end1, end1);
+            end2.setXY(lambda, 200);
+            transform.transform(end2, end2);
+            line.setLine(end1, end2);
+            Shape shape = stroke.createStrokedShape(line);
+            g.fill(shape);
+        }
     }
 
     /**
-     * Loads a filter with data from an XMLControl.
+     * Sets the spectral line wavelengths for a specified element.
      *
-     * @param control the control
-     * @param obj the filter
-     * @return the loaded object
+     * @param element the atomic number of the element
      */
-    public Object loadObject(XMLControl control, Object obj) {
-      return obj;
+    private void setWavelengths(int element) {
+        wavelengths.clear();
+        switch (element) {
+            case 1: // Hydrogen
+                wavelengths.add(410.2);
+                wavelengths.add(434.1);
+                wavelengths.add(486.1);
+                wavelengths.add(656.3);
+                break;
+            case 2: // Helium
+                wavelengths.add(447.1);
+                wavelengths.add(471.3);
+                wavelengths.add(492.2);
+                wavelengths.add(501.6);
+                wavelengths.add(587.6);
+                wavelengths.add(667.8);
+                wavelengths.add(706.0);
+                break;
+            case 10: // Neon
+                wavelengths.add(540.1);
+                wavelengths.add(585.2);
+                wavelengths.add(588.2);
+                wavelengths.add(603.0);
+                wavelengths.add(607.4);
+                wavelengths.add(616.4);
+                wavelengths.add(621.7);
+                wavelengths.add(626.6);
+                wavelengths.add(633.4);
+                wavelengths.add(638.3);
+                wavelengths.add(640.2);
+                wavelengths.add(650.6);
+                wavelengths.add(659.9);
+                wavelengths.add(692.9);
+                wavelengths.add(703.2);
+                break;
+            case 80: // Mercury
+                wavelengths.add(435.8);
+                wavelengths.add(546.1);
+                wavelengths.add(577.0);
+                wavelengths.add(579.1);
+                wavelengths.add(404.7);
+                wavelengths.add(407.8);
+                wavelengths.add(491.6);
+                break;
+        }
+        support.firePropertyChange("image", null, null); //$NON-NLS-1$
     }
-  }
+
+    /**
+     * Inner Inspector class to control filter parameters
+     */
+    private class Inspector extends JDialog {
+
+        /**
+         * Constructs the Inspector.
+         */
+        public Inspector() {
+            super(frame, !(frame instanceof org.opensourcephysics.display.OSPFrame));
+            setTitle(TrackerRes.getString("SpectralLineFilter.Title")); //$NON-NLS-1$
+            setResizable(false);
+            setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+            addComponentListener(new ComponentAdapter() {
+                public void componentShown(ComponentEvent e) {
+                    SpectralLineFilter.this.setEnabled(true);
+                }
+
+                public void componentHidden(ComponentEvent e) {
+                    SpectralLineFilter.this.setEnabled(false);
+                }
+            });
+            createGUI();
+            pack();
+        }
+
+        /**
+         * Creates the visible components.
+         */
+        void createGUI() {
+            // create dropdown
+            final JComboBox dropdown = new JComboBox();
+            Object item = new ChemicalElement(TrackerRes.getString("SpectralLineFilter.H"), 1); //$NON-NLS-1$
+            dropdown.addItem(item);
+            item = new ChemicalElement(TrackerRes.getString("SpectralLineFilter.He"), 2); //$NON-NLS-1$
+            dropdown.addItem(item);
+            item = new ChemicalElement(TrackerRes.getString("SpectralLineFilter.Ne"), 10); //$NON-NLS-1$
+            dropdown.addItem(item);
+            item = new ChemicalElement(TrackerRes.getString("SpectralLineFilter.Hg"), 80); //$NON-NLS-1$
+            dropdown.addItem(item);
+            dropdown.setSelectedIndex(0);
+            dropdown.addActionListener(e -> {
+                ChemicalElement element = (ChemicalElement) dropdown.getSelectedItem();
+                if (element != null) {
+                    setWavelengths(element.z);
+                }
+            });
+            // add components to content pane
+            JPanel buttonbar = new JPanel(new FlowLayout());
+            setContentPane(buttonbar);
+            buttonbar.add(dropdown);
+        }
+
+        class ChemicalElement {
+            String name;
+            int z;
+
+            ChemicalElement(String element, int atomicNumber) {
+                name = element;
+                z = atomicNumber;
+            }
+
+            public String toString() {
+                return name;
+            }
+        }
+    }
+
+    /**
+     * Returns an XML.ObjectLoader to save and load filter data.
+     *
+     * @return the object loader
+     */
+    public static XML.ObjectLoader getLoader() {
+        return new Loader();
+    }
+
+    /**
+     * A class to save and load filter data.
+     */
+    static class Loader implements XML.ObjectLoader {
+
+        /**
+         * Saves data to an XMLControl.
+         *
+         * @param control the control to save to
+         * @param obj     the filter to save
+         */
+        public void saveObject(XMLControl control, Object obj) {
+        }
+
+        /**
+         * Creates a new filter.
+         *
+         * @param control the control
+         * @return the new filter
+         */
+        public Object createObject(XMLControl control) {
+            return new SpectralLineFilter();
+        }
+
+        /**
+         * Loads a filter with data from an XMLControl.
+         *
+         * @param control the control
+         * @param obj     the filter
+         * @return the loaded object
+         */
+        public Object loadObject(XMLControl control, Object obj) {
+            return obj;
+        }
+    }
 }

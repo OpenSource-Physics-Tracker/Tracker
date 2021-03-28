@@ -41,65 +41,87 @@ package org.opensourcephysics.cabrillo.tracker.bounce;
  */
 public class BounceModel {
 
-	public BounceModel(int num_data, int deg, double when_step) {
-		degree = deg;
+    public BounceModel(int num_data, int deg, double when_step) {
+        degree = deg;
 
-		// There must be at least one data point on each side of a step
-		useUnknownStep = Double.isNaN(when_step);
-		if (useUnknownStep) {
-			useStep = false;
-			stepAt = (num_data + 1) / 2;    // looking for step in (stepAt-1,stepAt)
-		} else {
-			useStep = when_step > 0 && when_step < num_data - 1;
-			stepAt = useStep ? when_step : 0;
-		}
+        // There must be at least one data point on each side of a step
+        useUnknownStep = Double.isNaN(when_step);
+        if (useUnknownStep) {
+            useStep = false;
+            stepAt = (num_data + 1) / 2;    // looking for step in (stepAt-1,stepAt)
+        } else {
+            useStep = when_step > 0 && when_step < num_data - 1;
+            stepAt = useStep ? when_step : 0;
+        }
 
-		int numParams = degree + 1 + (useUnknownStep ? 2 : (useStep ? 1 : 0));
+        int numParams = degree + 1 + (useUnknownStep ? 2 : (useStep ? 1 : 0));
 
-		double[][] mapping1D = new double[num_data][numParams];
-		for (int t = 0; t < num_data; t++) {
-			int power = 1;
-			for (int d = 0; d <= degree; d++) {
-				mapping1D[t][d] = power;
-				power *= t;
-			}
-			if (this.usesStep()) {
-				mapping1D[t][degree + 1] = t >= stepAt ? (t - stepAt) : 0;
-			}
-			if (useUnknownStep) {
-				mapping1D[t][degree + 2] = t >= stepAt ? 1 : 0;
-			}
-		}
+        double[][] mapping1D = new double[num_data][numParams];
+        for (int t = 0; t < num_data; t++) {
+            int power = 1;
+            for (int d = 0; d <= degree; d++) {
+                mapping1D[t][d] = power;
+                power *= t;
+            }
+            if (this.usesStep()) {
+                mapping1D[t][degree + 1] = t >= stepAt ? (t - stepAt) : 0;
+            }
+            if (useUnknownStep) {
+                mapping1D[t][degree + 2] = t >= stepAt ? 1 : 0;
+            }
+        }
+        model = new BounceMatrix(mapping1D);
+        inverseModel = model.inverse();
+    }
 
-		model = new BounceMatrix(mapping1D);
-		inverseModel = model.inverse();
-	}
-	
-    private final BounceMatrix model;        /* model*params should match data in least-squares sense */
-    private final BounceMatrix inverseModel;  /* inverseModel*data sets params */
+    /**
+     * Model * params should match data in least-squares sense.
+     */
+    private final BounceMatrix model;
 
-    private final double stepAt;        /* where is a step modeled */
-    private final boolean useStep;       /* one more parameter than polynomial, to fit step at stepAt */
-    private final boolean useUnknownStep; /* two more paramters than polynomial, to try to fit step somewhere  near middle of window*/
+    /**
+     * InverseModel*data sets params.
+     */
+    private final BounceMatrix inverseModel;
 
-    private final int degree;        // degree of polynomial
+    /**
+     * where is a step modeled
+     */
+    private final double stepAt;
 
-	/**
-     * where is there a step?
+    /**
+     * One more parameter than polynomial, to fit step at - stepAt.
+     */
+    private final boolean useStep;
+
+    /**
+     * Two more parameters than polynomial, to try to fit step somewhere  near middle of window.
+     */
+    private final boolean useUnknownStep;
+
+    /**
+     * Degree of polynomial.
+     */
+    private final int degree;
+
+    /**
+     * Where is there a step?
      *
      * @return time of step in velocity
      */
     public double getStepAt() {
-        if (useUnknownStep) return Double.NaN;
+        if (useUnknownStep) {
+            return Double.NaN;
+        }
         return stepAt;
     }
 
     /**
-     * where is there a step?
+     * Where is there a step?
      * If there is a step in a model which estimates time as  well as size of step,
      * we need the model parameters to say where the step was fitted.
      *
-     * @param model_param parameters from fit
+     * @param model_param - parameters from fit
      * @return time of step in velocity
      */
     public double getStepAt(BounceMatrix model_param) {
@@ -132,7 +154,7 @@ public class BounceModel {
      * which can happen if
      * start, start+index_step, ...,  start+(num_data-1)*index_step
      * goes out of range for either data array
-     * or	xdata or ydata is Double.NaN for one of the specified points
+     * or Xdata or Ydata is Double.NaN for one of the specified points
      * <p>
      * Time t=0 corresponds to subscript "start"
      * Time t=1 to start+time_step
@@ -229,11 +251,11 @@ public class BounceModel {
      * Time t=0 corresponds to subscript "start"
      * Time t=1 to start+time_step
      *
-     * @param xData             array of x values
-     * @param yData             array of y values
-     * @param start             subscript of first (x,y) pair for window
-     * @param index_step        increment between subscripts for subsequent data points
-     * @param initial_stepAt   what time the predefined step happens 0<=t<num_data
+     * @param xData          array of x values
+     * @param yData          array of y values
+     * @param start          subscript of first (x,y) pair for window
+     * @param index_step     increment between subscripts for subsequent data points
+     * @param initial_stepAt what time the predefined step happens 0<=t<num_data
      * @return LinearModelParams containing parameters and residual square error
      */
     public BounceParameters fit_xy(double[] xData, double[] yData, int start, int index_step,
@@ -377,7 +399,7 @@ public class BounceModel {
         }
 
         double[][] param_array = model_param.getArray();
-		System.arraycopy(param_array[degree + 1], 0, result, 0, dimension);
+        System.arraycopy(param_array[degree + 1], 0, result, 0, dimension);
         return result;
     }
 }
