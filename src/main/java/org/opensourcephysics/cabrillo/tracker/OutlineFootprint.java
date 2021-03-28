@@ -24,11 +24,10 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.awt.*;
+import org.opensourcephysics.tools.FontSizer;
 
 import javax.swing.*;
-
-import org.opensourcephysics.tools.FontSizer;
+import java.awt.*;
 
 /**
  * An OutlineFootprint returns an outline shape for a Point array of length 2.
@@ -37,120 +36,121 @@ import org.opensourcephysics.tools.FontSizer;
  */
 public class OutlineFootprint extends LineFootprint {
 
-  // instance fields
-  private int spread; // outline width is (2 + 2*spread) pixels
+    /**
+     * Outline width is (2 + 2*spread) pixels
+     */
+    private int spread;
 
-  /**
-   * Constructs an OutlineFootprint.
-   *
-   * @param name the name of the footprint
-   */
-  public OutlineFootprint(String name) {
-    super(name);
-    setStroke(baseStroke);
-  }
-
-  /**
-   * Sets the spread. The width of the outline is (1 + 2*spread).
-   *
-   * @param spread the desired spread
-   */
-  public void setSpread(int spread) {
-    this.spread = spread;
-  }
-
-  /**
-   * Gets the spread.
-   *
-   * @return the spread
-   */
-  public int getSpread() {
-    return spread;
-  }
-
-  /**
-   * Gets the icon.
-   *
-   * @param w width of the icon
-   * @param h height of the icon
-   * @return the icon
-   */
-  public Icon getIcon(int w, int h) {
-    int scale = FontSizer.getIntegerFactor();
-    w *= scale;
-    h *= scale;
-    Point[] points = new Point[] {new Point(), new Point(w - scale*2, scale*2 - h)};
-    int prevSpread = spread;
-    spread = scale;
-    Shape shape = getShape(points);
-    ShapeIcon icon = new ShapeIcon(shape, w, h);
-    icon.setColor(color);
-    spread = prevSpread;
-    return icon;
-  }
-
-  /**
-   * Overrides LineProfile setStroke method.
-   *
-   * @param stroke the desired stroke
-   */
-  public void setStroke(BasicStroke stroke) {
-    super.setStroke(stroke);
-  }
-
-  /**
-   * Gets the shape of this footprint.
-   *
-   * @param points an array of Points
-   * @return the shape
-   */
-  public Shape getShape(Point[] points) {
-    Point p1 = points[0];
-    Point p2 = points[1];
-    double theta = Math.atan2(p1.y - p2.y, p1.x - p2.x);
-    transform.setToRotation(theta, p2.x, p2.y);
-    transform.translate(p2.x, p2.y);
-    float d = (float)p1.distance(p2); // length of the line
-    // create outline
-    path.reset();
-    path.moveTo(0, -1 - spread);
-    path.lineTo(0, 1 + spread);
-    path.lineTo(d, 1 + spread);
-    path.lineTo(d, -1 - spread);
-    path.closePath();
-    // handle marker
-    int w = Math.min(spread + 1, 4);
-    path.moveTo(d/2, w);
-    path.lineTo(d/2, -w);
-    int scale = FontSizer.getIntegerFactor();
-    // centerline
-    if (getSpread() > 4 +2*scale) {
-      path.moveTo(0, 0);
-      path.lineTo(d, 0);
+    /**
+     * Constructs an OutlineFootprint.
+     *
+     * @param name the name of the footprint
+     */
+    public OutlineFootprint(String name) {
+        super(name);
+        setStroke(baseStroke);
     }
-    Shape outline = transform.createTransformedShape(path); // outline shape
-    float lineWidth = Math.min(scale*baseStroke.getLineWidth(), spread+1);
-    lineWidth = Math.max(lineWidth, baseStroke.getLineWidth());
-  	if (stroke==null || stroke.getLineWidth()!=lineWidth) {
-  		stroke = new BasicStroke(lineWidth);
-  	}
-    outline = stroke.createStrokedShape(outline);
-    // ceate hitshapes
-    path.reset();
-    path.moveTo(d, -1 - spread);
-    path.lineTo(d, 1 + spread);
-    hitShapes[0] = transform.createTransformedShape(path); // end 1
-    path.reset();
-    path.moveTo(0, -1 - spread);
-    path.lineTo(0, 1 + spread);
-    hitShapes[1] = transform.createTransformedShape(path); // end 2
-    // set handle hitshape to center line
-    float f = 0.45f; // hitshape will be 90% of tape length
-    path.reset();
-    path.moveTo(d * (0.5f + f), 0);
-    path.lineTo(d * (0.5f - f), 0);
-    hitShapes[2] = transform.createTransformedShape(path); // sides
-    return outline;
-  }
-}
 
+    /**
+     * Sets the spread. The width of the outline is (1 + 2*spread).
+     *
+     * @param spread the desired spread
+     */
+    public void setSpread(int spread) {
+        this.spread = spread;
+    }
+
+    /**
+     * Gets the spread.
+     *
+     * @return the spread
+     */
+    public int getSpread() {
+        return spread;
+    }
+
+    /**
+     * Gets the icon.
+     *
+     * @param w width of the icon
+     * @param h height of the icon
+     * @return the icon
+     */
+    public Icon getIcon(int w, int h) {
+        int scale = FontSizer.getIntegerFactor();
+        w *= scale;
+        h *= scale;
+        Point[] points = new Point[]{new Point(), new Point(w - scale * 2, scale * 2 - h)};
+        int prevSpread = spread;
+        spread = scale;
+        Shape shape = getShape(points);
+        ShapeIcon icon = new ShapeIcon(shape, w, h);
+        icon.setColor(color);
+        spread = prevSpread;
+        return icon;
+    }
+
+    /**
+     * Overrides LineProfile setStroke method.
+     *
+     * @param stroke the desired stroke
+     */
+    public void setStroke(BasicStroke stroke) {
+        super.setStroke(stroke);
+    }
+
+    /**
+     * Gets the shape of this footprint.
+     *
+     * @param points an array of Points
+     * @return the shape
+     */
+    public Shape getShape(Point[] points) {
+        Point p1 = points[0];
+        Point p2 = points[1];
+        double theta = Math.atan2(p1.y - p2.y, p1.x - p2.x);
+        transform.setToRotation(theta, p2.x, p2.y);
+        transform.translate(p2.x, p2.y);
+        float d = (float) p1.distance(p2); // length of the line
+        // create outline
+        path.reset();
+        path.moveTo(0, -1 - spread);
+        path.lineTo(0, 1 + spread);
+        path.lineTo(d, 1 + spread);
+        path.lineTo(d, -1 - spread);
+        path.closePath();
+        // handle marker
+        int w = Math.min(spread + 1, 4);
+        path.moveTo(d / 2, w);
+        path.lineTo(d / 2, -w);
+        int scale = FontSizer.getIntegerFactor();
+        // centerline
+        if (getSpread() > 4 + 2 * scale) {
+            path.moveTo(0, 0);
+            path.lineTo(d, 0);
+        }
+        Shape outline = transform.createTransformedShape(path); // outline shape
+        float lineWidth = Math.min(scale * baseStroke.getLineWidth(), spread + 1);
+        lineWidth = Math.max(lineWidth, baseStroke.getLineWidth());
+        if (stroke == null || stroke.getLineWidth() != lineWidth) {
+            stroke = new BasicStroke(lineWidth);
+        }
+        outline = stroke.createStrokedShape(outline);
+        // ceate hitshapes
+        path.reset();
+        path.moveTo(d, -1 - spread);
+        path.lineTo(d, 1 + spread);
+        hitShapes[0] = transform.createTransformedShape(path); // end 1
+        path.reset();
+        path.moveTo(0, -1 - spread);
+        path.lineTo(0, 1 + spread);
+        hitShapes[1] = transform.createTransformedShape(path); // end 2
+        // set handle hitshape to center line
+        float f = 0.45f; // hitshape will be 90% of tape length
+        path.reset();
+        path.moveTo(d * (0.5f + f), 0);
+        path.lineTo(d * (0.5f - f), 0);
+        hitShapes[2] = transform.createTransformedShape(path); // sides
+        return outline;
+    }
+}

@@ -52,11 +52,55 @@ import org.opensourcephysics.controls.*;
 public class CircleFitter extends TTrack {
 
     protected static int maxDataPointCount = 50;
+
     protected static String[] dataVariables;
-    protected static String[] fieldVariables; // associated with number fields
-    protected static String[] formatVariables; // used by NumberFormatSetter
+
+    /**
+     * Associated with number fields
+     */
+    protected static String[] fieldVariables;
+
+    /**
+     * Used by NumberFormatSetter
+     */
+    protected static String[] formatVariables;
+
     protected static Map<String, ArrayList<String>> formatMap;
     protected static Map<String, String> formatDescriptionMap;
+
+    protected boolean fixedPosition = true;
+    protected boolean attachToSteps = false;
+    protected boolean isRelativeFrameNumbers = false;
+
+    private boolean refreshingAttachments;
+    private boolean abortRefreshAttachments;
+    private boolean loadingAttachments;
+
+    protected JCheckBoxMenuItem fixedItem;
+
+    protected JLabel clickToMarkLabel;
+    protected JLabel xDataPointLabel;
+    protected JLabel yDataPointLabel;
+
+    protected NumberField xDataField;
+    protected NumberField yDataField;
+
+    protected Component xDataPointSeparator;
+    protected Component yDataPointSeparator;
+
+    protected JMenuItem originToCenterItem;
+    protected JMenuItem clearPointsItem;
+    protected JMenuItem attachmentItem;
+
+    protected JButton pointCountButton;
+
+    protected int absoluteStart = 0;
+    protected int relativeStart = -2;
+    protected int attachmentFrameCount = 5;
+
+    protected TTrack[] attachmentForSteps;
+
+    protected String stepAttachmentName;
 
     static {
         String center = TrackerRes.getString("CircleFitter.Data.Center") + "}"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -109,22 +153,6 @@ public class CircleFitter extends TTrack {
         formatDescriptionMap.put(formatVariables[2], TrackerRes.getString("CircleFitter.Label.Radius")); //$NON-NLS-1$
 
     }
-
-    // instance fields
-    protected boolean fixedPosition = true;
-    protected JCheckBoxMenuItem fixedItem;
-    protected JLabel clickToMarkLabel;
-    protected JLabel xDataPointLabel, yDataPointLabel;
-    protected NumberField xDataField, yDataField;
-    protected Component xDataPointSeparator, yDataPointSeparator;
-    protected JMenuItem originToCenterItem, clearPointsItem;
-    protected JMenuItem attachmentItem;
-    protected JButton pointCountButton;
-    protected boolean attachToSteps = false, isRelativeFrameNumbers = false;
-    protected int absoluteStart = 0, relativeStart = -2, attachmentFrameCount = 5;
-    protected TTrack[] attachmentForSteps;
-    protected String stepAttachmentName;
-    private boolean refreshingAttachments, abortRefreshAttachments, loadingAttachments;
 
     /**
      * Constructs a CircleFitter.
@@ -1566,6 +1594,4 @@ public class CircleFitter extends TTrack {
             return obj;
         }
     }
-
 }
-

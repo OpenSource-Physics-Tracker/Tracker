@@ -44,12 +44,10 @@ import org.opensourcephysics.tools.FontSizer;
  */
 public class TViewChooser extends JPanel implements PropertyChangeListener {
 
-    // static fields
     protected static ImageIcon maxIcon = new ImageIcon(TViewChooser.class.getResource("/images/maximize.gif"));
     protected static Icon restoreIcon = new ImageIcon(TViewChooser.class.getResource("/images/restore.gif"));
 
 
-    // instance fields
     protected TrackerPanel trackerPanel;
     protected ArrayList<TView> views = new ArrayList<>();
     protected TView selectedView;
@@ -527,5 +525,4 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
             return obj;
         }
     }
-
 }

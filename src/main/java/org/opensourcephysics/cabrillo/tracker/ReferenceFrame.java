@@ -24,9 +24,11 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.beans.*;
+import org.opensourcephysics.media.core.ImageCoordSystem;
+import org.opensourcephysics.media.core.TPoint;
 
-import org.opensourcephysics.media.core.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * A ReferenceFrame is an image coordinate system with its origin
@@ -35,162 +37,162 @@ import org.opensourcephysics.media.core.*;
  * @author Douglas Brown
  */
 
-public class ReferenceFrame extends ImageCoordSystem
-                            implements PropertyChangeListener {
+public class ReferenceFrame extends ImageCoordSystem implements PropertyChangeListener {
 
-  // instance fields
-  private final PointMass originTrack;
-  private final ImageCoordSystem coords; // parent coords
-  private final boolean lockEnabled;
-  private boolean originLocked;
+    private final PointMass originTrack;
 
-  /**
-   * Constructs a ReferenceFrame with a default initial length.
-   *
-   * @param coords the image coordinate system providing angle and scale data
-   * @param originTrack the point mass providing origin data
-   */
-  public ReferenceFrame(ImageCoordSystem coords, PointMass originTrack) {
-    super(coords.getLength());
-    this.originTrack = originTrack;
-    this.coords = coords;
-    setFixedOrigin(false);
-    setFixedAngle(coords.isFixedAngle());
-    setFixedScale(coords.isFixedScale());
-    coords.addPropertyChangeListener("transform", this); //$NON-NLS-1$
-    originTrack.addPropertyChangeListener("step", this); //$NON-NLS-1$
-    originTrack.addPropertyChangeListener("steps", this); //$NON-NLS-1$
-    for (int n = 0; n < coords.getLength(); n++) {
-      setScaleXY(n, coords.getScaleX(n), coords.getScaleY(n));
-      setCosineSine(n, coords.getCosine(n),  coords.getSine(n));
-    }
-    setOrigins();
-    lockEnabled = true;
-  }
+    /**
+     * Parent coords
+     */
+    private final ImageCoordSystem coords;
 
-  /**
-   * Overrides ImageCoordSystem setFixedOrigin method. Origin is never
-   * fixed for a reference frame.
-   *
-   * @param fixed ignored
-   * @param n the frame number
-   */
-  public void setFixedOrigin(boolean fixed, int n) {
-    super.setFixedOrigin(false, n);
-  }
+    private final boolean lockEnabled;
+    private boolean originLocked;
 
-  /**
-   * Overrides setLocked method.
-   *
-   * @param locked <code>true</code> to lock the coordinate system
-   */
-  public void setLocked(boolean locked) {
-    if (locked) {
-      originLocked = originTrack.isLocked();
-      originTrack.setLocked(true);
-    }
-    else {
-      originTrack.setLocked(originLocked);
-    }
-    coords.setLocked(locked);
-    super.setLocked(locked);
-  }
-
-  /**
-   * Overrides isLocked method.
-   *
-   * @return <code>true</code> if this is locked
-   */
-  public boolean isLocked() {
-    return lockEnabled && coords.isLocked();
-  }
-
-  /**
-   * Responds to property change events. ReferenceFrame receives the
-   * following events: "step" and "mass" from PointMass (origin), and
-   * "transform" from ImageCoordSystem (angle and scale).
-   *
-   * @param e the property change event
-   */
-  public void propertyChange(PropertyChangeEvent e) {
-    String name = e.getPropertyName();
-    if (name.equals("step") || name.equals("steps")) // from PointMass //$NON-NLS-1$ //$NON-NLS-2$
-      setOrigins();
-    else if (name.equals("transform")) {  // from ImageCoordSystem //$NON-NLS-1$
-      Integer integer = (Integer)e.getNewValue();
-      if (integer != null) {
-        int n = integer;
-        setScaleXY(n, coords.getScaleX(n), coords.getScaleY(n));
-        setCosineSine(n, coords.getCosine(n),  coords.getSine(n));
-        if (originTrack.isEmpty() && n == 0) setOrigins();
-      }
-      else {
+    /**
+     * Constructs a ReferenceFrame with a default initial length.
+     *
+     * @param coords      the image coordinate system providing angle and scale data
+     * @param originTrack the point mass providing origin data
+     */
+    public ReferenceFrame(ImageCoordSystem coords, PointMass originTrack) {
+        super(coords.getLength());
+        this.originTrack = originTrack;
+        this.coords = coords;
+        setFixedOrigin(false);
+        setFixedAngle(coords.isFixedAngle());
+        setFixedScale(coords.isFixedScale());
+        coords.addPropertyChangeListener("transform", this); //$NON-NLS-1$
+        originTrack.addPropertyChangeListener("step", this); //$NON-NLS-1$
+        originTrack.addPropertyChangeListener("steps", this); //$NON-NLS-1$
         for (int n = 0; n < coords.getLength(); n++) {
-          setScaleXY(n, coords.getScaleX(n), coords.getScaleY(n));
-          setCosineSine(n, coords.getCosine(n),  coords.getSine(n));
+            setScaleXY(n, coords.getScaleX(n), coords.getScaleY(n));
+            setCosineSine(n, coords.getCosine(n), coords.getSine(n));
         }
-        if (originTrack.isEmpty()) setOrigins();
-      }
+        setOrigins();
+        lockEnabled = true;
     }
-  }
 
-  /**
-   * Gets the parent image coordinate system. The parent coords are returned
-   * after setting its angles and scales to match this.
-   *
-   * @return the parent image coordinate system
-   */
-  public ImageCoordSystem getCoords() {
-    coords.removePropertyChangeListener("transform", this); //$NON-NLS-1$
-    coords.setFixedAngle(isFixedAngle());
-    coords.setFixedScale(isFixedScale());
-    for (int n = 0; n < coords.getLength(); n++) {
-      coords.setScaleXY(n, getScaleX(n), getScaleY(n));
-      coords.setCosineSine(n, getCosine(n),  getSine(n));
+    /**
+     * Overrides ImageCoordSystem setFixedOrigin method. Origin is never
+     * fixed for a reference frame.
+     *
+     * @param fixed ignored
+     * @param n     the frame number
+     */
+    public void setFixedOrigin(boolean fixed, int n) {
+        super.setFixedOrigin(false, n);
     }
-    coords.addPropertyChangeListener("transform", this); //$NON-NLS-1$
-    return coords;
-  }
 
-  /**
-   * Gets the origin track of this reference frame.
-   *
-   * @return the point mass supplying origin data
-   */
-  public PointMass getOriginTrack() {
-    return originTrack;
-  }
-
-  /**
-   * Sets the origins of the image coordinate system.
-   */
-  protected void setOrigins() {
-    firePropChange = false;
-    // find starting origin position
-    double x = coords.getOriginX(0); // in case origin is empty
-    double y = coords.getOriginY(0);
-    for (int n = 0; n < coords.getLength(); n++) {
-      Step step = originTrack.getStep(n);
-      if (step != null) {
-        TPoint p = ((PositionStep)step).getPosition();
-        x = p.getX();
-        y = p.getY();
-        break;
-      }
+    /**
+     * Overrides setLocked method.
+     *
+     * @param locked <code>true</code> to lock the coordinate system
+     */
+    public void setLocked(boolean locked) {
+        if (locked) {
+            originLocked = originTrack.isLocked();
+            originTrack.setLocked(true);
+        } else {
+            originTrack.setLocked(originLocked);
+        }
+        coords.setLocked(locked);
+        super.setLocked(locked);
     }
-    // set coord system origins
-    for (int n = 0; n < coords.getLength(); n++) {
-      Step step = originTrack.getStep(n);
-      if (step != null) {
-        TPoint p = ((PositionStep)step).getPosition();
-        x = p.getX();
-        y = p.getY();
-      }
-      setOriginXY(n, x, y);
-    }
-    firePropChange = true;
-    // fire property change for overall updates
-    support.firePropertyChange("transform", null, null); //$NON-NLS-1$
-  }
 
+    /**
+     * Overrides isLocked method.
+     *
+     * @return <code>true</code> if this is locked
+     */
+    public boolean isLocked() {
+        return lockEnabled && coords.isLocked();
+    }
+
+    /**
+     * Responds to property change events. ReferenceFrame receives the
+     * following events: "step" and "mass" from PointMass (origin), and
+     * "transform" from ImageCordSystem (angle and scale).
+     *
+     * @param e the property change event
+     */
+    public void propertyChange(PropertyChangeEvent e) {
+        String name = e.getPropertyName();
+        if (name.equals("step") || name.equals("steps")) // from PointMass //$NON-NLS-1$ //$NON-NLS-2$
+            setOrigins();
+        else if (name.equals("transform")) {  // from ImageCoordSystem //$NON-NLS-1$
+            Integer integer = (Integer) e.getNewValue();
+            if (integer != null) {
+                int n = integer;
+                setScaleXY(n, coords.getScaleX(n), coords.getScaleY(n));
+                setCosineSine(n, coords.getCosine(n), coords.getSine(n));
+                if (originTrack.isEmpty() && n == 0) setOrigins();
+            } else {
+                for (int n = 0; n < coords.getLength(); n++) {
+                    setScaleXY(n, coords.getScaleX(n), coords.getScaleY(n));
+                    setCosineSine(n, coords.getCosine(n), coords.getSine(n));
+                }
+                if (originTrack.isEmpty()) setOrigins();
+            }
+        }
+    }
+
+    /**
+     * Gets the parent image coordinate system. The parent coords are returned
+     * after setting its angles and scales to match this.
+     *
+     * @return the parent image coordinate system
+     */
+    public ImageCoordSystem getCoords() {
+        coords.removePropertyChangeListener("transform", this); //$NON-NLS-1$
+        coords.setFixedAngle(isFixedAngle());
+        coords.setFixedScale(isFixedScale());
+        for (int n = 0; n < coords.getLength(); n++) {
+            coords.setScaleXY(n, getScaleX(n), getScaleY(n));
+            coords.setCosineSine(n, getCosine(n), getSine(n));
+        }
+        coords.addPropertyChangeListener("transform", this); //$NON-NLS-1$
+        return coords;
+    }
+
+    /**
+     * Gets the origin track of this reference frame.
+     *
+     * @return the point mass supplying origin data
+     */
+    public PointMass getOriginTrack() {
+        return originTrack;
+    }
+
+    /**
+     * Sets the origins of the image coordinate system.
+     */
+    protected void setOrigins() {
+        firePropChange = false;
+        // find starting origin position
+        double x = coords.getOriginX(0); // in case origin is empty
+        double y = coords.getOriginY(0);
+        for (int n = 0; n < coords.getLength(); n++) {
+            Step step = originTrack.getStep(n);
+            if (step != null) {
+                TPoint p = ((PositionStep) step).getPosition();
+                x = p.getX();
+                y = p.getY();
+                break;
+            }
+        }
+        // set coord system origins
+        for (int n = 0; n < coords.getLength(); n++) {
+            Step step = originTrack.getStep(n);
+            if (step != null) {
+                TPoint p = ((PositionStep) step).getPosition();
+                x = p.getX();
+                y = p.getY();
+            }
+            setOriginXY(n, x, y);
+        }
+        firePropChange = true;
+        // fire property change for overall updates
+        support.firePropertyChange("transform", null, null); //$NON-NLS-1$
+    }
 }

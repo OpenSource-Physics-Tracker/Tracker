@@ -55,20 +55,30 @@ public class BounceParameters {
     }
 
 
-    // The model that was fitted to create these parameters.
+    /**
+     * The model that was fitted to create these parameters.
+     */
     private final BounceModel model;
 
-    // The params matrix has as many rows as model has parameters.
-    // It has as many columns as the dimensionality of the data being fitted.
+    /**
+     * The params matrix has as many rows as model has parameters.
+     * It has as many columns as the dimensionality of the data being fitted.
+     */
     private final BounceMatrix params;
 
-    // The sum of the squares of the residual error of the fitting.
+    /**
+     * The sum of the squares of the residual error of the fitting.
+     */
     private final double squareError;
 
-    // If a step was removed before fitting the model, when was the step?
+    /**
+     * If a step was removed before fitting the model, when was the step?
+     */
     private final double initialStepAt;
 
-    // If a step was removed before fitting the model, how big was it?
+    /**
+     * If a step was removed before fitting the model, how big was it?
+     */
     private final double[] initialStepSize;
 
 

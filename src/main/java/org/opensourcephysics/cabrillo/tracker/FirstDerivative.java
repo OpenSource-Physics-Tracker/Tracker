@@ -31,78 +31,78 @@ package org.opensourcephysics.cabrillo.tracker;
  */
 public class FirstDerivative implements Derivative {
 
-  private double[] xDeriv, yDeriv = new double[0];
-  private final Object[] result = new Object[4];
+    private double[] xDeriv, yDeriv = new double[0];
+    private final Object[] result = new Object[4];
 
-  /**
-   * Evaluates the derivative.
-   * 
-   * Input data:
-   *    data[0] = parameters (int[] {spill, start, stepsize, count})
-   *    data[1] = xData (double[])
-   *    data[2] = yData (double[])
-   *    data[3] = validData (boolean[])
-   *    
-   * Returned result:
-   *    result[0] = xDeriv (double[]) (invalid values are NaN)
-   *    result[1] = yDeriv (double[]) (invalid values are NaN)
-   *    result[2] = null
-   *    result[3] = null
-   *
-   * @param data the input data
-   * @return Object[] the result
-   */
-  public Object[] evaluate(Object[] data) {
-    int[] params = (int[])data[0];
-    // instance fields
-    int spill = params[0];
-    int start = params[1];
-    int step = params[2];
-    int count = params[3];
-    double[] x = (double[])data[1];
-    double[] y = (double[])data[2];
-    boolean[] valid = (boolean[])data[3];
-    if (yDeriv.length != x.length) {
-      result[0] = xDeriv = new double[x.length];
-      result[1] = yDeriv = new double[x.length];
-    }
-
-    // get upper and lower index checking limits
-    int upper = Math.min(start + step *(count -1), x.length);
-
-    // find v at each step index from lower to upper
-    outer:
-    for (int i = start; i <= upper; i+= step) {
-
-      // derivative at i will be valid only if all step positions
-      // between i-spill*step and i+spill*step are valid
-      for (int j = i - spill * step; j <= i + spill * step; j+= step) {
-        if (j < 0 || j >= valid.length || !valid[j]) {
-        	if (i<valid.length) {
-        		xDeriv[i] = Double.NaN;
-        		yDeriv[i] = Double.NaN;
-        	}
-          continue outer;
+    /**
+     * Evaluates the derivative.
+     * <p>
+     * Input data:
+     * data[0] = parameters (int[] {spill, start, stepsize, count})
+     * data[1] = xData (double[])
+     * data[2] = yData (double[])
+     * data[3] = validData (boolean[])
+     * <p>
+     * Returned result:
+     * result[0] = xDeriv (double[]) (invalid values are NaN)
+     * result[1] = yDeriv (double[]) (invalid values are NaN)
+     * result[2] = null
+     * result[3] = null
+     *
+     * @param data the input data
+     * @return Object[] the result
+     */
+    public Object[] evaluate(Object[] data) {
+        int[] params = (int[]) data[0];
+        // instance fields
+        int spill = params[0];
+        int start = params[1];
+        int step = params[2];
+        int count = params[3];
+        double[] x = (double[]) data[1];
+        double[] y = (double[]) data[2];
+        boolean[] valid = (boolean[]) data[3];
+        if (yDeriv.length != x.length) {
+            result[0] = xDeriv = new double[x.length];
+            result[1] = yDeriv = new double[x.length];
         }
-      }
 
-      // use first derivative algorithm
-      if (spill == 1) {
-        xDeriv[i] = (- x[i - step]
-                     + x[i + step]) / 2;
-        yDeriv[i] = (- y[i - step]
-                     + y[i + step]) / 2;
-      } else { // spill is 2
-        xDeriv[i] = (- 2 * x[i - 2* step]
-                     - x[i - step]
-                     + x[i + step]
-                     + 2 * x[i + 2* step]) / 10;
-        yDeriv[i] = (- 2 * y[i - 2* step]
-                     - y[i - step]
-                     + y[i + step]
-                     + 2 * y[i + 2* step]) / 10;
-      }
+        // get upper and lower index checking limits
+        int upper = Math.min(start + step * (count - 1), x.length);
+
+        // find v at each step index from lower to upper
+        outer:
+        for (int i = start; i <= upper; i += step) {
+
+            // derivative at i will be valid only if all step positions
+            // between i-spill*step and i+spill*step are valid
+            for (int j = i - spill * step; j <= i + spill * step; j += step) {
+                if (j < 0 || j >= valid.length || !valid[j]) {
+                    if (i < valid.length) {
+                        xDeriv[i] = Double.NaN;
+                        yDeriv[i] = Double.NaN;
+                    }
+                    continue outer;
+                }
+            }
+
+            // use first derivative algorithm
+            if (spill == 1) {
+                xDeriv[i] = (-x[i - step]
+                        + x[i + step]) / 2;
+                yDeriv[i] = (-y[i - step]
+                        + y[i + step]) / 2;
+            } else { // spill is 2
+                xDeriv[i] = (-2 * x[i - 2 * step]
+                        - x[i - step]
+                        + x[i + step]
+                        + 2 * x[i + 2 * step]) / 10;
+                yDeriv[i] = (-2 * y[i - 2 * step]
+                        - y[i - step]
+                        + y[i + step]
+                        + 2 * y[i + 2 * step]) / 10;
+            }
+        }
+        return result;
     }
-    return result;
-  }
 }

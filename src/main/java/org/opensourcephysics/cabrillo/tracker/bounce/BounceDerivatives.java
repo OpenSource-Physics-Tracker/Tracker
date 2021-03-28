@@ -70,6 +70,7 @@ public class BounceDerivatives implements Derivative {
      * @param data the input data
      * @return Object array containing the result
      */
+    @Override
     public Object[] evaluate(Object[] data) {
         int[] params = (int[]) data[0];
         // window_size is the number of data points used for fitting a model

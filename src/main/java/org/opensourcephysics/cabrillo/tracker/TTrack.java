@@ -52,9 +52,12 @@ import org.opensourcephysics.cabrillo.tracker.AutoTrackerCore.KeyFrame;
  *
  * @author Douglas Brown
  */
-public abstract class TTrack implements Interactive,
-        Trackable,
-        PropertyChangeListener {
+public abstract class TTrack implements Interactive, Trackable, PropertyChangeListener {
+
+    /**
+     * Unique ID number
+     */
+    private final int ID;
 
     protected static String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //$NON-NLS-1$
     protected static JDialog skippedStepWarningDialog;
@@ -65,20 +68,33 @@ public abstract class TTrack implements Interactive,
     protected static TrackNameDialog nameDialog;
     protected static int nextID = 1;
     protected static HashMap<Integer, TTrack> activeTracks = new HashMap<>();
-    protected static FontRenderContext frc
-            = new FontRenderContext(null,   // no AffineTransform
-            false,  // no antialiasing
-            false); // no fractional metrics
+
+    /**
+     * First param : no AffineTransform
+     * Second param : no antialiasing
+     * Thirs param : no fractional metrics
+     */
+    protected static FontRenderContext frc = new FontRenderContext(null, false, false);
 
     // instance fields
     protected String name = TrackerRes.getString("TTrack.Name.None"); //$NON-NLS-1$
     protected String description = ""; //$NON-NLS-1$
     protected boolean visible = true;
     protected boolean trailVisible = false;
-    protected int trailLength; // controls trail length
+
+    /**
+     * Controls trail length
+     */
+    protected int trailLength;
+
     protected boolean locked = false;
     protected boolean enabled = true;
-    protected boolean viewable = true; // determines whether Views include this track
+
+    /**
+     * Determines whether Views include this track
+     */
+    protected boolean viewable = true;
+
     protected Footprint[] footprints = new Footprint[0];
     protected Footprint footprint;
     protected Footprint defaultFootprint;
@@ -99,8 +115,7 @@ public abstract class TTrack implements Interactive,
     protected NumberField[] positionFields;
     protected Map<String, NumberField[]> numberFields = new TreeMap<>();
     protected Border fieldBorder;
-    protected Component tSeparator, xSeparator, ySeparator, magSeparator,
-            angleSeparator, stepSeparator;
+    protected Component tSeparator, xSeparator, ySeparator, magSeparator, angleSeparator, stepSeparator;
     protected JMenu menu;
     protected boolean autoAdvance;
     protected boolean markByDefault = false, isMarking = false;
@@ -121,28 +136,53 @@ public abstract class TTrack implements Interactive,
     protected XMLProperty dataProp;
     protected Object[][] constantsLoadedFromXML;
     protected String[] dataDescriptions;
-    protected boolean dataValid; // true if data is valid
+
+    /**
+     * True if data is valid
+     */
+    protected boolean dataValid;
+
     protected boolean refreshDataLater;
     protected int[] preferredColumnOrder;
     protected ArrayList<Integer> dataFrames = new ArrayList<>();
     protected String partName, hint;
     protected int stepSizeWhenFirstMarked;
     protected TreeSet<Integer> keyFrames = new TreeSet<>();
-    // for autotracking
-    protected boolean autoTrackerMarking;
-    protected int targetIndex;
-    // attached tracks--used by AttachmentDialog with TapeMeasure, Protractor and CircleFitter tracks
-    protected TTrack[] attachments;
-    protected String[] attachmentNames; // used when loading attachments
-    // user-editable text columns shown in DataTable view
-    protected Map<String, String[]> textColumnEntries = new TreeMap<>();
-    protected ArrayList<String> textColumnNames = new ArrayList<>();
-    // mouse listener for number fields
-    protected MouseAdapter formatMouseListener, formatAngleMouseListener;
-    protected String[] customNumberFormats;
-    private final int ID; // unique ID number
 
-    // For autoskipping while autotracking
+    /**
+     * For AutoTracking
+     */
+    protected boolean autoTrackerMarking;
+
+    protected int targetIndex;
+
+    /**
+     * Attached tracks--used by AttachmentDialog with TapeMeasure, Protractor and CircleFitter tracks
+     */
+    protected TTrack[] attachments;
+
+    /**
+     * Used when loading attachments
+     */
+    protected String[] attachmentNames;
+
+    /**
+     * User-editable text columns shown in DataTable view
+     */
+    protected Map<String, String[]> textColumnEntries = new TreeMap<>();
+
+    protected ArrayList<String> textColumnNames = new ArrayList<>();
+
+    /**
+     * Mouse listener for number fields
+     */
+    protected MouseAdapter formatMouseListener, formatAngleMouseListener;
+
+    protected String[] customNumberFormats;
+
+    /**
+     * For AutoSkipping while AutoTracking
+     */
     public boolean skippedStepWarningSuppress = false;
 
 
@@ -922,8 +962,8 @@ public abstract class TTrack implements Interactive,
     /**
      * Gets this track's current icon.
      *
-     * @param w       the icon width
-     * @param h       the icon height
+     * @param w the icon width
+     * @param h the icon height
      * @return the icon
      */
     public Icon getIcon(int w, int h, String context) {
@@ -2986,6 +3026,4 @@ public abstract class TTrack implements Interactive,
     protected static TTrack getTrack(int ID) {
         return activeTracks.get(ID);
     }
-
 }
-

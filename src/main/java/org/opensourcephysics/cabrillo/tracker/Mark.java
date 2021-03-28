@@ -35,20 +35,19 @@ import java.awt.*;
  */
 public interface Mark {
 
-  /**
-   * Draws this object.
-   *
-   * @param g the Graphics2D context
-   * @param highlighted <code>true</code> to draw a highlighted version
-   */
-  void draw(Graphics2D g, boolean highlighted);
+    /**
+     * Draws this object.
+     *
+     * @param g           the Graphics2D context
+     * @param highlighted <code>true</code> to draw a highlighted version
+     */
+    void draw(Graphics2D g, boolean highlighted);
 
-  /**
-   * Gets the bounds of this object.
-   *
-   * @param highlighted <code>true</code> to get the highlighted bounds
-   * @return the bounding rectangle
-   */
-  Rectangle getBounds(boolean highlighted);
-
+    /**
+     * Gets the bounds of this object.
+     *
+     * @param highlighted <code>true</code> to get the highlighted bounds
+     * @return the bounding rectangle
+     */
+    Rectangle getBounds(boolean highlighted);
 }

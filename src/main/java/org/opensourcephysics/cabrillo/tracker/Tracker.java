@@ -63,20 +63,21 @@ public class Tracker {
         XML.setLoader(Preferences.class, new Preferences.Loader());
     }
 
-    // define static constants
     /**
-     * tracker version and copyright
+     * Tracker version
      */
     public static final String VERSION = "5.2.0.0";
+
+    /**
+     * Tracker copyright
+     */
     public static final String COPYRIGHT = "Copyright (c) 2018 Douglas Brown, Nikolai Avdeev";
+
     /**
-     * the tracker icon
+     * The tracker icon
      */
-    public static final ImageIcon TRACKER_ICON = new ImageIcon(Tracker.class.getResource("/images/tracker_icon_32.png"));
-    /**
-     * a larger tracker icon
-     */
-    public static final ImageIcon TRACKER_ICON_256 = new ImageIcon(Tracker.class.getResource("/images/tracker_icon_256.png"));
+    public static final ImageIcon TRACKER_ICON =
+            new ImageIcon(Tracker.class.getResource("/images/tracker_icon_32.png"));
 
     public static final String THETA = TeXParser.parseTeX("$\\theta");
     static final String OMEGA = TeXParser.parseTeX("$\\omega");

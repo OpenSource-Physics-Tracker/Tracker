@@ -40,240 +40,236 @@ import org.opensourcephysics.tools.FontSizer;
  */
 public class MultiLineFootprint implements Footprint, Cloneable {
 
-  // instance fields
-  protected String name;
-  protected AffineTransform transform = new AffineTransform();
-  protected BasicStroke baseStroke = new BasicStroke();
-  protected BasicStroke stroke;
-  protected Color color = Color.black;
-  protected GeneralPath path = new GeneralPath();
-  protected Line2D line = new Line2D.Double();
-  protected Shape[] hitShapes = new Shape[0];
-  protected boolean closed = false;
+    protected String name;
+    protected AffineTransform transform = new AffineTransform();
+    protected BasicStroke baseStroke = new BasicStroke();
+    protected BasicStroke stroke;
+    protected Color color = Color.black;
+    protected GeneralPath path = new GeneralPath();
+    protected Line2D line = new Line2D.Double();
+    protected Shape[] hitShapes = new Shape[0];
+    protected boolean closed = false;
 
-  /**
-   * Constructs a LineFootprint.
-   *
-   * @param name the name
-   */
-  public MultiLineFootprint(String name) {
-    this.name = name;
-  }
-
-  /**
-   * Gets a predefined MultiLineFootprint.
-   *
-   * @param name the name of the footprint
-   * @return the footprint
-   */
-  public static MultiLineFootprint getFootprint(String name) {
-    for (MultiLineFootprint footprint : footprints) {
-      if (name.equals(footprint.getName())) try {
-        return (MultiLineFootprint) footprint.clone();
-      } catch (CloneNotSupportedException ex) {
-        ex.printStackTrace();
-      }
+    /**
+     * Constructs a LineFootprint.
+     *
+     * @param name the name
+     */
+    public MultiLineFootprint(String name) {
+        this.name = name;
     }
-    return null;
-  }
 
-  /**
-   * Gets the name of this footprint.
-   *
-   * @return the name
-   */
-  public String getName() {
-    return name;
-  }
+    /**
+     * Gets a predefined MultiLineFootprint.
+     *
+     * @param name the name of the footprint
+     * @return the footprint
+     */
+    public static MultiLineFootprint getFootprint(String name) {
+        for (MultiLineFootprint footprint : footprints) {
+            if (name.equals(footprint.getName())) try {
+                return (MultiLineFootprint) footprint.clone();
+            } catch (CloneNotSupportedException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return null;
+    }
 
-  /**
-   * Gets the display name of the footprint.
-   *
-   * @return the localized display name
-   */
-  public String getDisplayName() {
-  	return TrackerRes.getString(name);
-  }
+    /**
+     * Gets the name of this footprint.
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
 
-  /**
-   * Gets the minimum point array length required by this footprint.
-   *
-   * @return the length
-   */
-  public int getLength() {
-    return 1;
-  }
+    /**
+     * Gets the display name of the footprint.
+     *
+     * @return the localized display name
+     */
+    public String getDisplayName() {
+        return TrackerRes.getString(name);
+    }
 
-  /**
-   * Gets the icon.
-   *
-   * @param w width of the icon
-   * @param h height of the icon
-   * @return the icon
-   */
-  public Icon getIcon(int w, int h) {
-    int scale = FontSizer.getIntegerFactor();
-    w *= scale;
-    h *= scale;
-    Point[] points = new Point[] {new Point(), new Point(w - 2, 2 - h)};
-    Shape shape = getShape(points);
-    ShapeIcon icon = new ShapeIcon(shape, w, h);
-    icon.setColor(color);
-    return icon;
-  }
+    /**
+     * Gets the minimum point array length required by this footprint.
+     *
+     * @return the length
+     */
+    public int getLength() {
+        return 1;
+    }
 
-  /**
-   * Gets the footprint mark.
-   *
-   * @param points a Point array
-   * @return the mark
-   */
-  public Mark getMark(Point[] points) {
-    final Shape shape = getShape(points);
-    final Color color = this.color;
-    return new Mark() {
-      public void draw(Graphics2D g, boolean highlighted) {
-        Color gcolor = g.getColor();
-        g.setColor(color);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                           RenderingHints.VALUE_ANTIALIAS_ON);
-        g.fill(shape);
-        g.setColor(gcolor);
-      }
+    /**
+     * Gets the icon.
+     *
+     * @param w width of the icon
+     * @param h height of the icon
+     * @return the icon
+     */
+    public Icon getIcon(int w, int h) {
+        int scale = FontSizer.getIntegerFactor();
+        w *= scale;
+        h *= scale;
+        Point[] points = new Point[]{new Point(), new Point(w - 2, 2 - h)};
+        Shape shape = getShape(points);
+        ShapeIcon icon = new ShapeIcon(shape, w, h);
+        icon.setColor(color);
+        return icon;
+    }
 
-      public Rectangle getBounds(boolean highlighted) {
-        return shape.getBounds();
-      }
-    };
-  }
+    /**
+     * Gets the footprint mark.
+     *
+     * @param points a Point array
+     * @return the mark
+     */
+    public Mark getMark(Point[] points) {
+        final Shape shape = getShape(points);
+        final Color color = this.color;
+        return new Mark() {
+            public void draw(Graphics2D g, boolean highlighted) {
+                Color gcolor = g.getColor();
+                g.setColor(color);
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+                g.fill(shape);
+                g.setColor(gcolor);
+            }
 
-  /**
-   * Gets the hit shapes. This return an empty array.
-   *
-   * @return the hit shapes
-   */
-  public Shape[] getHitShapes() {
-    return hitShapes;
-  }
+            public Rectangle getBounds(boolean highlighted) {
+                return shape.getBounds();
+            }
+        };
+    }
 
-  /**
-   * Sets the stroke.
-   *
-   * @param stroke the desired stroke
-   */
-  public void setStroke(BasicStroke stroke) {
-    if (stroke == null) return;
-    this.baseStroke = new BasicStroke(stroke.getLineWidth(),
-                                  BasicStroke.CAP_BUTT,
-                                  BasicStroke.JOIN_MITER,
-                                  8,
-                                  stroke.getDashArray(),
-                                  stroke.getDashPhase());
-  }
+    /**
+     * Gets the hit shapes. This return an empty array.
+     *
+     * @return the hit shapes
+     */
+    public Shape[] getHitShapes() {
+        return hitShapes;
+    }
 
-  /**
-   * Gets the stroke.
-   *
-   * @return the stroke
-   */
-  public BasicStroke getStroke() {
-    return baseStroke;
-  }
+    /**
+     * Sets the stroke.
+     *
+     * @param stroke the desired stroke
+     */
+    public void setStroke(BasicStroke stroke) {
+        if (stroke == null) return;
+        this.baseStroke = new BasicStroke(stroke.getLineWidth(),
+                BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_MITER,
+                8,
+                stroke.getDashArray(),
+                stroke.getDashPhase());
+    }
 
-  /**
-   * Sets the line width.
-   *
-   * @param w the desired line width
-   */
-  public void setLineWidth(double w) {
-    baseStroke = new BasicStroke((float)w,
-                              BasicStroke.CAP_BUTT,
-                              BasicStroke.JOIN_MITER,
-                              8,
-                              baseStroke.getDashArray(),
-                              baseStroke.getDashPhase());
-  }
+    /**
+     * Gets the stroke.
+     *
+     * @return the stroke
+     */
+    public BasicStroke getStroke() {
+        return baseStroke;
+    }
 
-  /**
-   * Sets the color.
-   *
-   * @param color the desired color
-   */
-  public void setColor(Color color) {
-    this.color = color;
-  }
+    /**
+     * Sets the line width.
+     *
+     * @param w the desired line width
+     */
+    public void setLineWidth(double w) {
+        baseStroke = new BasicStroke((float) w,
+                BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_MITER,
+                8,
+                baseStroke.getDashArray(),
+                baseStroke.getDashPhase());
+    }
 
-  /**
-   * Gets the color.
-   *
-   * @return the color
-   */
-  public Color getColor() {
-    return color;
-  }
-  
-  /**
-   * Determine if this draws closed paths.
-   *
-   * @return true if closed
-   */
-  public boolean isClosed() {
-  	return closed;
-  }
-  
-  /**
-   * Sets the closed property.
-   *
-   */
-  public void setClosed(boolean closed) {
-  	this.closed = closed;
-  }
+    /**
+     * Sets the color.
+     *
+     * @param color the desired color
+     */
+    public void setColor(Color color) {
+        this.color = color;
+    }
 
-  /**
-   * Gets the shape of this footprint.
-   *
-   * @param points an array of Points
-   * @return the shape
-   */
-  public Shape getShape(Point[] points) {
-    int scale = FontSizer.getIntegerFactor();
-  	if (stroke==null || stroke.getLineWidth()!=scale*baseStroke.getLineWidth()) {
-  		stroke = new BasicStroke(scale*baseStroke.getLineWidth());
-  	}
-  	Area area = new Area();
-  	for (int i=0; i<points.length-1; i++) {
-      Point p1 = points[i];
-      Point p2 = points[i+1];
-      if (p1==null || p2==null) continue;
-      line.setLine(p1, p2);
-      area.add(new Area(stroke.createStrokedShape(line)));
-  	}
-  	if (closed && points.length>2 && points[0]!=null && points[points.length-1]!=null) {
-      line.setLine(points[points.length-1], points[0]);
-      area.add(new Area(stroke.createStrokedShape(line)));
-  	}
-    return area;
-  }
+    /**
+     * Gets the color.
+     *
+     * @return the color
+     */
+    public Color getColor() {
+        return color;
+    }
 
-  // static fields
-  private static final Collection<MultiLineFootprint> footprints = new HashSet<>();
+    /**
+     * Determine if this draws closed paths.
+     *
+     * @return true if closed
+     */
+    public boolean isClosed() {
+        return closed;
+    }
 
-  // static constants  
-  private static final MultiLineFootprint LINE;
-  private static final MultiLineFootprint BOLD_LINE;
+    /**
+     * Sets the closed property.
+     */
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+    }
 
-  // static initializers
-  static {
+    /**
+     * Gets the shape of this footprint.
+     *
+     * @param points an array of Points
+     * @return the shape
+     */
+    public Shape getShape(Point[] points) {
+        int scale = FontSizer.getIntegerFactor();
+        if (stroke == null || stroke.getLineWidth() != scale * baseStroke.getLineWidth()) {
+            stroke = new BasicStroke(scale * baseStroke.getLineWidth());
+        }
+        Area area = new Area();
+        for (int i = 0; i < points.length - 1; i++) {
+            Point p1 = points[i];
+            Point p2 = points[i + 1];
+            if (p1 == null || p2 == null) continue;
+            line.setLine(p1, p2);
+            area.add(new Area(stroke.createStrokedShape(line)));
+        }
+        if (closed && points.length > 2 && points[0] != null && points[points.length - 1] != null) {
+            line.setLine(points[points.length - 1], points[0]);
+            area.add(new Area(stroke.createStrokedShape(line)));
+        }
+        return area;
+    }
 
-    // LINE
-    LINE = new MultiLineFootprint("Footprint.Lines"); //$NON-NLS-1$
-    footprints.add(LINE);
+    // static fields
+    private static final Collection<MultiLineFootprint> footprints = new HashSet<>();
 
-    // BOLD_LINE
-    BOLD_LINE = new MultiLineFootprint("Footprint.BoldLines"); //$NON-NLS-1$
-    BOLD_LINE.setStroke(new BasicStroke(2));
-    footprints.add(BOLD_LINE);
+    // static constants
+    private static final MultiLineFootprint LINE;
+    private static final MultiLineFootprint BOLD_LINE;
 
-  }
+    // static initializers
+    static {
+
+        // LINE
+        LINE = new MultiLineFootprint("Footprint.Lines"); //$NON-NLS-1$
+        footprints.add(LINE);
+
+        // BOLD_LINE
+        BOLD_LINE = new MultiLineFootprint("Footprint.BoldLines"); //$NON-NLS-1$
+        BOLD_LINE.setStroke(new BasicStroke(2));
+        footprints.add(BOLD_LINE);
+    }
 }
-
