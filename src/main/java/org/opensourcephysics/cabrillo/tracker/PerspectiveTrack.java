@@ -46,9 +46,11 @@ import java.util.HashMap;
 public class PerspectiveTrack extends TTrack {
 
     static int n = 0;
+
     static HashMap<Filter, PerspectiveTrack> filterMap = new HashMap<>();
 
     PerspectiveFilter filter;
+
     String filterState;
 
     /**
@@ -322,11 +324,6 @@ public class PerspectiveTrack extends TTrack {
     @Override
     protected boolean isAutoTrackable() {
         return true;
-    }
-
-
-    @Override
-    public void draw(DrawingPanel panel, Graphics _g) {
     }
 
     @Override

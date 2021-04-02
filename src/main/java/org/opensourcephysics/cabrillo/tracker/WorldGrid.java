@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.display.DrawingPanel;
 import org.opensourcephysics.media.core.TPoint;
 import org.opensourcephysics.media.core.Trackable;
@@ -38,6 +40,8 @@ import java.util.ArrayList;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class WorldGrid implements Trackable {
 
     private static final float[] DASHED_LINE = new float[]{1, 8};
@@ -195,15 +199,6 @@ public class WorldGrid implements Trackable {
     }
 
     /**
-     * Gets the color.
-     *
-     * @return the line color
-     */
-    public Color getColor() {
-        return lineColor;
-    }
-
-    /**
      * Sets the color.
      *
      * @param color the desired line color
@@ -212,15 +207,6 @@ public class WorldGrid implements Trackable {
         if (color != null) {
             lineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         }
-    }
-
-    /**
-     * Gets the alpha.
-     *
-     * @return the line color alpha
-     */
-    public int getAlpha() {
-        return alpha;
     }
 
     /**
@@ -233,24 +219,6 @@ public class WorldGrid implements Trackable {
         alpha = Math.max(alpha, 0);
         this.alpha = alpha;
         setColor(lineColor);
-    }
-
-    /**
-     * Sets the visibility of the axes.
-     *
-     * @param isVisible true if the axes are visible
-     */
-    public void setVisible(boolean isVisible) {
-        visible = isVisible;
-    }
-
-    /**
-     * Gets the visibility of the axes.
-     *
-     * @return true if the axes is drawn
-     */
-    public boolean isVisible() {
-        return visible;
     }
 
     /**

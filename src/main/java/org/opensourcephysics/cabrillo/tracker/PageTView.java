@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.controls.OSPLog;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
@@ -53,6 +55,8 @@ import java.util.ArrayList;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class PageTView extends JPanel implements TView {
 
     protected Icon icon;
@@ -63,6 +67,7 @@ public class PageTView extends JPanel implements TView {
      * Each tab is a TabView
      */
     protected JTabbedPane tabbedPane;
+
     protected JButton pageButton;
     protected ArrayList<Component> toolbarComponents = new ArrayList<>();
     protected JDialog nameDialog;
@@ -258,7 +263,6 @@ public class PageTView extends JPanel implements TView {
     public void propertyChange(PropertyChangeEvent e) {
     }
 
-//_________________________ protected and private methods _________________
 
     /**
      * Creates the GUI.

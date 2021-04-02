@@ -24,6 +24,7 @@
  */
 package org.opensourcephysics.cabrillo.tracker.pencil;
 
+import lombok.Getter;
 import org.opensourcephysics.cabrillo.tracker.Tracker;
 import org.opensourcephysics.cabrillo.tracker.TrackerPanel;
 import org.opensourcephysics.controls.XML;
@@ -43,6 +44,7 @@ import java.awt.geom.Rectangle2D;
  *
  * @author Douglas Brown
  */
+@Getter
 public class PencilCaption extends InteractiveTextLine {
 
     /**
@@ -157,26 +159,6 @@ public class PencilCaption extends InteractiveTextLine {
     @Override
     public boolean isMeasured() {
         return !"".equals(getText()); //$NON-NLS-1$
-    }
-
-    @Override
-    public double getXMin() {
-        return xMin;
-    }
-
-    @Override
-    public double getXMax() {
-        return xMax;
-    }
-
-    @Override
-    public double getYMin() {
-        return yMin;
-    }
-
-    @Override
-    public double getYMax() {
-        return yMax;
     }
 
     /**

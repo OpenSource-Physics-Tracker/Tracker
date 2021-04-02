@@ -370,10 +370,6 @@ public class TableTrackView extends TrackView {
             if ((shouldBe && !selected) || (!shouldBe && selected)) return true;
         }
 
-        // ignore formatting since now handled by NumberFormatSetter
-//  	if (dataTable.getFormattedColumnNames().length>0)
-//  		return true;
-
         // check for reordered columns
         TableColumnModel model = dataTable.getColumnModel();
         int count = model.getColumnCount();
@@ -572,10 +568,6 @@ public class TableTrackView extends TrackView {
                     textColumnsVisible.add(added);
                 }
             }
-//  		else if (added!=null) {
-//  			// new column is visible by default
-//    		textColumnsVisible.add(added);    			
-//  		}
             else if (removed != null) {
                 textColumnsVisible.remove(removed);
             }

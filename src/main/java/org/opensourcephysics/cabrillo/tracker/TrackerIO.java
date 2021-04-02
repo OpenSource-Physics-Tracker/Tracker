@@ -418,7 +418,6 @@ public class TrackerIO extends VideoIO {
             chooser.setMultiSelectionEnabled(false);
             chooser.setAcceptAllFileFilterUsed(true);
             chooser.addChoosableFileFilter(txtFileFilter);
-//      chooser.setFileFilter(chooser.getAcceptAllFileFilter());
             chooser.setDialogTitle(TrackerRes.getString("TrackerIO.Dialog.OpenData.Title"));        //$NON-NLS-1$
             result = chooser.showOpenDialog(null);
             File file = chooser.getSelectedFile();
@@ -433,7 +432,6 @@ public class TrackerIO extends VideoIO {
             chooser.setMultiSelectionEnabled(false);
             chooser.setAcceptAllFileFilterUsed(true);
             chooser.addChoosableFileFilter(jarFileFilter);
-//      chooser.setFileFilter(chooser.getAcceptAllFileFilter());
             chooser.setDialogTitle(TrackerRes.getString("TrackerIO.Dialog.OpenEJS.Title"));        //$NON-NLS-1$
             result = chooser.showOpenDialog(null);
             File file = chooser.getSelectedFile();

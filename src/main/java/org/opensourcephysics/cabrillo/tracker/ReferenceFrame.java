@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.media.core.ImageCoordSystem;
 import org.opensourcephysics.media.core.TPoint;
 
@@ -37,6 +39,8 @@ import java.beans.PropertyChangeListener;
  * @author Douglas Brown
  */
 
+@Getter
+@Setter
 public class ReferenceFrame extends ImageCoordSystem implements PropertyChangeListener {
 
     private final PointMass originTrack;
@@ -155,14 +159,6 @@ public class ReferenceFrame extends ImageCoordSystem implements PropertyChangeLi
         return coords;
     }
 
-    /**
-     * Gets the origin track of this reference frame.
-     *
-     * @return the point mass supplying origin data
-     */
-    public PointMass getOriginTrack() {
-        return originTrack;
-    }
 
     /**
      * Sets the origins of the image coordinate system.

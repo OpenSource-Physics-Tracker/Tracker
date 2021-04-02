@@ -33,6 +33,8 @@ import java.awt.geom.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.cabrillo.tracker.bounce.BounceDerivatives;
 import org.opensourcephysics.cabrillo.tracker.vector.VectorStep;
 import org.opensourcephysics.display.*;
@@ -47,11 +49,14 @@ import org.opensourcephysics.controls.*;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class PointMass extends TTrack {
 
     protected static final int FINITE_DIFF = 0;
     protected static final int BOUNCE_DETECT = 1;
     protected static final int FINITE_DIFF_VSPILL2 = 2;
+
     protected static final double MINIMUM_MASS = 1E-30;
 
     protected static Derivative vDeriv = new FirstDerivative();
@@ -252,7 +257,7 @@ public class PointMass extends TTrack {
     // instance fields
     protected double mass;
     protected Footprint[] vFootprints;
-    protected Footprint vFootprint = LineFootprint.getFootprint("Footprint.Arrow"); //$NON-NLS-1$
+    protected Footprint velocityFootprint = LineFootprint.getFootprint("Footprint.Arrow"); //$NON-NLS-1$
     protected Footprint[] aFootprints;
     protected Footprint aFootprint = LineFootprint.getFootprint("Footprint.Arrow"); //$NON-NLS-1$
     protected Map<TrackerPanel, StepArray> vMap  // trackerPanel to StepArray
@@ -608,8 +613,8 @@ public class PointMass extends TTrack {
         Collection<Footprint> valid = new ArrayList<>();
         for (Footprint choice : choices) {
             if (choice != null &&
-                    choice.getLength() == vFootprint.getLength()) {
-                choice.setColor(vFootprint.getColor());
+                    choice.getLength() == velocityFootprint.getLength()) {
+                choice.setColor(velocityFootprint.getColor());
                 valid.add(choice);
             }
         }
@@ -620,15 +625,6 @@ public class PointMass extends TTrack {
     }
 
     /**
-     * Gets the current velocity footprint.
-     *
-     * @return the velocity footprint
-     */
-    public Footprint getVelocityFootprint() {
-        return vFootprint;
-    }
-
-    /**
      * Sets the velocity footprint.
      *
      * @param name the name of the desired footprint
@@ -636,14 +632,14 @@ public class PointMass extends TTrack {
     public void setVelocityFootprint(String name) {
         for (Footprint value : vFootprints)
             if (name.equals(value.getName())) {
-                vFootprint = value;
+                velocityFootprint = value;
                 for (TrackerPanel panel : panels) {
                     Step[] stepArray = getVArray(panel).array;
                     for (Step step : stepArray)
                         if (step != null)
-                            step.setFootprint(vFootprint);
+                            step.setFootprint(velocityFootprint);
                 }
-                support.firePropertyChange("footprint", null, vFootprint); //$NON-NLS-1$
+                support.firePropertyChange("footprint", null, velocityFootprint); //$NON-NLS-1$
                 repaint();
                 return;
             }
@@ -956,7 +952,7 @@ public class PointMass extends TTrack {
     public void markInterpolatedSteps(PositionStep step, boolean refreshData) {
         if (isLocked()) return;
         // keyFrames contain all manually or auto-marked steps
-        if (!keyFrames.contains(step.n)) return;
+        if (!keyFrames.contains(step.frameNumber)) return;
         XMLControl control = new XMLControlElement(this);
         boolean changed = false;
         VideoClip clip = trackerPanel.getPlayer().getVideoClip();
@@ -964,16 +960,16 @@ public class PointMass extends TTrack {
         int earlier = -1, later = -1;
         for (int keyframe : keyFrames) {
             boolean inFrame = clip.includesFrame(keyframe);
-            if (!inFrame || keyframe == step.n) continue;
-            if (keyframe < step.n) {
+            if (!inFrame || keyframe == step.frameNumber) continue;
+            if (keyframe < step.frameNumber) {
                 earlier = keyframe;
             }
-            if (later == -1 && keyframe > step.n) {
+            if (later == -1 && keyframe > step.frameNumber) {
                 later = keyframe;
             }
         }
         Step[] stepArray = getSteps();
-        int firstStep = clip.frameToStep(step.n);
+        int firstStep = clip.frameToStep(step.frameNumber);
         int lastStep = firstStep;
         if (earlier > -1) {
             PositionStep start = (PositionStep) stepArray[earlier];
@@ -1008,8 +1004,8 @@ public class PointMass extends TTrack {
     public boolean markInterpolatedSteps(PositionStep startStep, PositionStep endStep) {
         if (isLocked()) return false;
         VideoClip clip = trackerPanel.getPlayer().getVideoClip();
-        int startStepNum = clip.frameToStep(startStep.n);
-        int endStepNum = clip.frameToStep(endStep.n);
+        int startStepNum = clip.frameToStep(startStep.frameNumber);
+        int endStepNum = clip.frameToStep(endStep.frameNumber);
         int range = endStepNum - startStepNum;
         if (range < 2) return false;
         Step[] stepArray = getSteps();
@@ -1138,7 +1134,7 @@ public class PointMass extends TTrack {
 
             int curStepNum = clip.frameToStep(n);
             if (prevNonNullStep != null) {
-                int prevStepNum = clip.frameToStep(prevNonNullStep.n);
+                int prevStepNum = clip.frameToStep(prevNonNullStep.frameNumber);
                 for (int i = prevStepNum + 1; i < curStepNum; i++) {
                     skippedSteps.add(i);
                 }
@@ -1890,7 +1886,7 @@ public class PointMass extends TTrack {
                     v.setTipEnabled(false);
                     v.getHandle().setStepEditTrigger(true);
                     v.setDefaultPointIndex(2); // handle
-                    v.setFootprint(vFootprint);
+                    v.setFootprint(velocityFootprint);
                     v.setLabelVisible(labelsVisible);
                     v.setRolloverVisible(!labelsVisible);
                     v.attach(p);
@@ -2240,7 +2236,7 @@ public class PointMass extends TTrack {
             element.setStroke(new BasicStroke(stroke.getLineWidth(),
                     BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 8, null, 0));
             item = new JMenuItem(element.getDisplayName(), element.getIcon(21, 16));
-            if (element == vFootprint) {
+            if (element == velocityFootprint) {
                 item.setBorder(BorderFactory.createLineBorder(item.getBackground().darker()));
             }
             item.setActionCommand(element.getName());
@@ -2899,7 +2895,7 @@ public class PointMass extends TTrack {
             for (Step step : steps) {
                 if (step != null) {
                     VectorStep v = (VectorStep) step;
-                    PositionStep p = (PositionStep) getStep(v.n);
+                    PositionStep p = (PositionStep) getStep(v.frameNumber);
                     if (v.chain != null) v.chain.clear();
                     // detach any existing point
                     v.attach(null);

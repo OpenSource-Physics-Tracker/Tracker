@@ -86,7 +86,6 @@ public class ExportZipDialog extends JDialog {
     protected static Color labelColor = new Color(0, 0, 102);
     protected static String preferredExtension = DEFAULT_VIDEO_EXTENSION;
 
-    // instance fields
     protected ExportVideoDialog videoExporter;
     protected TrackerPanel trackerPanel;
     protected TFrame frame;
@@ -198,7 +197,6 @@ public class ExportZipDialog extends JDialog {
         addedFilesDialog.pack();
     }
 
-    //_____________________________ private methods ____________________________
 
     /**
      * Creates the visible components of this dialog.
@@ -777,7 +775,7 @@ public class ExportZipDialog extends JDialog {
             // delete temp directory
             File temp = new File(getTempDirectory());
             ResourceLoader.deleteFile(temp);// unable to delete directory
-// offer to open the newly created zip file
+            // offer to open the newly created zip file
             openZip(target.getAbsolutePath());
         }
     }
@@ -964,7 +962,6 @@ public class ExportZipDialog extends JDialog {
         clipXMLControl.setValue("video_framecount", clipXMLControl.getInt("stepcount")); //$NON-NLS-1$ //$NON-NLS-2$
         clipXMLControl.setValue("startframe", 0); //$NON-NLS-1$
         clipXMLControl.setValue("stepsize", 1); //$NON-NLS-1$
-//    clipXMLControl.setValue("frameshift", 0); //$NON-NLS-1$
         if (videoPath != null) {
             // modify videoControl with correct video type, and add delta_t for image videos
             VideoType format = ExportVideoDialog.formats.get(formatDropdown.getSelectedItem());
@@ -983,12 +980,12 @@ public class ExportZipDialog extends JDialog {
             }
         }
 
-        // clipcontrol
+        // ClipControl
         XMLControl clipControlControl = toModify.getChildControl("clipcontrol"); //$NON-NLS-1$
         clipControlControl.setValue("delta_t", player.getMeanStepDuration()); //$NON-NLS-1$
         clipControlControl.setValue("frame", 0); //$NON-NLS-1$
 
-        // imageCoordSystem
+        // imageCordSystem
         XMLControl coordsControl = toModify.getChildControl("coords"); //$NON-NLS-1$
         Object array = coordsControl.getObject("framedata"); //$NON-NLS-1$
         ImageCoordSystem.FrameData[] coordKeyFrames = (ImageCoordSystem.FrameData[]) array;
@@ -1122,13 +1119,7 @@ public class ExportZipDialog extends JDialog {
                                 // change frame number in step data and add to the new key frame data
                                 keyFrameDatum[0] = newFrameNum;
                                 newKeyFrameData.add(keyFrameDatum);
-//    	        	newFrameNumbers.put(newFrameNum, i);  // maps to stepData index       	
                             }
-//    	        double[][] newKeys = new double[newFrameNum+1][];
-//    	        for (Integer k: newFrameNumbers.keySet()) {
-//    	        	double[] stepData = keyFrameData[newFrameNumbers.get(k)];
-//    	        	newKeys[k] = keyFrameData[newFrameNumbers.get(k)];
-//    	        }
                             double[][] newKeyData = newKeyFrameData.toArray(new double[newKeyFrameData.size()][]);
                             trackControl.setValue("framedata", newKeyData);                     //$NON-NLS-1$
                         } else if (TapeMeasure.class.equals(trackType)) {
@@ -1186,7 +1177,6 @@ public class ExportZipDialog extends JDialog {
                     }
                 }
             }
-
         }
     }
 
@@ -1396,7 +1386,6 @@ public class ExportZipDialog extends JDialog {
         File[] files = TrackerIO.getChooserFiles("save"); //$NON-NLS-1$
         chooser.resetChoosableFileFilters();
         if (files == null) return null; // cancelled by user
-//  	targetExtension = chooser.getFileFilter()==TrackerIO.zipFileFilter? "zip": "trz"; //$NON-NLS-1$ //$NON-NLS-2$
 
         // define target filename and check for reserved characters, including spaces
         targetName = XML.stripExtension(files[0].getName());

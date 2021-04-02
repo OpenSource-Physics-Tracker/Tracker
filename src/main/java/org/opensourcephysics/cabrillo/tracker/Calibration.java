@@ -24,6 +24,7 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.controls.XMLControlElement;
@@ -53,6 +54,7 @@ import java.util.Map;
  *
  * @author Douglas Brown
  */
+@Getter
 public class Calibration extends TTrack {
 
     /**
@@ -301,14 +303,6 @@ public class Calibration extends TTrack {
         return locked;
     }
 
-    /**
-     * Overrides TTrack setTrailVisible method.
-     * Calibration trails are never visible.
-     *
-     * @param visible ignored
-     */
-    public void setTrailVisible(boolean visible) {
-    }
 
     /**
      * Determines if at least one point in this track is autotrackable.
@@ -335,15 +329,6 @@ public class Calibration extends TTrack {
      */
     public int getFootprintLength() {
         return 1;
-    }
-
-    /**
-     * Determines if the world coordinates are fixed.
-     *
-     * @return <code>true</code> if fixed
-     */
-    public boolean isFixedCoordinates() {
-        return fixedCoordinates;
     }
 
     /**
@@ -583,7 +568,7 @@ public class Calibration extends TTrack {
         if (step == null) return;
         int key = 0;
         for (int i : keyFrames) {
-            if (i <= step.n)
+            if (i <= step.frameNumber)
                 key = i;
         }
         // compare step with keyStep
@@ -660,15 +645,6 @@ public class Calibration extends TTrack {
      * @return the point index
      */
     protected int getTargetIndex() {
-//    int n = trackerPanel.getFrameNumber();
-//    CalibrationStep step = (CalibrationStep)getStep(n);
-//    if (step!=null) {
-//	    for (int i=0; i<step.getPoints().length; i++) {
-//		    if (step.getPoints()[i]==null) {
-//		    	return i;
-//		    }	    	
-//	    }
-//    }
         return super.getTargetIndex();
     }
 
@@ -789,7 +765,7 @@ public class Calibration extends TTrack {
         axisDropdownAction = e -> {
             int i = axisDropdown.getSelectedIndex();
             if (axes == i) return;
-// check for invalid coords if step is complete
+            // check for invalid coords if step is complete
             if (trackerPanel != null) {
                 int n = trackerPanel.getFrameNumber();
                 CalibrationStep step = (CalibrationStep) getStep(n);

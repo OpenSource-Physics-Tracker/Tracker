@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.cabrillo.tracker.deploy.TrackerStarter;
 import org.opensourcephysics.controls.*;
 import org.opensourcephysics.display.*;
@@ -57,6 +59,8 @@ import java.util.logging.Level;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class Tracker {
 
     static {
@@ -481,15 +485,6 @@ public class Tracker {
     }
 
     /**
-     * Gets the frame.
-     *
-     * @return the frame
-     */
-    public TFrame getFrame() {
-        return frame;
-    }
-
-    /**
      * Creates the TFrame.
      */
     private void createFrame() {
@@ -576,8 +571,6 @@ public class Tracker {
             });
         }
     }
-
-//________________________________  static methods ____________________________
 
     /**
      * Compares version strings.
@@ -731,7 +724,6 @@ public class Tracker {
                     // add entry to the results map
                     results.put(file.getName(), expandedFunctions);
                 }
-
             }
         }
         return results;

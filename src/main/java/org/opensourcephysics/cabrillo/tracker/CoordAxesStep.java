@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.cabrillo.tracker.AutoTrackerCore.FrameData;
 import org.opensourcephysics.display.DrawingPanel;
 import org.opensourcephysics.display.Interactive;
@@ -46,14 +48,20 @@ import java.util.Map;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class CoordAxesStep extends Step {
 
-    // instance fields
     private final Origin origin;
+
     private final Handle handle;
+
     private boolean originEnabled = true;
+
     private Map<TrackerPanel, Shape> handleShapes = new HashMap<>();
+
     private final Shape[] fillShapes = new Shape[2];
+
     private final GeneralPath path = new GeneralPath();
 
     /**
@@ -70,43 +78,6 @@ public class CoordAxesStep extends Step {
         handle.setCoordsEditTrigger(true);
         points = new TPoint[]{origin, handle}; // origin is "default" point
         screenPoints = new Point[1];
-    }
-
-    /**
-     * Gets the origin.
-     *
-     * @return the origin
-     */
-    public TPoint getOrigin() {
-        return origin;
-    }
-
-    /**
-     * Gets the handle.
-     *
-     * @return the origin
-     */
-    public TPoint getHandle() {
-        return handle;
-    }
-
-    /**
-     * /**
-     * Enables and disables the interactivity of the origin.
-     *
-     * @param enabled <code>true</code> to enable the origin
-     */
-    public void setOriginEnabled(boolean enabled) {
-        originEnabled = enabled;
-    }
-
-    /**
-     * Gets whether the origin is enabled.
-     *
-     * @return <code>true</code> if the origin is enabled
-     */
-    public boolean isOriginEnabled() {
-        return originEnabled;
     }
 
     /**
@@ -289,7 +260,7 @@ public class CoordAxesStep extends Step {
      * @return a descriptive string
      */
     public String toString() {
-        return "CoordAxesStep " + n; //$NON-NLS-1$
+        return "CoordAxesStep " + frameNumber; //$NON-NLS-1$
     }
 
     /**
@@ -362,14 +333,15 @@ public class CoordAxesStep extends Step {
 
     }
 
-    //______________________ inner Handle class ________________________
 
     class Handle extends TPoint {
 
-        // instance fields
         private double angleIncrement = 0;
+        private double lastY;
+        private double lastX;
+
         protected Point2D.Double p = new Point2D.Double();
-        private double lastX, lastY;
+
 
         /**
          * Overrides TPoint setXY method to set the angle of the x axis.

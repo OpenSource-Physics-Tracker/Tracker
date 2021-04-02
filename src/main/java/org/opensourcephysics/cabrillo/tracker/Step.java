@@ -32,6 +32,8 @@ import java.awt.geom.*;
 
 import javax.swing.JTextField;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.tools.FontSizer;
@@ -44,6 +46,8 @@ import org.opensourcephysics.tools.FontSizer;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public abstract class Step implements Cloneable {
 
     protected static Rectangle hitRect = new Rectangle(-4, -4, 8, 8);
@@ -69,7 +73,7 @@ public abstract class Step implements Cloneable {
 
     protected int trackID;                   // ID number of track this belongs to
 
-    protected int n;                         // frame number
+    protected int frameNumber;                         // frame number
 
     protected Footprint footprint;           // determines appearance
 
@@ -105,25 +109,7 @@ public abstract class Step implements Cloneable {
      */
     protected Step(TTrack track, int n) {
         trackID = track.getID();
-        this.n = n;
-    }
-
-    /**
-     * Gets the frame number.
-     *
-     * @return the frame number
-     */
-    public int getFrameNumber() {
-        return n;
-    }
-
-    /**
-     * Sets the footprint.
-     *
-     * @param footprint the footprint
-     */
-    public void setFootprint(Footprint footprint) {
-        this.footprint = footprint;
+        this.frameNumber = n;
     }
 
     /**
@@ -133,15 +119,6 @@ public abstract class Step implements Cloneable {
      */
     public TTrack getTrack() {
         return TTrack.getTrack(trackID);
-    }
-
-    /**
-     * Gets the array of TPoints contained in this step.
-     *
-     * @return the TPoints array
-     */
-    public TPoint[] getPoints() {
-        return points;
     }
 
     /**
@@ -255,7 +232,7 @@ public abstract class Step implements Cloneable {
             if (autoTracker.isInteracting(track)) return;
         }
         TrackerPanel trackerPanel = (TrackerPanel) panel;
-        boolean highlighted = (trackerPanel.getFrameNumber() == n);
+        boolean highlighted = (trackerPanel.getFrameNumber() == frameNumber);
         if (trackerPanel.autoTracker != null
                 && trackerPanel.autoTracker.getWizard().isVisible()
                 && trackerPanel.autoTracker.getTrack() == track) {
@@ -296,7 +273,7 @@ public abstract class Step implements Cloneable {
      * @return the bounding rectangle
      */
     public Rectangle getBounds(TrackerPanel trackerPanel) {
-        boolean highlighted = (trackerPanel.getFrameNumber() == n);
+        boolean highlighted = (trackerPanel.getFrameNumber() == frameNumber);
         return getMark(trackerPanel).getBounds(highlighted);
     }
 
@@ -370,7 +347,7 @@ public abstract class Step implements Cloneable {
      * @return a descriptive string
      */
     public String toString() {
-        return "Step " + n; //$NON-NLS-1$
+        return "Step " + frameNumber; //$NON-NLS-1$
     }
 
     /**

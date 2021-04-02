@@ -148,7 +148,6 @@ public class SpectralLineFilter extends Filter implements PropertyChangeListener
         return filter;
     }
 
-//_____________________________ private methods _______________________
 
     /**
      * Initializes the image.

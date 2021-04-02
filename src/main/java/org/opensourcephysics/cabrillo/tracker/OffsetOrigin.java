@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.controls.XMLControlElement;
@@ -52,6 +54,8 @@ import java.util.Map;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class OffsetOrigin extends TTrack {
 
     protected static String[] dataVariables;
@@ -181,15 +185,6 @@ public class OffsetOrigin extends TTrack {
     }
 
     /**
-     * Determines if the world coordinates are fixed.
-     *
-     * @return <code>true</code> if fixed
-     */
-    public boolean isFixedCoordinates() {
-        return fixedCoordinates;
-    }
-
-    /**
      * Sets the fixed coordinates property. When fixed, the world coordinates
      * are the same at all times.
      *
@@ -238,15 +233,6 @@ public class OffsetOrigin extends TTrack {
             locked = locked || trackerPanel.getCoords().isLocked();
         }
         return locked;
-    }
-
-    /**
-     * Overrides TTrack setTrailVisible method.
-     * Offset origin trails are never visible.
-     *
-     * @param visible ignored
-     */
-    public void setTrailVisible(boolean visible) {
     }
 
     /**
@@ -437,7 +423,7 @@ public class OffsetOrigin extends TTrack {
         if (step == null) return;
         int key = 0;
         for (int i : keyFrames) {
-            if (i <= step.n)
+            if (i <= step.frameNumber)
                 key = i;
         }
         // compare step with keyStep

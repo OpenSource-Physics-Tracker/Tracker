@@ -49,7 +49,9 @@ import java.util.ArrayList;
 abstract public class ParticleModel extends PointMass {
 
     protected static int tracePtsPerStep = 10;
+
     protected static boolean loading = false;
+
     protected static Point2D nan = new Point2D.Double(Double.NaN, Double.NaN);
 
 	/**
@@ -83,6 +85,7 @@ abstract public class ParticleModel extends PointMass {
 	 * Used in draw method
 	 */
 	protected int lastValidFrame = -1;
+
     protected double t0, dt = 0.1, time;
     protected boolean refreshDerivsLater, refreshStepsLater;
     protected boolean invalidWarningShown, startFrameUndefined;

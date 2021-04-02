@@ -24,6 +24,9 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -33,10 +36,12 @@ import java.awt.geom.AffineTransform;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class ShapeIcon implements Icon {
 
-    private final int w;
-    private final int h;
+    private final int iconWidth;
+    private final int iconHeight;
 
     private final Shape shape;
     private final Shape decoration;
@@ -63,15 +68,15 @@ public class ShapeIcon implements Icon {
      * @param height     height of the icon
      */
     public ShapeIcon(Shape shape, Shape decoration, int width, int height) {
-        w = width;
-        h = height;
+        iconWidth = width;
+        iconHeight = height;
         this.shape = shape;
         this.decoration = decoration;
         Rectangle rect = shape == null ? new Rectangle() : shape.getBounds();
         if (decoration != null)
             rect = rect.union(decoration.getBounds());
-        offsetX = w / 2 - rect.width / 2 - rect.x;
-        offsetY = h / 2 - rect.height / 2 - rect.y;
+        offsetX = iconWidth / 2 - rect.width / 2 - rect.x;
+        offsetY = iconHeight / 2 - rect.height / 2 - rect.y;
     }
 
     /**
@@ -85,14 +90,6 @@ public class ShapeIcon implements Icon {
         this(shape, null, width, height);
     }
 
-    /**
-     * Sets the color.
-     *
-     * @param color the desired color
-     */
-    public void setColor(Color color) {
-        this.color = color;
-    }
 
     /**
      * Sets the colors.
@@ -103,24 +100,6 @@ public class ShapeIcon implements Icon {
     public void setColor(Color color, Color decorationColor) {
         this.color = color;
         decoColor = decorationColor;
-    }
-
-    /**
-     * Gets the icon width.
-     *
-     * @return the icon width
-     */
-    public int getIconWidth() {
-        return w;
-    }
-
-    /**
-     * Gets the icon height.
-     *
-     * @return the icon height
-     */
-    public int getIconHeight() {
-        return h;
     }
 
     /**
@@ -144,7 +123,7 @@ public class ShapeIcon implements Icon {
         g.setPaint(color);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-        g.clipRect(x, y, w, h);
+        g.clipRect(x, y, iconWidth, iconHeight);
 
         // paint shape, if any
         if (shape != null) {

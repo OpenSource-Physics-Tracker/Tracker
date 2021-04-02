@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.cabrillo.tracker.pencil.PencilDrawer;
 import org.opensourcephysics.cabrillo.tracker.pencil.PencilDrawing;
 import org.opensourcephysics.cabrillo.tracker.pencil.PencilScene;
@@ -52,6 +54,8 @@ import java.util.*;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class TrackerPanel extends VideoPanel implements Scrollable {
 
     /**
@@ -295,15 +299,6 @@ public class TrackerPanel extends VideoPanel implements Scrollable {
             }
         }
         return null;
-    }
-
-    /**
-     * Gets the description of this panel.
-     *
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
     }
 
     /**
@@ -2697,7 +2692,7 @@ public class TrackerPanel extends VideoPanel implements Scrollable {
         for (TTrack track : getTracks()) {
             Step step = track.getStep(pt, this);
             if (step != null) {
-                step = track.deleteStep(step.n);
+                step = track.deleteStep(step.frameNumber);
                 if (step == null) return;
                 setSelectedPoint(null);
                 selectedSteps.clear();

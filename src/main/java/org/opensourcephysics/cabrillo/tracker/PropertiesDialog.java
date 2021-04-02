@@ -105,7 +105,6 @@ public class PropertiesDialog extends JDialog {
         dispose();
     }
 
-//_____________________________ private methods ____________________________
 
     /**
      * Creates the visible components of this panel.
@@ -397,5 +396,4 @@ public class PropertiesDialog extends JDialog {
             return c;
         }
     }
-
 }

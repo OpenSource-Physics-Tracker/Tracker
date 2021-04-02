@@ -28,6 +28,8 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.awt.font.*;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.display.*;
@@ -41,15 +43,20 @@ import java.util.*;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class PositionStep extends Step {
 
     private static final Point[] twoPoints = new Point[2];
 
-    protected Position p;
+    protected Position position;
+
     protected boolean labelVisible;
     protected boolean rolloverVisible;
+
     protected Map<TrackerPanel, TextLayout> textLayouts = new HashMap<>();
     protected Map<TrackerPanel, Rectangle> layoutBounds = new HashMap<>();
+
     protected CircleFootprint innerCircleFootprint = new CircleFootprint("CircleFootprint.Circle", 2); //$NON-NLS-1$
 
     /**
@@ -62,49 +69,14 @@ public class PositionStep extends Step {
      */
     public PositionStep(PointMass track, int n, double x, double y) {
         super(track, n);
-        p = new Position(x, y);
-        p.setTrackEditTrigger(true);
-        points = new TPoint[]{p};
+        position = new Position(x, y);
+        position.setTrackEditTrigger(true);
+        points = new TPoint[]{position};
         screenPoints = new Point[getLength()];
         setLabelVisible(track.labelsVisible);
         setRolloverVisible(!track.labelsVisible);
     }
 
-    /**
-     * Gets the position TPoint.
-     *
-     * @return the position TPoint
-     */
-    public Position getPosition() {
-        return p;
-    }
-
-    /**
-     * Gets the label visibility.
-     *
-     * @return <code>true</code> if label is visible
-     */
-    public boolean isLabelVisible() {
-        return labelVisible;
-    }
-
-    /**
-     * Sets the label visibility.
-     *
-     * @param visible <code>true</code> to make label visible
-     */
-    public void setLabelVisible(boolean visible) {
-        labelVisible = visible;
-    }
-
-    /**
-     * Sets the rollover visibility.
-     *
-     * @param visible <code>true</code> to make labels visible on rollover only
-     */
-    public void setRolloverVisible(boolean visible) {
-        rolloverVisible = visible;
-    }
 
     /**
      * Overrides Step draw method.
@@ -216,7 +188,7 @@ public class PositionStep extends Step {
             }
             // we have a mark at this point
             // overlay autofill mark for autofilled steps (not keyframes)
-            if (!getTrack().keyFrames.contains(this.n)) {
+            if (!getTrack().keyFrames.contains(this.frameNumber)) {
                 innerCircleFootprint.setColor(footprint.getColor());
                 final Mark autofillMark = innerCircleFootprint.getMark(screenPoints);
                 final Mark normalMark = mark;
@@ -296,7 +268,7 @@ public class PositionStep extends Step {
     public Object clone() {
         PositionStep step = (PositionStep) super.clone();
         if (step != null)
-            step.points[0] = step.p = step.new Position(p.getX(), p.getY());
+            step.points[0] = step.position = step.new Position(position.getX(), position.getY());
         if (step != null) {
             step.textLayouts = new HashMap<>();
         }
@@ -312,11 +284,9 @@ public class PositionStep extends Step {
      * @return a descriptive string
      */
     public String toString() {
-        return "PositionStep " + n + " [" + format.format(p.x) //$NON-NLS-1$ //$NON-NLS-2$
-                + ", " + format.format(p.y) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+        return "PositionStep " + frameNumber + " [" + format.format(position.x) //$NON-NLS-1$ //$NON-NLS-2$
+                + ", " + format.format(position.y) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
-
-//____________________ inner Position class ______________________
 
     protected class Position extends TPoint {
 
@@ -345,9 +315,9 @@ public class PositionStep extends Step {
                 if (track.isAutofill()) {
                     track.markInterpolatedSteps(PositionStep.this, true);
                 }
-                track.updateDerivatives(n);
+                track.updateDerivatives(frameNumber);
             }
-            track.support.firePropertyChange("step", null, n); //$NON-NLS-1$
+            track.support.firePropertyChange("step", null, frameNumber); //$NON-NLS-1$
         }
 
         /**
@@ -374,7 +344,7 @@ public class PositionStep extends Step {
          * @return the frame number
          */
         public int getFrameNumber(VideoPanel vidPanel) {
-            return n;
+            return frameNumber;
         }
 
         /**
@@ -401,8 +371,8 @@ public class PositionStep extends Step {
                 m.markInterpolatedSteps(PositionStep.this, !adjusting);
             }
             if (!adjusting) {
-                m.updateDerivatives(n);
-                m.support.firePropertyChange("step", null, n); //$NON-NLS-1$
+                m.updateDerivatives(frameNumber);
+                m.support.firePropertyChange("step", null, frameNumber); //$NON-NLS-1$
             }
             m.support.firePropertyChange("adjusting", null, adjusting); //$NON-NLS-1$
         }
@@ -416,7 +386,7 @@ public class PositionStep extends Step {
      * @return the screen position point
      */
     protected Point getLayoutPosition(TrackerPanel trackerPanel) {
-        Point pt = p.getScreenPosition(trackerPanel);
+        Point pt = position.getScreenPosition(trackerPanel);
         pt.setLocation(pt.x - 4 - textLayoutFont.getSize(), pt.y - 6);
         return pt;
     }
@@ -443,8 +413,8 @@ public class PositionStep extends Step {
          */
         public void saveObject(XMLControl control, Object obj) {
             PositionStep step = (PositionStep) obj;
-            control.setValue("x", step.p.x); //$NON-NLS-1$
-            control.setValue("y", step.p.y); //$NON-NLS-1$
+            control.setValue("x", step.position.x); //$NON-NLS-1$
+            control.setValue("y", step.position.y); //$NON-NLS-1$
         }
 
         /**
@@ -470,7 +440,7 @@ public class PositionStep extends Step {
             PositionStep step = (PositionStep) obj;
             double x = control.getDouble("x"); //$NON-NLS-1$
             double y = control.getDouble("y"); //$NON-NLS-1$
-            step.p.setXY(x, y);
+            step.position.setXY(x, y);
             return obj;
         }
     }

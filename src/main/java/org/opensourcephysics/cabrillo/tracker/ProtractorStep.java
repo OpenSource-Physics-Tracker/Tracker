@@ -29,6 +29,8 @@ import java.awt.*;
 import java.awt.font.*;
 import java.awt.geom.*;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.tools.FontSizer;
@@ -39,6 +41,8 @@ import org.opensourcephysics.controls.*;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class ProtractorStep extends Step {
 
     protected static AffineTransform transform = new AffineTransform();
@@ -105,24 +109,6 @@ public class ProtractorStep extends Step {
         rotator = new Rotator();
         points = new TPoint[]{vertex, end1, end2, handle, rotator};
         screenPoints = new Point[getLength()];
-    }
-
-    /**
-     * Enables and disables the interactivity of the ends.
-     *
-     * @param enabled <code>true</code> to enable the ends
-     */
-    public void setEndsEnabled(boolean enabled) {
-        endsEnabled = enabled;
-    }
-
-    /**
-     * Gets whether the ends are enabled.
-     *
-     * @return <code>true</code> if the ends are enabled
-     */
-    public boolean isEndsEnabled() {
-        return endsEnabled;
     }
 
     /**
@@ -402,7 +388,7 @@ public class ProtractorStep extends Step {
      */
     public String getFormattedLength(TPoint end) {
         double length = getArmLength(end);
-        if (protractor.trackerPanel.getFrameNumber() == n) {
+        if (protractor.trackerPanel.getFrameNumber() == frameNumber) {
             NumberField field = end == end1 ? getTrack().xField : getTrack().yField;
             field.setValue(length);
             return field.getFormat().format(length);
@@ -436,7 +422,7 @@ public class ProtractorStep extends Step {
         double theta = line2Angle - line1Angle;
         if (theta > Math.PI) theta -= 2 * Math.PI;
         if (theta < -Math.PI) theta += 2 * Math.PI;
-        if (protractor.trackerPanel.getFrameNumber() == n) {
+        if (protractor.trackerPanel.getFrameNumber() == frameNumber) {
             protractor.angleField.setValue(theta);
         }
         return theta;
@@ -468,8 +454,8 @@ public class ProtractorStep extends Step {
      */
     public double getArmLength(TPoint end) {
         if (protractor.trackerPanel == null) return 1.0;
-        double scaleX = protractor.trackerPanel.getCoords().getScaleX(n);
-        double scaleY = protractor.trackerPanel.getCoords().getScaleY(n);
+        double scaleX = protractor.trackerPanel.getCoords().getScaleX(frameNumber);
+        double scaleY = protractor.trackerPanel.getCoords().getScaleY(frameNumber);
         double dx = (vertex.getX() - end.getX()) / scaleX;
         double dy = (end.getY() - vertex.getY()) / scaleY;
         return Math.sqrt(dx * dx + dy * dy);
@@ -519,9 +505,9 @@ public class ProtractorStep extends Step {
      * @return the frame number
      */
     public int n() {
-        if (protractor.isFixed() && protractor.trackerPanel != null)
+        if (protractor.isFixedPosition() && protractor.trackerPanel != null)
             return protractor.trackerPanel.getFrameNumber();
-        return n;
+        return frameNumber;
     }
 
     /**
@@ -532,8 +518,6 @@ public class ProtractorStep extends Step {
     public static int getLength() {
         return 5;
     }
-
-    //__________________________ private methods __________________________
 
     /**
      * Gets TextLayout screen position. Unlike most positions,
@@ -570,7 +554,7 @@ public class ProtractorStep extends Step {
         endPoint2.setLocation(vertex);
         // the following code is to determine the position on a world view
         if (!trackerPanel.isDrawingInImageSpace()) {
-            AffineTransform at = trackerPanel.getCoords().getToWorldTransform(n);
+            AffineTransform at = trackerPanel.getCoords().getToWorldTransform(frameNumber);
             at.transform(endPoint1, endPoint1);
             endPoint1.y = -endPoint1.y;
             at.transform(endPoint2, endPoint2);
@@ -586,8 +570,6 @@ public class ProtractorStep extends Step {
         }
         return p;
     }
-
-    //______________________ inner Handle class ________________________
 
     class Handle extends Step.Handle {
 
@@ -616,7 +598,7 @@ public class ProtractorStep extends Step {
             double dy = y - getY();
             setLocation(x, y);
 
-            if (protractor.isFixed()) { // set properties of step 0
+            if (protractor.isFixedPosition()) { // set properties of step 0
                 ProtractorStep step = (ProtractorStep) protractor.steps.getStep(0);
                 step.vertex.setLocation(vertex.getX() + dx, vertex.getY() + dy);
                 step.end2.setLocation(end2.getX() + dx, end2.getY() + dy);
@@ -627,7 +609,7 @@ public class ProtractorStep extends Step {
                 vertex.setLocation(vertex.getX() + dx, vertex.getY() + dy);
                 end2.setLocation(end2.getX() + dx, end2.getY() + dy);
                 end1.setLocation(end1.getX() + dx, end1.getY() + dy);
-                protractor.keyFrames.add(n);
+                protractor.keyFrames.add(frameNumber);
             }
             repaint();
         }
@@ -662,8 +644,6 @@ public class ProtractorStep extends Step {
 
     }
 
-    //______________________ inner Tip class ________________________
-
     class Tip extends TPoint {
 
         /**
@@ -696,7 +676,7 @@ public class ProtractorStep extends Step {
                     }
                 }
             }
-            if (protractor.isFixed()) {
+            if (protractor.isFixedPosition()) {
                 ProtractorStep step = (ProtractorStep) protractor.steps.getStep(0);
                 TPoint target = this == end1 ? step.end1 : this == end2 ? step.end2 : step.vertex;
                 target.setLocation(x, y); // set property of step 0
@@ -704,7 +684,7 @@ public class ProtractorStep extends Step {
                 protractor.refreshStep(ProtractorStep.this); // sets properties of this step
             } else {
                 setLocation(x, y);
-                protractor.keyFrames.add(n);
+                protractor.keyFrames.add(frameNumber);
             }
             repaint();
             protractor.dataValid = false;
@@ -722,8 +702,6 @@ public class ProtractorStep extends Step {
         }
 
     }
-
-    //______________________ inner Rotator class ________________________
 
     class Rotator extends TPoint {
         TPoint pt = new TPoint(); // for setting screen position
@@ -753,7 +731,7 @@ public class ProtractorStep extends Step {
             double midline = line1Angle + arc / 2;
             transform.setToRotation(midline - theta, vertex.x, vertex.y);
 
-            if (protractor.isFixed()) {
+            if (protractor.isFixedPosition()) {
                 ProtractorStep step = (ProtractorStep) protractor.steps.getStep(0);
                 transform.transform(step.end1, step.end1);
                 transform.transform(step.end2, step.end2);
@@ -762,7 +740,7 @@ public class ProtractorStep extends Step {
             } else {
                 transform.transform(end1, end1);
                 transform.transform(end2, end2);
-                protractor.keyFrames.add(n);
+                protractor.keyFrames.add(frameNumber);
             }
 
             // show arc highlight shape

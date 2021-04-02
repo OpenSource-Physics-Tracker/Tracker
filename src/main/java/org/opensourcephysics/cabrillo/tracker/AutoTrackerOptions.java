@@ -1,5 +1,8 @@
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -17,11 +20,14 @@ import java.beans.PropertyChangeSupport;
  *
  * @author Nikolai Avdeev aka NickKolok
  */
+@Getter
+@Setter
 public class AutoTrackerOptions implements Cloneable {
 
     private int goodMatch = 4;
     private int evolveAlpha = 63;
     private int autoSkipCount = 2;
+
     /**
      * Positive for 1D, negative for 2D tracking.
      */
@@ -41,9 +47,6 @@ public class AutoTrackerOptions implements Cloneable {
 
     public final PropertyChangeSupport changes = new PropertyChangeSupport(this);
 
-    public int getGoodMatch() {
-        return goodMatch;
-    }
 
     public void setGoodMatch(int goodMatch) {
         int oldMatch = this.goodMatch;
@@ -55,17 +58,11 @@ public class AutoTrackerOptions implements Cloneable {
         return match > goodMatch;
     }
 
-    public int getPossibleMatch() {
-        return possibleMatch;
-    }
 
     public boolean isMatchPossible(double match) {
         return match > possibleMatch;
     }
 
-    public int getEvolveAlpha() {
-        return evolveAlpha;
-    }
 
     public void setEvolveAlpha(int evolveAlpha) {
         int oldAlpha = this.evolveAlpha;
@@ -81,25 +78,6 @@ public class AutoTrackerOptions implements Cloneable {
         setEvolveAlpha(alpha);
     }
 
-    public int getAutoSkipCount() {
-        return autoSkipCount;
-    }
-
-    public void setAutoSkipCount(int autoskipCount) {
-        this.autoSkipCount = autoskipCount;
-    }
-
-    public boolean isLookAhead() {
-        return lookAhead;
-    }
-
-    public void setLookAhead(boolean lookAhead) {
-        this.lookAhead = lookAhead;
-    }
-
-    public double getMaskWidth() {
-        return maskWidth;
-    }
 
     public void setMaskWidth(double maskWidth) {
         if (this.maskWidth == maskWidth) {
@@ -110,9 +88,6 @@ public class AutoTrackerOptions implements Cloneable {
         changes.firePropertyChange("maskWidth", old, this.maskWidth);
     }
 
-    public double getMaskHeight() {
-        return maskHeight;
-    }
 
     public void setMaskHeight(double maskHeight) {
         if (this.maskHeight == maskHeight) {
@@ -121,10 +96,6 @@ public class AutoTrackerOptions implements Cloneable {
         double old = this.maskHeight;
         this.maskHeight = maskHeight;
         changes.firePropertyChange("maskHeight", old, this.maskHeight);
-    }
-
-    public int getLineSpread() {
-        return lineSpread;
     }
 
     public void setLineSpread(int spread) {
@@ -139,10 +110,6 @@ public class AutoTrackerOptions implements Cloneable {
     public int getPredictionLookBack() {
         int predictionLookBack = 4;
         return predictionLookBack;
-    }
-
-    public int getMaskShapeType() {
-        return maskShapeType;
     }
 
     public void setMaskShapeType(int maskShapeType) {

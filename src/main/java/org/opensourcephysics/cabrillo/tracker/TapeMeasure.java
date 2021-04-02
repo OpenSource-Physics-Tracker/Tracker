@@ -1099,11 +1099,11 @@ public class TapeMeasure extends TTrack {
         if (step == null) return;
         int positionKey = 0, lengthKey = 0;
         for (int i : keyFrames) {
-            if (i <= step.n)
+            if (i <= step.frameNumber)
                 positionKey = i;
         }
         for (int i : lengthKeyFrames) {
-            if (i <= step.n)
+            if (i <= step.frameNumber)
                 lengthKey = i;
         }
         // compare step with keyStep
@@ -1148,7 +1148,7 @@ public class TapeMeasure extends TTrack {
         if ((readOnly || isStickMode()) && !editing) {
             // if not fixed, add target frame to key frames
             if (!isFixedPosition())
-                keyFrames.add(target.n);
+                keyFrames.add(target.frameNumber);
             // replace target with key frame step
             target = getKeyStep(target);
         }
@@ -1238,7 +1238,7 @@ public class TapeMeasure extends TTrack {
         int key = 0;
         if (!this.isFixedPosition()) {
             for (int i : keyFrames) {
-                if (i <= step.n)
+                if (i <= step.frameNumber)
                     key = i;
             }
         }

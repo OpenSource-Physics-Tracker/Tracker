@@ -48,6 +48,8 @@ import javax.swing.border.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.TableCellRenderer;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.controls.OSPLog;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.display.*;
@@ -66,6 +68,8 @@ import org.opensourcephysics.cabrillo.tracker.AutoTrackerCore.FrameData;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class AutoTracker implements Trackable, PropertyChangeListener {
 
     /**
@@ -183,10 +187,17 @@ public class AutoTracker implements Trackable, PropertyChangeListener {
     private Shape searchShape, maskShape, matchShape;
     private Shape searchHitShape, maskHitShape;
 
-    private Mark mark; // draws the mask, target and/or search area
+    /**
+     * Draws the mask, target and/or search area
+     */
+    private Mark mark;
+
     private TrackerPanel trackerPanel;
 
-    private final Point[] screenPoints = {new Point()}; // used for footprints
+    /**
+     * Used for footprints
+     */
+    private final Point[] screenPoints = {new Point()};
 
     private int autoskipsRemained = 0;
 
@@ -425,16 +436,6 @@ public class AutoTracker implements Trackable, PropertyChangeListener {
     public boolean isMarked(int frameNumber) {
         TTrack track = getTrack();
         return track != null && track.getStep(frameNumber) != null;
-    }
-
-
-    /**
-     * Gets the wizard.
-     *
-     * @return the wizard
-     */
-    public Wizard getWizard() {
-        return wizard;
     }
 
     /**

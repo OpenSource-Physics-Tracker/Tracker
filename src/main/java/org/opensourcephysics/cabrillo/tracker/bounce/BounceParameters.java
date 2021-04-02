@@ -141,8 +141,8 @@ public class BounceParameters {
      * @param t time
      * @return derivatives
      */
-    public double[] first_deriv(double t) {
-        double[] result = model.first_deriv(params, t);
+    public double[] firstDeriv(double t) {
+        double[] result = model.firstDeriv(params, t);
         if (initialStepSize != null && initialStepAt < t) {
             for (int i = 0; i < result.length; i++) {
                 result[i] += initialStepSize[i];
@@ -164,8 +164,8 @@ public class BounceParameters {
      * @param t time
      * @return derivatives
      */
-    public double[] second_deriv(double t) {
-        double[] result = model.second_deriv(params, t);
+    public double[] secondDeriv(double t) {
+        double[] result = model.secondDeriv(params, t);
         if (initialStepSize != null && Math.round(initialStepAt - t) == 0) {
             for (int i = 0; i < result.length; i++) {
                 result[i] += initialStepSize[i];

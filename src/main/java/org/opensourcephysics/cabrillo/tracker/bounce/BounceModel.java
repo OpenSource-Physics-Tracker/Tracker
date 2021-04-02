@@ -41,23 +41,23 @@ package org.opensourcephysics.cabrillo.tracker.bounce;
  */
 public class BounceModel {
 
-    public BounceModel(int num_data, int deg, double when_step) {
+    public BounceModel(int numData, int deg, double whenStep) {
         degree = deg;
 
         // There must be at least one data point on each side of a step
-        useUnknownStep = Double.isNaN(when_step);
+        useUnknownStep = Double.isNaN(whenStep);
         if (useUnknownStep) {
             useStep = false;
-            stepAt = (num_data + 1) / 2;    // looking for step in (stepAt-1,stepAt)
+            stepAt = (numData + 1) / 2;    // looking for step in (stepAt-1,stepAt)
         } else {
-            useStep = when_step > 0 && when_step < num_data - 1;
-            stepAt = useStep ? when_step : 0;
+            useStep = whenStep > 0 && whenStep < numData - 1;
+            stepAt = useStep ? whenStep : 0;
         }
 
         int numParams = degree + 1 + (useUnknownStep ? 2 : (useStep ? 1 : 0));
 
-        double[][] mapping1D = new double[num_data][numParams];
-        for (int t = 0; t < num_data; t++) {
+        double[][] mapping1D = new double[numData][numParams];
+        for (int t = 0; t < numData; t++) {
             int power = 1;
             for (int d = 0; d <= degree; d++) {
                 mapping1D[t][d] = power;
@@ -152,7 +152,7 @@ public class BounceModel {
      * fitted paramters
      * returns null if fitting is not possible,
      * which can happen if
-     * start, start+index_step, ...,  start+(num_data-1)*index_step
+     * start, start+index_step, ...,  start+(numData-1)*index_step
      * goes out of range for either data array
      * or Xdata or Ydata is Double.NaN for one of the specified points
      * <p>
@@ -166,16 +166,16 @@ public class BounceModel {
      * @return LinearModelParams containing parameters and residual square error
      */
     public BounceParameters fit_xy(double[] xData, double[] yData, int start, int index_step) {
-        int num_data = model.getRowDimension();
-        int last_index = start + (num_data - 1) * index_step;
+        int numData = model.getRowDimension();
+        int last_index = start + (numData - 1) * index_step;
         if (start < 0 || last_index >= xData.length || last_index >= yData.length) {
             return null;
         }
 
         // copy data points into a matrix
-        BounceMatrix data_matrix = new BounceMatrix(num_data, 2);
+        BounceMatrix data_matrix = new BounceMatrix(numData, 2);
         double[][] data = data_matrix.getArray();
-        for (int t = 0; t < num_data; t++) {
+        for (int t = 0; t < numData; t++) {
             data[t][0] = xData[start + index_step * t];
             data[t][1] = yData[start + index_step * t];
             if (Double.isNaN(data[t][0]) || Double.isNaN(data[t][1])) {
@@ -187,7 +187,7 @@ public class BounceModel {
 
         double[][] error_array = model.times(params).minus(data_matrix).getArray();
         double square_error = 0;
-        for (int t = 0; t < num_data; t++) {
+        for (int t = 0; t < numData; t++) {
             square_error += error_array[t][0] * error_array[t][0];
             square_error += error_array[t][1] * error_array[t][1];
         }
@@ -212,11 +212,11 @@ public class BounceModel {
             double try_step = stepAt - extra / dv;
             if (try_step < 0) {
                 try_step = 0.001;
-            } else if (try_step >= num_data - 1) {
-                try_step = num_data - 1.001;
+            } else if (try_step >= numData - 1) {
+                try_step = numData - 1.001;
             }
 
-            BounceModel step_model = new BounceModel(num_data, degree, try_step);
+            BounceModel step_model = new BounceModel(numData, degree, try_step);
             BounceParameters fit_step = step_model.fit_xy(xData, yData, start, index_step);
             if (null == best_fit || best_fit.getSquareError() > fit_step.getSquareError()) {
                 best_fit = fit_step;
@@ -227,7 +227,7 @@ public class BounceModel {
         }
         if (weight > 0) combined_step /= weight;
 
-        BounceModel step_model = new BounceModel(num_data, degree, combined_step);
+        BounceModel step_model = new BounceModel(numData, degree, combined_step);
         BounceParameters fit_step = step_model.fit_xy(xData, yData, start, index_step);
         if (null == best_fit || best_fit.getSquareError() > fit_step.getSquareError()) {
             best_fit = fit_step;
@@ -244,7 +244,7 @@ public class BounceModel {
      * <p>
      * returns null if fitting is not possible,
      * which can happen if
-     * start, start+index_step, ...,  start+(num_data-1)*index_step
+     * start, start+index_step, ...,  start+(numData-1)*index_step
      * goes out of range for either data array
      * or	xdata or ydata is Double.NaN for one of the specified points
      * <p>
@@ -255,7 +255,7 @@ public class BounceModel {
      * @param yData          array of y values
      * @param start          subscript of first (x,y) pair for window
      * @param index_step     increment between subscripts for subsequent data points
-     * @param initial_stepAt what time the predefined step happens 0<=t<num_data
+     * @param initial_stepAt what time the predefined step happens 0<=t<numData
      * @return LinearModelParams containing parameters and residual square error
      */
     public BounceParameters fit_xy(double[] xData, double[] yData, int start, int index_step,
@@ -265,16 +265,16 @@ public class BounceModel {
             throw new RuntimeException("Can't fit with an initial step if the model already tries to fit a step"); //$NON-NLS-1$
         }
 
-        int num_data = model.getRowDimension();
-        int last_index = start + (num_data - 1) * index_step;
+        int numData = model.getRowDimension();
+        int last_index = start + (numData - 1) * index_step;
         if (start < 0 || last_index >= xData.length || last_index >= yData.length) {
             return null;
         }
 
         // copy data points into a matrix
-        BounceMatrix data_matrix = new BounceMatrix(num_data, 2);
+        BounceMatrix data_matrix = new BounceMatrix(numData, 2);
         double[][] data = data_matrix.getArray();
-        for (int t = 0; t < num_data; t++) {
+        for (int t = 0; t < numData; t++) {
             data[t][0] = xData[start + index_step * t] - (t > initial_stepAt ? initial_step_size[0] * (t - initial_stepAt) : 0);
             data[t][1] = yData[start + index_step * t] - (t > initial_stepAt ? initial_step_size[1] * (t - initial_stepAt) : 0);
             if (Double.isNaN(data[t][0]) || Double.isNaN(data[t][1])) {
@@ -286,7 +286,7 @@ public class BounceModel {
 
         double[][] error_array = model.times(params).minus(data_matrix).getArray();
         double square_error = 0;
-        for (int t = 0; t < num_data; t++) {
+        for (int t = 0; t < numData; t++) {
             square_error += error_array[t][0] * error_array[t][0];
             square_error += error_array[t][1] * error_array[t][1];
         }
@@ -308,7 +308,7 @@ public class BounceModel {
      * @param t           what time
      * @return first derivates of x and y at time t
      */
-    public double[] first_deriv(BounceMatrix model_param, double t) {
+    public double[] firstDeriv(BounceMatrix model_param, double t) {
         int dimension = model_param.getColumnDimension();
 
         double[] result = new double[dimension];
@@ -347,7 +347,7 @@ public class BounceModel {
      *                    "start" in the fit_xy call
      * @return second derivates of x and y at time t
      */
-    public double[] second_deriv(BounceMatrix model_param, double t) {
+    public double[] secondDeriv(BounceMatrix model_param, double t) {
         int dimension = model_param.getColumnDimension();
 
         double[] result = new double[dimension];

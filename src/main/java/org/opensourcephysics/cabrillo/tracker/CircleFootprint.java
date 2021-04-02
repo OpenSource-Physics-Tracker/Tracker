@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.tools.FontSizer;
 
 import javax.swing.*;
@@ -39,20 +41,22 @@ import java.util.HashSet;
 /**
  * A CircleFootprint returns a circle for a Point[] of length 1.
  */
+@Getter
+@Setter
 public class CircleFootprint implements Footprint, Cloneable {
 
-  /**
-   * Constructs a CircleFootprint.
-   *
-   * @param name   the name
-   * @param radius radius of the footprint
-   */
-  public CircleFootprint(String name, int radius) {
-    this.name = name;
-    setRadius(radius);
-    setStroke(new BasicStroke(1.0f));
-    center.setFrame(-1, -1, 2, 2);
-  }
+    /**
+     * Constructs a CircleFootprint.
+     *
+     * @param name   the name
+     * @param radius radius of the footprint
+     */
+    public CircleFootprint(String name, int radius) {
+        this.name = name;
+        setRadius(radius);
+        setStroke(new BasicStroke(1.0f));
+        center.setFrame(-1, -1, 2, 2);
+    }
 
     protected static float plainStrokeSize = 1.0f;
     protected static float boldStrokeSize = 2.0f;
@@ -78,7 +82,8 @@ public class CircleFootprint implements Footprint, Cloneable {
     protected BasicStroke baseHighlightStroke, baseOutlineStroke;
     protected BasicStroke highlightStroke, outlineStroke;
 
-    protected boolean outlined = true, spotted;
+    protected boolean outlined = true;
+    protected boolean spotShown;
 
     protected CircleDialog dialog;
 
@@ -118,14 +123,6 @@ public class CircleFootprint implements Footprint, Cloneable {
         return null;
     }
 
-    /**
-     * Gets the name of this footprint.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
 
     /**
      * Gets the display name of the footprint.
@@ -160,7 +157,7 @@ public class CircleFootprint implements Footprint, Cloneable {
         setRadius(outlined ? 5 : 6);
         Shape shape = getShape(new Point[]{new Point()});
         Area area = null;
-        if (spotted) {
+        if (spotShown) {
             area = new Area(spot);
         }
         if (outlined) {
@@ -194,7 +191,7 @@ public class CircleFootprint implements Footprint, Cloneable {
                         RenderingHints.VALUE_ANTIALIAS_ON);
                 g.fill(shape);
                 g.setPaint(highlightColor);
-                if (spotted) {
+                if (spotShown) {
                     g.fill(spot);
                 }
                 if (outlined) {
@@ -214,14 +211,6 @@ public class CircleFootprint implements Footprint, Cloneable {
         };
     }
 
-    /**
-     * Gets the hit shapes.
-     *
-     * @return the hit shapes
-     */
-    public Shape[] getHitShapes() {
-        return hitShapes;
-    }
 
     /**
      * Sets the stroke.
@@ -272,24 +261,6 @@ public class CircleFootprint implements Footprint, Cloneable {
     }
 
     /**
-     * Sets the outlined flag.
-     *
-     * @param outline true to draw an outline around the circle
-     */
-    public void setOutlined(boolean outline) {
-        outlined = outline;
-    }
-
-    /**
-     * Sets the spotted flag.
-     *
-     * @param drawSpot true to draw a spot at the center of the circle
-     */
-    public void setSpotShown(boolean drawSpot) {
-        spotted = drawSpot;
-    }
-
-    /**
      * Sets the alpha of the fill.
      *
      * @param alpha 0 for transparent, 255 for solid
@@ -308,7 +279,7 @@ public class CircleFootprint implements Footprint, Cloneable {
         String s = r + " "; //$NON-NLS-1$
         if (outlined)
             s += "outline "; //$NON-NLS-1$
-        if (spotted)
+        if (spotShown)
             s += "spot "; //$NON-NLS-1$
         if (baseOutlineStroke.getLineWidth() > plainStrokeSize)
             s += "bold "; //$NON-NLS-1$
@@ -350,9 +321,9 @@ public class CircleFootprint implements Footprint, Cloneable {
             dialog.setLocation(x, y);
         }
         dialog.boldCheckbox.setSelected(baseOutlineStroke.getLineWidth() > plainStrokeSize);
-        dialog.spotCheckbox.setSelected(spotted);
+        dialog.spotCheckbox.setSelected(spotShown);
         dialog.spinner.setValue(r);
-        prevSpot = spotted;
+        prevSpot = spotShown;
         prevStrokeSize = baseOutlineStroke.getLineWidth();
         prevRadius = r;
         dialog.setVisible(true);
@@ -374,9 +345,9 @@ public class CircleFootprint implements Footprint, Cloneable {
             dialog.setLocation(x, y);
         }
         dialog.boldCheckbox.setSelected(baseOutlineStroke.getLineWidth() > plainStrokeSize);
-        dialog.spotCheckbox.setSelected(spotted);
+        dialog.spotCheckbox.setSelected(spotShown);
         dialog.spinner.setValue(r);
-        prevSpot = spotted;
+        prevSpot = spotShown;
         prevStrokeSize = baseOutlineStroke.getLineWidth();
         prevRadius = r;
         dialog.setVisible(true);

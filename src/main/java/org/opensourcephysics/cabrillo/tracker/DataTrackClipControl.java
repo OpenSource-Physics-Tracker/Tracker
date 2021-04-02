@@ -240,12 +240,6 @@ public class DataTrackClipControl extends JPanel implements PropertyChangeListen
 
     public void propertyChange(PropertyChangeEvent e) {
         refreshSpinners();
-//		if (e.getPropertyName().equals("dataclip")) { //$NON-NLS-1$
-//			refreshSpinners();
-//		}
-//		else if (e.getPropertyName().equals("videoclip")) { //$NON-NLS-1$
-//			refreshSpinners();
-//		}
     }
 
     /**

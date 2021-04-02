@@ -143,8 +143,6 @@ public class Undo {
         panel.repaint();
     }
 
-//_____________________ private and protected methods ______________________
-
     /**
      * Posts an undoable edit for a deleted track.
      *

@@ -31,6 +31,8 @@ import java.awt.geom.*;
 
 import javax.swing.*;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.tools.FontSizer;
 
 /**
@@ -38,7 +40,19 @@ import org.opensourcephysics.tools.FontSizer;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class MultiLineFootprint implements Footprint, Cloneable {
+
+    /**
+     * Constructs a LineFootprint.
+     *
+     * @param name the name
+     */
+    public MultiLineFootprint(String name) {
+        this.name = name;
+    }
+
 
     protected String name;
     protected AffineTransform transform = new AffineTransform();
@@ -50,13 +64,21 @@ public class MultiLineFootprint implements Footprint, Cloneable {
     protected Shape[] hitShapes = new Shape[0];
     protected boolean closed = false;
 
-    /**
-     * Constructs a LineFootprint.
-     *
-     * @param name the name
-     */
-    public MultiLineFootprint(String name) {
-        this.name = name;
+    private static final Collection<MultiLineFootprint> footprints = new HashSet<>();
+
+    private static final MultiLineFootprint LINE;
+    private static final MultiLineFootprint BOLD_LINE;
+
+    static {
+
+        // LINE
+        LINE = new MultiLineFootprint("Footprint.Lines"); //$NON-NLS-1$
+        footprints.add(LINE);
+
+        // BOLD_LINE
+        BOLD_LINE = new MultiLineFootprint("Footprint.BoldLines"); //$NON-NLS-1$
+        BOLD_LINE.setStroke(new BasicStroke(2));
+        footprints.add(BOLD_LINE);
     }
 
     /**
@@ -74,15 +96,6 @@ public class MultiLineFootprint implements Footprint, Cloneable {
             }
         }
         return null;
-    }
-
-    /**
-     * Gets the name of this footprint.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
     }
 
     /**
@@ -147,15 +160,6 @@ public class MultiLineFootprint implements Footprint, Cloneable {
     }
 
     /**
-     * Gets the hit shapes. This return an empty array.
-     *
-     * @return the hit shapes
-     */
-    public Shape[] getHitShapes() {
-        return hitShapes;
-    }
-
-    /**
      * Sets the stroke.
      *
      * @param stroke the desired stroke
@@ -171,15 +175,6 @@ public class MultiLineFootprint implements Footprint, Cloneable {
     }
 
     /**
-     * Gets the stroke.
-     *
-     * @return the stroke
-     */
-    public BasicStroke getStroke() {
-        return baseStroke;
-    }
-
-    /**
      * Sets the line width.
      *
      * @param w the desired line width
@@ -191,40 +186,6 @@ public class MultiLineFootprint implements Footprint, Cloneable {
                 8,
                 baseStroke.getDashArray(),
                 baseStroke.getDashPhase());
-    }
-
-    /**
-     * Sets the color.
-     *
-     * @param color the desired color
-     */
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    /**
-     * Gets the color.
-     *
-     * @return the color
-     */
-    public Color getColor() {
-        return color;
-    }
-
-    /**
-     * Determine if this draws closed paths.
-     *
-     * @return true if closed
-     */
-    public boolean isClosed() {
-        return closed;
-    }
-
-    /**
-     * Sets the closed property.
-     */
-    public void setClosed(boolean closed) {
-        this.closed = closed;
     }
 
     /**
@@ -251,25 +212,5 @@ public class MultiLineFootprint implements Footprint, Cloneable {
             area.add(new Area(stroke.createStrokedShape(line)));
         }
         return area;
-    }
-
-    // static fields
-    private static final Collection<MultiLineFootprint> footprints = new HashSet<>();
-
-    // static constants
-    private static final MultiLineFootprint LINE;
-    private static final MultiLineFootprint BOLD_LINE;
-
-    // static initializers
-    static {
-
-        // LINE
-        LINE = new MultiLineFootprint("Footprint.Lines"); //$NON-NLS-1$
-        footprints.add(LINE);
-
-        // BOLD_LINE
-        BOLD_LINE = new MultiLineFootprint("Footprint.BoldLines"); //$NON-NLS-1$
-        BOLD_LINE.setStroke(new BasicStroke(2));
-        footprints.add(BOLD_LINE);
     }
 }

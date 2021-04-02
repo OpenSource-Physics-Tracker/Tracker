@@ -30,11 +30,15 @@ import java.awt.geom.*;
 
 import javax.swing.*;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.tools.FontSizer;
 
 /**
  * A PointShapeFootprint returns a shape for a Point[] of length 1.
  */
+@Getter
+@Setter
 public class PointShapeFootprint implements Footprint, Cloneable {
 
     protected String name;
@@ -79,15 +83,6 @@ public class PointShapeFootprint implements Footprint, Cloneable {
             }
         }
         return null;
-    }
-
-    /**
-     * Gets the name of this footprint.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
     }
 
     /**
@@ -154,15 +149,6 @@ public class PointShapeFootprint implements Footprint, Cloneable {
     }
 
     /**
-     * Gets the hit shapes.
-     *
-     * @return the hit shapes
-     */
-    public Shape[] getHitShapes() {
-        return hitShapes;
-    }
-
-    /**
      * Sets the stroke. May be set to null.
      *
      * @param stroke the desired stroke
@@ -172,15 +158,6 @@ public class PointShapeFootprint implements Footprint, Cloneable {
         if (stroke != null) {
             defaultWidth = stroke.getLineWidth();
         }
-    }
-
-    /**
-     * Gets the stroke. May return null;
-     *
-     * @return the stroke
-     */
-    public BasicStroke getStroke() {
-        return baseStroke;
     }
 
     /**
@@ -196,24 +173,6 @@ public class PointShapeFootprint implements Footprint, Cloneable {
                 8,
                 baseStroke.getDashArray(),
                 baseStroke.getDashPhase());
-    }
-
-    /**
-     * Sets the color.
-     *
-     * @param color the desired color
-     */
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    /**
-     * Gets the color.
-     *
-     * @return the color
-     */
-    public Color getColor() {
-        return color;
     }
 
     /**

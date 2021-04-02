@@ -95,7 +95,7 @@ public class CircleFitterStep extends Step {
         XMLControl control = new XMLControlElement(this); // for undoable edit
 
         if (!circleFitter.isFixed() && refreshAndPostEdit) {
-            circleFitter.keyFrames.add(n);
+            circleFitter.keyFrames.add(frameNumber);
         }
 
         // make new array if needed
@@ -158,7 +158,7 @@ public class CircleFitterStep extends Step {
         XMLControl control = new XMLControlElement(this);
         if (index > -1) {
             if (!circleFitter.isFixed() && !p.isAttached()) {
-                circleFitter.keyFrames.add(n);
+                circleFitter.keyFrames.add(frameNumber);
             }
 
             // make new array
@@ -176,9 +176,9 @@ public class CircleFitterStep extends Step {
             }
         }
         assert circleFitter.trackerPanel != null;
-        if (n == circleFitter.trackerPanel.getFrameNumber()) {
+        if (frameNumber == circleFitter.trackerPanel.getFrameNumber()) {
             repaint();
-            circleFitter.refreshFields(n);
+            circleFitter.refreshFields(frameNumber);
         }
         circleFitter.dataValid = false;
         if (fireEvents) {
@@ -385,7 +385,7 @@ public class CircleFitterStep extends Step {
         if (dataCount < 3 || circleFitter.trackerPanel == null) {
             return Double.NaN;
         }
-        return radius / circleFitter.trackerPanel.getCoords().getScaleX(n);
+        return radius / circleFitter.trackerPanel.getCoords().getScaleX(frameNumber);
     }
 
     /**
@@ -460,7 +460,7 @@ public class CircleFitterStep extends Step {
                 }
         }
 
-        boolean isVisible = circleFitter.trackerPanel != null && n == circleFitter.trackerPanel.getFrameNumber();
+        boolean isVisible = circleFitter.trackerPanel != null && frameNumber == circleFitter.trackerPanel.getFrameNumber();
         if (radius != prevR || center.x != prevX || center.y != prevY) {
             if (isVisible) {
                 repaint();
@@ -652,7 +652,7 @@ public class CircleFitterStep extends Step {
         for (int i = 0; i < dataPoints[0].length; i++) {
             s.append("\n").append(i).append(": ").append(dataPoints[0][i]); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        return "CircleFitterStep " + n + " [center (" + center.x + ", " + center.y + "), radius " + radius + "]" + s; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+        return "CircleFitterStep " + frameNumber + " [center (" + center.x + ", " + center.y + "), radius " + radius + "]" + s; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
     }
 
     /**
@@ -717,10 +717,10 @@ public class CircleFitterStep extends Step {
             } else {
                 setLocation(x, y);
                 if (!this.isAttached())
-                    circleFitter.keyFrames.add(n);
+                    circleFitter.keyFrames.add(frameNumber);
                 if (doRefresh) refreshCircle();
             }
-            if (doRefresh) circleFitter.refreshFields(n);
+            if (doRefresh) circleFitter.refreshFields(frameNumber);
 
             circleFitter.dataValid = false;
             if (doRefresh) circleFitter.firePropertyChange("data", null, circleFitter); //$NON-NLS-1$
@@ -737,7 +737,7 @@ public class CircleFitterStep extends Step {
 
         @Override
         public String toString() {
-            return "DataPoint " + n + ": " + super.toString(); //$NON-NLS-1$ //$NON-NLS-2$
+            return "DataPoint " + frameNumber + ": " + super.toString(); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         public Step getAttachedStep() {
@@ -764,15 +764,6 @@ public class CircleFitterStep extends Step {
          */
         public CenterPoint(double x, double y) {
             super(x, y);
-        }
-
-        /**
-         * Overrides TPoint setXY method to prevent user dragging/nudging.
-         *
-         * @param x the x coordinate
-         * @param y the y coordinate
-         */
-        public void setXY(double x, double y) {
         }
 
     }
@@ -809,7 +800,7 @@ public class CircleFitterStep extends Step {
             }
             control.setValue("datapoints", pointData); //$NON-NLS-1$
             if (step.circleFitter != null && !step.circleFitter.isFixed()) {
-                control.setValue("iskey", step.circleFitter.keyFrames.contains(step.n)); //$NON-NLS-1$
+                control.setValue("iskey", step.circleFitter.keyFrames.contains(step.frameNumber)); //$NON-NLS-1$
             }
         }
 
@@ -834,15 +825,15 @@ public class CircleFitterStep extends Step {
          */
         public Object loadObject(XMLControl control, Object obj) {
             CircleFitterStep step = (CircleFitterStep) obj;
-            if (step.circleFitter != null && step.circleFitter.isFixed() && step.n != 0) {
+            if (step.circleFitter != null && step.circleFitter.isFixed() && step.frameNumber != 0) {
                 step = (CircleFitterStep) step.circleFitter.getStep(0);
             }
             if (step.circleFitter != null && !step.circleFitter.isFixed()) {
                 boolean isKey = control.getBoolean("iskey"); //$NON-NLS-1$
                 if (isKey) {
-                    step.circleFitter.keyFrames.add(step.n);
+                    step.circleFitter.keyFrames.add(step.frameNumber);
                 } else {
-                    step.circleFitter.keyFrames.remove(step.n);
+                    step.circleFitter.keyFrames.remove(step.frameNumber);
                 }
             }
             double[][] pointData = (double[][]) control.getObject("datapoints"); //$NON-NLS-1$

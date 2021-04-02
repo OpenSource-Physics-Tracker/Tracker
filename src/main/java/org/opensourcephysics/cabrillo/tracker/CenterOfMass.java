@@ -219,21 +219,6 @@ public class CenterOfMass extends PointMass {
         }
     }
 
-    /**
-     * Overrides TTrack setLocked method. CenterOfMass is always locked.
-     *
-     * @param locked ignored
-     */
-    public void setLocked(boolean locked) {
-    }
-
-    /**
-     * Overrides PointMass setMass method. Mass is determined by masses.
-     *
-     * @param mass ignored
-     */
-    public void setMass(double mass) {
-    }
 
     /**
      * Overrides TTrack isStepComplete method. Always returns true.

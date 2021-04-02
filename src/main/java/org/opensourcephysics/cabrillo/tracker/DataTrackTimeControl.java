@@ -13,7 +13,9 @@ import java.beans.PropertyChangeListener;
 public class DataTrackTimeControl extends JPanel implements PropertyChangeListener {
 
     protected DataTrack dataTrack;
-    private JRadioButton videoButton, dataButton;
+
+    private JRadioButton videoButton;
+    private JRadioButton dataButton;
 
     /**
      * Constructor.

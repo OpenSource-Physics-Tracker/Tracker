@@ -50,9 +50,11 @@ import org.opensourcephysics.tools.FontSizer;
  */
 public class ExportDataDialog extends JDialog {
 
-    protected static ExportDataDialog dataExporter; // singleton
+    /**
+     * Singleton
+     */
+    protected static ExportDataDialog dataExporter;
 
-    // instance fields
     protected TrackerPanel trackerPanel;
     protected JButton saveAsButton, closeButton;
     protected JComponent tablePanel, delimiterPanel, contentPanel, formatPanel;
@@ -97,7 +99,6 @@ public class ExportDataDialog extends JDialog {
         setLocation(x, y);
     }
 
-//_____________________________ private methods ____________________________
 
     /**
      * Creates the visible components of this dialog.

@@ -49,6 +49,7 @@ public class RGBRegion extends TTrack {
 
     protected static int defaultRadius = 10;
     protected static int defaultMaxRadius = 100;
+
     protected static String[] dataVariables;
 
     /**
@@ -381,14 +382,6 @@ public class RGBRegion extends TTrack {
     protected void setMarking(boolean marking) {
         super.setMarking(marking);
         repaint(trackerPanel);
-    }
-
-    /**
-     * Overrides TTrack setTrailVisible method to keep trails hidden.
-     *
-     * @param visible ignored
-     */
-    public void setTrailVisible(boolean visible) {
     }
 
     /**
@@ -818,14 +811,14 @@ public class RGBRegion extends TTrack {
         int key = 0;
         if (!isFixedPosition()) {
             for (int i : keyFrames) {
-                if (i <= step.n)
+                if (i <= step.frameNumber)
                     key = i;
             }
         }
         int radiusKey = 0;
         if (!isFixedRadius()) {
             for (int i : radiusKeyFrames) {
-                if (i <= step.n)
+                if (i <= step.frameNumber)
                     radiusKey = i;
             }
         }
@@ -850,7 +843,6 @@ public class RGBRegion extends TTrack {
         }
     }
 
-//__________________________ static methods ___________________________
 
     /**
      * Returns the luma (perceived brightness) of a video RGB color.

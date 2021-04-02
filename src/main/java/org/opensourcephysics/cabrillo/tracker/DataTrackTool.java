@@ -41,11 +41,14 @@ import org.opensourcephysics.tools.Tool;
  */
 public class DataTrackTool extends UnicastRemoteObject implements Tool {
 
-    /* Define serialVersionUID so RMI serialization can occur reliably.
-    The value of this must never change even in future releases */
+    /**
+     * Define serialVersionUID so RMI serialization can occur reliably.
+     * The value of this must never change even in future releases.
+     */
     private static final long serialVersionUID = 1L;
 
     private final TFrame frame;
+
     private final TreeMap<Integer, Tool> replyToTools = new TreeMap<>();
     private final TreeMap<Integer, String> jarPaths = new TreeMap<>();
 
@@ -436,8 +439,6 @@ public class DataTrackTool extends UnicastRemoteObject implements Tool {
         }
         return dataTrack;
     }
-
-//______________________________  static methods  ____________________________
 
     /**
      * Determines if a jar file is a (likely) data source.

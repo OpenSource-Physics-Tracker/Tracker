@@ -38,9 +38,10 @@ import java.awt.geom.Area;
  */
 public class DoubleArrowFootprint extends LineFootprint {
 
-    // instance fields
     protected int tipLength = 16;
+
     boolean openHead = true;
+
     protected BasicStroke headStroke = new BasicStroke();
 
     /**

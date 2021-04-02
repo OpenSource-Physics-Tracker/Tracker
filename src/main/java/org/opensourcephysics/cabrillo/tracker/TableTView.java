@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.tools.FontSizer;
@@ -42,9 +44,11 @@ import java.util.Map;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class TableTView extends TrackChooserTView {
 
-    protected Icon icon;
+    protected Icon viewIcon;
     protected JDialog columnsDialog;
     protected JLabel trackLabel;
     protected JButton defineButton, closeButton, textColumnButton;
@@ -58,7 +62,7 @@ public class TableTView extends TrackChooserTView {
      */
     public TableTView(TrackerPanel panel) {
         super(panel);
-        icon = new ImageIcon(getClass().getResource("/images/datatable.gif")); //$NON-NLS-1$
+        viewIcon = new ImageIcon(getClass().getResource("/images/datatable.gif")); //$NON-NLS-1$
         getColumnsDialog();
     }
 
@@ -69,15 +73,6 @@ public class TableTView extends TrackChooserTView {
      */
     public String getViewName() {
         return TrackerRes.getString("TFrame.View.Table"); //$NON-NLS-1$
-    }
-
-    /**
-     * Gets the icon for this view
-     *
-     * @return the icon for this view
-     */
-    public Icon getViewIcon() {
-        return icon;
     }
 
     /**

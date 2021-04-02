@@ -24,6 +24,7 @@
  */
 package org.opensourcephysics.cabrillo.tracker.pencil;
 
+import lombok.Getter;
 import org.opensourcephysics.cabrillo.tracker.*;
 import org.opensourcephysics.display.ColorIcon;
 import org.opensourcephysics.display.DrawingPanel;
@@ -46,6 +47,7 @@ import java.util.Collections;
  *
  * @author Douglas Brown
  */
+@Getter
 public class PencilControl extends JDialog {
 
     private static final Color LIGHT_GREY = new Color(230, 230, 230);
@@ -630,15 +632,6 @@ public class PencilControl extends JDialog {
     }
 
     /**
-     * Gets the selected scene. May return null.
-     *
-     * @return the selected scene
-     */
-    protected PencilScene getSelectedScene() {
-        return selectedScene;
-    }
-
-    /**
      * Sets the selected scene.
      *
      * @param scene the scene to select. May be null.
@@ -688,6 +681,7 @@ public class PencilControl extends JDialog {
     private class ColorButton extends JButton implements ActionListener {
 
         Color color;
+
         ColorIcon icon;
 
         /**
@@ -771,7 +765,9 @@ public class PencilControl extends JDialog {
      * A class to undo/redo a pencil drawing for a PencilScene.
      */
     private class DrawingEdit extends AbstractUndoableEdit {
+
         PencilDrawing drawing;
+
         PencilScene scene;
 
         /**
@@ -861,6 +857,7 @@ public class PencilControl extends JDialog {
      * A class to undo/redo clearing all PencilScenes.
      */
     private class ClearEdit extends AbstractUndoableEdit {
+
         ArrayList<PencilScene> scenes = new ArrayList<>();
 
         /**
@@ -902,14 +899,16 @@ public class PencilControl extends JDialog {
         public String getRedoPresentationName() {
             return TrackerRes.getString("PencilControlDialog.ClearEdit.Redo.Text");
         }
-
     }
 
     /**
      * A class to undo/redo caption text changes.
      */
     private class CaptionEdit extends AbstractUndoableEdit {
-        String undoText, redoText;
+
+        String undoText;
+        String redoText;
+
         PencilScene scene;
 
         /**
@@ -955,6 +954,5 @@ public class PencilControl extends JDialog {
         public String getRedoPresentationName() {
             return TrackerRes.getString("PencilControlDialog.CaptionEdit.Redo.Text");
         }
-
     }
 }

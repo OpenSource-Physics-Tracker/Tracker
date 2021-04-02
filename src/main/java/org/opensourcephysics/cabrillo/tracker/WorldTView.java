@@ -31,6 +31,8 @@
 
  import javax.swing.*;
 
+ import lombok.Getter;
+ import lombok.Setter;
  import org.opensourcephysics.cabrillo.tracker.pencil.PencilScene;
  import org.opensourcephysics.display.*;
  import org.opensourcephysics.media.core.*;
@@ -44,11 +46,13 @@
   *
   * @author Douglas Brown
   */
+ @Getter
+ @Setter
  public class WorldTView extends TrackerPanel implements TView {
 
      protected TrackerPanel trackerPanel;
 
-     protected Icon icon;
+     protected Icon viewIcon;
 
      protected JMenuItem copyImageItem;
      protected JMenuItem printItem;
@@ -71,7 +75,7 @@
          setDrawingInImageSpace(false);
          setPreferredSize(new Dimension(240, 180));
          setShowCoordinates(false);
-         icon = new ImageIcon(getClass().getResource("/images/axes.gif")); //$NON-NLS-1$
+         viewIcon = new ImageIcon(getClass().getResource("/images/axes.gif")); //$NON-NLS-1$
          // world view button
          worldViewButton = new TButton();
          toolbarComponents.add(worldViewButton);
@@ -217,15 +221,6 @@
      }
 
      /**
-      * Gets the tracker panel being viewed
-      *
-      * @return the tracker panel being viewed
-      */
-     public TrackerPanel getTrackerPanel() {
-         return trackerPanel;
-     }
-
-     /**
       * Overrides TrackerPanel getSnapPoint method.
       *
       * @return the snap point
@@ -260,15 +255,6 @@
       */
      public String getViewName() {
          return TrackerRes.getString("TFrame.View.World"); //$NON-NLS-1$
-     }
-
-     /**
-      * Gets the icon for this view
-      *
-      * @return the icon for the view
-      */
-     public Icon getViewIcon() {
-         return icon;
      }
 
      /**

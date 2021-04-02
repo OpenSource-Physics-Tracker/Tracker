@@ -62,7 +62,6 @@ public class TMenuBar extends JMenuBar implements PropertyChangeListener {
 
     protected Map<String, AbstractAction> actions;
 
-    // file menu
     protected JMenu fileMenu;
     protected JMenuItem newTabItem;
     protected JMenuItem openItem;
@@ -89,7 +88,7 @@ public class TMenuBar extends JMenuBar implements PropertyChangeListener {
     protected JMenuItem propertiesItem;
     protected JMenuItem printFrameItem;
     protected JMenuItem exitItem;
-    // edit menu
+
     protected JMenu editMenu;
     protected JMenuItem undoItem;
     protected JMenuItem redoItem;
@@ -140,7 +139,7 @@ public class TMenuBar extends JMenuBar implements PropertyChangeListener {
     protected JMenuItem aboutVideoItem;
     protected JMenuItem checkDurationsItem;
     protected JMenuItem emptyVideoItem;
-    // tracks menu
+
     protected JMenu trackMenu;
     protected JMenu createMenu; // Tracks/New
     protected JMenu cloneMenu; // Tracks/Clone

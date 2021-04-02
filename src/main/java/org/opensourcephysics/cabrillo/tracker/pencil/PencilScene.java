@@ -29,6 +29,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.cabrillo.tracker.Tracker;
 import org.opensourcephysics.cabrillo.tracker.TrackerPanel;
 import org.opensourcephysics.cabrillo.tracker.TrackerRes;
@@ -44,6 +46,8 @@ import org.opensourcephysics.media.core.Trackable;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class PencilScene implements Trackable, Comparable, Interactive {
 
     private boolean heavy;
@@ -183,32 +187,6 @@ public class PencilScene implements Trackable, Comparable, Interactive {
         return startFrame <= frame && endFrame >= frame;
     }
 
-    /**
-     * Gets the visibility of this scene.
-     *
-     * @return true if visible
-     */
-    public boolean isVisible() {
-        return visible;
-    }
-
-    /**
-     * Sets the visibility of this scene.
-     *
-     * @param vis true for visible
-     */
-    public void setVisible(boolean vis) {
-        visible = vis;
-    }
-
-    /**
-     * Gets the heavy state of this scene. When heavy, bold fonts and heavy lines are displayed.
-     *
-     * @return true if heavy
-     */
-    public boolean isHeavy() {
-        return heavy;
-    }
 
     /**
      * Sets the heavy state of this scene.

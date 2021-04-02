@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.tools.FontSizer;
 
 import javax.swing.*;
@@ -35,6 +37,8 @@ import java.awt.geom.Area;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class ArrowFootprint extends LineFootprint {
 
     // instance fields
@@ -54,24 +58,6 @@ public class ArrowFootprint extends LineFootprint {
      */
     public ArrowFootprint(String name) {
         super(name);
-    }
-
-    /**
-     * Sets the stretch. The length of the arrow is stretched by this factor.
-     *
-     * @param stretch the desired stretch
-     */
-    public void setStretch(double stretch) {
-        this.stretch = stretch;
-    }
-
-    /**
-     * Gets the stretch.
-     *
-     * @return the stretch
-     */
-    public double getStretch() {
-        return stretch;
     }
 
     /**

@@ -31,6 +31,8 @@ import java.awt.geom.*;
 
 import javax.swing.*;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.tools.FontSizer;
 
 /**
@@ -38,9 +40,10 @@ import org.opensourcephysics.tools.FontSizer;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class LineFootprint implements Footprint, Cloneable {
 
-    // instance fields
     protected String name;
     protected Shape highlight;
     protected AffineTransform transform = new AffineTransform();
@@ -75,15 +78,6 @@ public class LineFootprint implements Footprint, Cloneable {
             }
         }
         return null;
-    }
-
-    /**
-     * Gets the name of this footprint.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
     }
 
     /**
@@ -152,16 +146,6 @@ public class LineFootprint implements Footprint, Cloneable {
     }
 
     /**
-     * Gets the hit shapes. Shape[0] is for p0, Shape[1] for p1
-     * and Shape[2] for the line
-     *
-     * @return the hit shapes
-     */
-    public Shape[] getHitShapes() {
-        return hitShapes;
-    }
-
-    /**
      * Sets the stroke.
      *
      * @param stroke the desired stroke
@@ -174,15 +158,6 @@ public class LineFootprint implements Footprint, Cloneable {
                 8,
                 stroke.getDashArray(),
                 stroke.getDashPhase());
-    }
-
-    /**
-     * Gets the stroke.
-     *
-     * @return the stroke
-     */
-    public BasicStroke getStroke() {
-        return baseStroke;
     }
 
     /**
@@ -213,23 +188,7 @@ public class LineFootprint implements Footprint, Cloneable {
                 baseStroke.getDashPhase());
     }
 
-    /**
-     * Sets the color.
-     *
-     * @param color the desired color
-     */
-    public void setColor(Color color) {
-        this.color = color;
-    }
 
-    /**
-     * Gets the color.
-     *
-     * @return the color
-     */
-    public Color getColor() {
-        return color;
-    }
 
     /**
      * Gets the shape of this footprint.
@@ -251,14 +210,14 @@ public class LineFootprint implements Footprint, Cloneable {
         return stroke.createStrokedShape(line);
     }
 
-    // static fields
     private static final Collection<LineFootprint> footprints = new HashSet<>();
 
-    // static constants
+
     /**
      * A dashed line pattern
      */
     public static final float[] DASHED_LINE = new float[]{10, 4};
+
     protected static final Shape HIGHLIGHT;
     private static final LineFootprint LINE;
     private static final LineFootprint BOLD_LINE;
@@ -272,8 +231,8 @@ public class LineFootprint implements Footprint, Cloneable {
     private static final ArrowFootprint DASH_ARROW;
     private static final ArrowFootprint BOLD_DASH_ARROW;
     private static final ArrowFootprint BIG_DASH_ARROW;
-    private static final DoubleCrosshairFootprint DOUBLE_TARGET;
-    private static final DoubleCrosshairFootprint BOLD_DOUBLE_TARGET;
+    private static final DoubleCrossHairFootPrint DOUBLE_TARGET;
+    private static final DoubleCrossHairFootPrint BOLD_DOUBLE_TARGET;
 
     // static initializers
     static {
@@ -344,13 +303,12 @@ public class LineFootprint implements Footprint, Cloneable {
         footprints.add(BIG_DASH_ARROW);
 
         // DOUBLE_TARGET
-        DOUBLE_TARGET = new DoubleCrosshairFootprint("Footprint.DoubleTarget"); //$NON-NLS-1$
+        DOUBLE_TARGET = new DoubleCrossHairFootPrint("Footprint.DoubleTarget"); //$NON-NLS-1$
         footprints.add(DOUBLE_TARGET);
 
         // BOLD_DOUBLE_TARGET
-        BOLD_DOUBLE_TARGET = new DoubleCrosshairFootprint("Footprint.BoldDoubleTarget"); //$NON-NLS-1$
+        BOLD_DOUBLE_TARGET = new DoubleCrossHairFootPrint("Footprint.BoldDoubleTarget"); //$NON-NLS-1$
         BOLD_DOUBLE_TARGET.setStroke(new BasicStroke(2));
         footprints.add(BOLD_DOUBLE_TARGET);
-
     }
 }

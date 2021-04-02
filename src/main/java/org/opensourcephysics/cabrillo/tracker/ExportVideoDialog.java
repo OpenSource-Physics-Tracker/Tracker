@@ -187,7 +187,6 @@ public class ExportVideoDialog extends JDialog {
         setLocation(x, y);
     }
 
-//_____________________________ private methods ____________________________
 
     /**
      * Creates the visible components of this dialog.
@@ -374,11 +373,6 @@ public class ExportVideoDialog extends JDialog {
                         }
                     }
                 }
-//        else {
-//          s = TrackerRes.getString("TFrame.View.Unknown")+number; //$NON-NLS-1$
-//          views.put(s, c[i]);
-//        	viewDropdown.addItem(s);
-//        }
             }
         }
         // add tab view
@@ -735,9 +729,7 @@ public class ExportVideoDialog extends JDialog {
                     "", 0, taskLength); //$NON-NLS-1$
             monitor.setMillisToPopup(2000);
             monitor.setProgress(1);
-//			final JComponent theView = view;
 
-            // create "stepnumber" PropertyChangeListener to add frames
             listener = e -> {
                 final int progress = (Integer) e.getNewValue() + 1;
                 Runnable runner = () -> {
@@ -759,7 +751,6 @@ public class ExportVideoDialog extends JDialog {
                             + " %d%%.\n", progress * 100 / taskLength); //$NON-NLS-1$
                     monitor.setNote(message);
                     // paint the view and add frame
-//	          	theView.paintImmediately(theView.getBounds());
                     try {
                         for (BufferedImage image : getNextImages(size)) {
                             recorder.addFrame(image);

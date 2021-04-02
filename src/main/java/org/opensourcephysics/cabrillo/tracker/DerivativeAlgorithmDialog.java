@@ -44,12 +44,20 @@ import java.util.ArrayList;
 public class DerivativeAlgorithmDialog extends JDialog {
 
     protected TrackerPanel trackerPanel;
+
     protected ArrayList<PointMass> targetMasses = new ArrayList<>();
-    protected JButton okButton, cancelButton;
+
+    protected JButton okButton;
+    protected JButton cancelButton;
+
     JTextPane textPane;
+
     int[] types = new int[]{PointMass.FINITE_DIFF, PointMass.BOUNCE_DETECT};
+
     JRadioButton[] buttons = new JRadioButton[types.length];
+
     TitledBorder choiceBorder;
+
     int prevAlgorithm;
 
     /**
@@ -82,8 +90,6 @@ public class DerivativeAlgorithmDialog extends JDialog {
         targetMasses.addAll(masses);
         refreshGUI();
     }
-
-//_____________________________ private methods ____________________________
 
     /**
      * Creates the visible components of this panel.
