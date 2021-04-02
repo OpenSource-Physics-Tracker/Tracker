@@ -51,6 +51,7 @@ import java.util.ArrayList;
 public class AttachmentDialog extends JDialog implements PropertyChangeListener {
 
     protected int trackID;
+
     /**
      * Depends on font level
      */
@@ -621,9 +622,6 @@ public class AttachmentDialog extends JDialog implements PropertyChangeListener 
         public Class<?> getColumnClass(int col) {
             return col == 0 ? String.class : PointMass.class;
         }
-
-        public void setValueAt(Object val, int row, int col) {
-        } // empty method
 
     }
 

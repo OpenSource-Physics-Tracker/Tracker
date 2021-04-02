@@ -24,6 +24,7 @@
  */
 package org.opensourcephysics.cabrillo.tracker.pencil;
 
+import lombok.Getter;
 import org.opensourcephysics.cabrillo.tracker.Tracker;
 import org.opensourcephysics.cabrillo.tracker.TrackerPanel;
 import org.opensourcephysics.cabrillo.tracker.TrackerRes;
@@ -48,6 +49,7 @@ public class PencilDrawer {
 
     static Color[][] colors;
 
+    @Getter
     static Cursor pencilCursor;
 
     static BasicStroke lightStroke;
@@ -333,15 +335,6 @@ public class PencilDrawer {
         drawingControl.setFontLevel(FontSizer.getLevel());
         drawingControl.refreshGUI();
         return drawingControl;
-    }
-
-    /**
-     * Gets the pencil cursor for drawing.
-     *
-     * @return a pencil cursor
-     */
-    public Cursor getPencilCursor() {
-        return pencilCursor;
     }
 
     /**

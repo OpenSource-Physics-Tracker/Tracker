@@ -45,13 +45,18 @@ import org.opensourcephysics.tools.FontSizer;
  */
 public class MainTView extends JPanel implements TView {
 
-    // instance fields
     private TrackerPanel trackerPanel;
+
     public JScrollPane scrollPane;
+
     Rectangle scrollRect = new Rectangle();
+
     private final Point zoomCenter = new Point();
+
     private JToolBar playerBar;
+
     private final MouseAdapter mouseAdapter;
+
     KeyAdapter keyAdapter;
 
     /**
@@ -483,11 +488,6 @@ public class MainTView extends JPanel implements TView {
         if (prevSize.width < rect.width || prevSize.height < rect.height) {
             rect.setLocation((int) (-xRatio * panelLoc.x), (int) (-yRatio * panelLoc.y));
         }
-//    System.out.println("prev size "+prevSize);
-//    System.out.println("size "+size);
-//    System.out.println("initial rect "+rect);
-//    System.out.println("zoomcenter "+zoomCenter);
-//    System.out.println("zoom by "+xRatio+" to "+trackerPanel.getMagnification());
         double x = rect.x + (xRatio - 1) * zoomCenter.getX();
         double y = rect.y + (yRatio - 1) * zoomCenter.getY();
         rect.setLocation((int) x, (int) y);

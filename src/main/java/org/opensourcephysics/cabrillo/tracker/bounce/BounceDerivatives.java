@@ -294,11 +294,11 @@ public class BounceDerivatives implements Derivative {
             BounceParameters use_this_model = use_model[c];    // which model has a chosen step
             if (null == use_this_model) use_this_model = poly_fit[c];
 
-            double[] deriv1 = use_this_model.first_deriv(c_at[c]);
+            double[] deriv1 = use_this_model.firstDeriv(c_at[c]);
             xDeriv1[i] = deriv1[0];
             yDeriv1[i] = deriv1[1];
 
-            double[] deriv2 = use_this_model.second_deriv(c_at[c]);
+            double[] deriv2 = use_this_model.secondDeriv(c_at[c]);
             xDeriv2[i] = deriv2[0];
             yDeriv2[i] = deriv2[1];
         }

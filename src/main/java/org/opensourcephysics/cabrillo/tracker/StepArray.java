@@ -25,7 +25,7 @@ public class StepArray {
      */
     public StepArray(Step step) {
         autofill = true;
-        step.n = 0;
+        step.frameNumber = 0;
         array[0] = step;
         fill(step);
     }
@@ -39,7 +39,7 @@ public class StepArray {
      */
     public StepArray(Step step, int increment) {
         autofill = true;
-        step.n = 0;
+        step.frameNumber = 0;
         array[0] = step;
         length = increment;
         delta = increment;
@@ -140,8 +140,6 @@ public class StepArray {
         return autofill;
     }
 
-    //__________________________ private methods _________________________
-
     /**
      * Replaces null elements of the the array with clones of the
      * specified step.
@@ -152,7 +150,7 @@ public class StepArray {
         for (int n = 0; n < length; n++)
             if (array[n] == null) {
                 Step clone = (Step) step.clone();
-                clone.n = n;
+                clone.frameNumber = n;
                 array[n] = clone;
             }
     }

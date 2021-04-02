@@ -20,6 +20,7 @@ import java.beans.PropertyChangeEvent;
 public class ModelFunctionPanel extends FunctionPanel {
 
     InitialValueEditor initEditor;
+
     ParticleModel model;
 
     /**
@@ -187,9 +188,7 @@ public class ModelFunctionPanel extends FunctionPanel {
                 || paramEditor.containsInvalidExpressions()
                 || initEditor.containsInvalidExpressions();
     }
-
 }
-
 /*
  * Open Source Physics software is free software; you can redistribute
  * it and/or modify it under the terms of the GNU General Public License (GPL) as

@@ -45,6 +45,7 @@ public class SecondDerivative implements Derivative {
 
     private double[] xDeriv;
     private double[] yDeriv = new double[0];
+
     private final Object[] result = new Object[4];
 
     /**

@@ -46,19 +46,38 @@ import org.opensourcephysics.display.DrawingPanel;
  * @author W. Christian, D. Brown
  * @version 1.0
  */
-public class DynamicParticle
-        extends ParticleModel implements ODE {
+public class DynamicParticle extends ParticleModel implements ODE {
 
-    // instance fields
-    protected boolean inSystem; // used only when loading
-    protected String boosterName; // used only when loading
-    protected double[] state = new double[5]; // {x, vx, y, vy, t}
-    protected double[] initialState = new double[5]; // {x, vx, y, vy, t}
+    /**
+     * Used only when loading
+     */
+    protected boolean inSystem;
+
+    /**
+     * Used only when loading
+     */
+    protected String boosterName;
+
+    /**
+     * {x, vx, y, vy, t}
+     */
+    protected double[] state = new double[5];
+
+    /**
+     * {x, vx, y, vy, t}
+     */
+    protected double[] initialState = new double[5];
+
     protected ODESolver solver = new RK4(this);
+
     protected int iterationsPerStep = 100;
+
     protected DynamicSystem system;
+
     protected Point2D[] points;
+
     protected HashMap<Integer, double[]> frameStates = new HashMap<>();
+
     protected ModelBooster modelBooster = new ModelBooster();
 
     /**

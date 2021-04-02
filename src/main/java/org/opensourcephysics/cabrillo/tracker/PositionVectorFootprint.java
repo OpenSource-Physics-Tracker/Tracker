@@ -24,6 +24,9 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -32,6 +35,8 @@ import java.awt.geom.Ellipse2D;
  * A PositionVectorFootprint returns a vector shape for a Point[] of length 2,
  * but creates a hit shape only at the tip of the vector.
  */
+@Getter
+@Setter
 public class PositionVectorFootprint extends PointShapeFootprint {
 
     LineFootprint arrow;
@@ -72,24 +77,6 @@ public class PositionVectorFootprint extends PointShapeFootprint {
     public Icon getIcon(int w, int h) {
         arrow.setColor(color);
         return arrow.getIcon(w, h);
-    }
-
-    /**
-     * Sets the stroke. May be set to null.
-     *
-     * @param stroke the desired stroke
-     */
-    public void setStroke(BasicStroke stroke) {
-        arrow.setStroke(stroke);
-    }
-
-    /**
-     * Gets the stroke. May return null;
-     *
-     * @return the stroke
-     */
-    public BasicStroke getStroke() {
-        return arrow.getStroke();
     }
 
     /**

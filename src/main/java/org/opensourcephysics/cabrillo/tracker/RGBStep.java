@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.display.DrawingPanel;
@@ -47,6 +49,8 @@ import java.util.Map;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class RGBStep extends Step {
 
     protected static GeneralPath crosshair;
@@ -90,15 +94,6 @@ public class RGBStep extends Step {
         position.setStepEditTrigger(true);
         points = new TPoint[]{position};
         screenPoints = new Point[getLength()];
-    }
-
-    /**
-     * Gets the position TPoint.
-     *
-     * @return the position TPoint
-     */
-    public TPoint getPosition() {
-        return position;
     }
 
     /**
@@ -155,7 +150,7 @@ public class RGBStep extends Step {
         if (mark == null) {
             transform = trackerPanel.getPixelTransform();
             if (!trackerPanel.isDrawingInImageSpace()) {
-                transform.concatenate(trackerPanel.getCoords().getToWorldTransform(n));
+                transform.concatenate(trackerPanel.getCoords().getToWorldTransform(frameNumber));
             }
             // make region of interest
             Shape region = new Ellipse2D.Double(
@@ -206,15 +201,6 @@ public class RGBStep extends Step {
     }
 
     /**
-     * Sets the radius.
-     *
-     * @param r the radius
-     */
-    public void setRadius(int r) {
-        radius = r;
-    }
-
-    /**
      * Clones this Step.
      *
      * @return a clone of this step
@@ -238,7 +224,7 @@ public class RGBStep extends Step {
      * @return a descriptive string
      */
     public String toString() {
-        return "RGBStep " + n //$NON-NLS-1$
+        return "RGBStep " + frameNumber //$NON-NLS-1$
                 + " [" + format.format(position.x) //$NON-NLS-1$
                 + ", " + format.format(position.y) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
@@ -252,7 +238,7 @@ public class RGBStep extends Step {
     public double[] getRGBData(TrackerPanel trackerPanel) {
         Video vid = trackerPanel.getVideo();
         if (vid == null || !vid.isVisible()) return null;
-        if (!dataValid && trackerPanel.getFrameNumber() == n) {
+        if (!dataValid && trackerPanel.getFrameNumber() == frameNumber) {
             BufferedImage image = vid.getImage();
             if (image != null
                     && image.getType() == BufferedImage.TYPE_INT_RGB) {
@@ -306,7 +292,6 @@ public class RGBStep extends Step {
         return rgbData;
     }
 
-//____________________ inner Position class ______________________
 
     protected class Position extends TPoint {
 
@@ -337,11 +322,11 @@ public class RGBStep extends Step {
                 rgbRegion.clearData(); // all data is invalid
             } else {
                 setLocation(x, y);
-                rgbRegion.keyFrames.add(n);
+                rgbRegion.keyFrames.add(frameNumber);
                 dataValid = false; // this step's data is invalid
             }
             repaint();
-            track.support.firePropertyChange("step", null, n); //$NON-NLS-1$
+            track.support.firePropertyChange("step", null, frameNumber); //$NON-NLS-1$
         }
 
         /**
@@ -365,12 +350,11 @@ public class RGBStep extends Step {
          * @return the frame number
          */
         public int getFrameNumber(VideoPanel vidPanel) {
-            return n;
+            return frameNumber;
         }
 
     }
 
-//__________________________ static methods ___________________________
 
     /**
      * Returns an ObjectLoader to save and load data for this class.

@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.tools.FontSizer;
 
 import javax.swing.*;
@@ -34,6 +36,8 @@ import java.awt.*;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class OutlineFootprint extends LineFootprint {
 
     /**
@@ -49,24 +53,6 @@ public class OutlineFootprint extends LineFootprint {
     public OutlineFootprint(String name) {
         super(name);
         setStroke(baseStroke);
-    }
-
-    /**
-     * Sets the spread. The width of the outline is (1 + 2*spread).
-     *
-     * @param spread the desired spread
-     */
-    public void setSpread(int spread) {
-        this.spread = spread;
-    }
-
-    /**
-     * Gets the spread.
-     *
-     * @return the spread
-     */
-    public int getSpread() {
-        return spread;
     }
 
     /**

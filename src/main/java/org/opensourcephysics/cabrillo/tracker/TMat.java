@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.display.DrawingPanel;
 import org.opensourcephysics.display.Measurable;
 import org.opensourcephysics.media.core.*;
@@ -41,6 +43,8 @@ import java.beans.PropertyChangeListener;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class TMat implements Measurable, Trackable, PropertyChangeListener {
 
     protected Rectangle mat;
@@ -103,42 +107,6 @@ public class TMat implements Measurable, Trackable, PropertyChangeListener {
         trackerPanel.addPropertyChangeListener("coords", this); //$NON-NLS-1$
         coords = trackerPanel.getCoords();
         coords.addPropertyChangeListener("transform", this); //$NON-NLS-1$
-    }
-
-    /**
-     * Gets the paint.
-     *
-     * @return the paint used to draw the mat
-     */
-    public Paint getPaint() {
-        return paint;
-    }
-
-    /**
-     * Sets the paint.
-     *
-     * @param paint the desired paint
-     */
-    public void setPaint(Paint paint) {
-        this.paint = paint;
-    }
-
-    /**
-     * Shows or hides this mat.
-     *
-     * @param visible <code>true</code> to show this mat.
-     */
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    /**
-     * Gets the visibility of this mat.
-     *
-     * @return <code>true</code> if this mat is visible
-     */
-    public boolean isVisible() {
-        return visible;
     }
 
     /**
@@ -264,8 +232,6 @@ public class TMat implements Measurable, Trackable, PropertyChangeListener {
         coords.removePropertyChangeListener("transform", this); //$NON-NLS-1$
         trackerPanel = null;
     }
-
-//_______________________________ private methods _________________________
 
     /**
      * Gets the world bounds of the mat.

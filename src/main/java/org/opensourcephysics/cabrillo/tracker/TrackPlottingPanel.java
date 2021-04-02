@@ -55,10 +55,8 @@ import java.util.TreeSet;
  */
 public class TrackPlottingPanel extends PlottingPanel implements Tool {
 
-    // static fields
     protected static final String DEFINED_AS = ": ";
 
-    // instance fields
     protected TrackerPanel trackerPanel;
     protected int trackID;
     protected DatasetManager data;

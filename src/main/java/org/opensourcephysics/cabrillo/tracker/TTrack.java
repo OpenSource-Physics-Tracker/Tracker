@@ -36,6 +36,8 @@ import javax.swing.Timer;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.cabrillo.tracker.vector.Vector;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
@@ -52,6 +54,8 @@ import org.opensourcephysics.cabrillo.tracker.AutoTrackerCore.KeyFrame;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public abstract class TTrack implements Interactive, Trackable, PropertyChangeListener {
 
     /**
@@ -564,53 +568,6 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     }
 
     /**
-     * Gets the locked property.
-     *
-     * @return <code>true</code> if this is locked
-     */
-    public boolean isLocked() {
-        return locked;
-    }
-
-    /**
-     * Sets the autoAdvance property.
-     *
-     * @param auto <code>true</code> to request that the video autoadvance while marking.
-     */
-    public void setAutoAdvance(boolean auto) {
-        autoAdvance = auto;
-    }
-
-    /**
-     * Gets the autoAdvance property.
-     *
-     * @return <code>true</code> if this is autoadvance
-     */
-    public boolean isAutoAdvance() {
-        return autoAdvance;
-    }
-
-    /**
-     * Sets the markByDefault property. When true, the mouse handler should mark
-     * a point whenever the active track reports itself incomplete.
-     *
-     * @param mark <code>true</code> to mark by default
-     */
-    public void setMarkByDefault(boolean mark) {
-        markByDefault = mark;
-    }
-
-    /**
-     * Gets the markByDefault property. When true, the mouse handler should mark
-     * a point whenever the active track reports itself incomplete.
-     *
-     * @return <code>true</code> if this marks by default
-     */
-    public boolean isMarkByDefault() {
-        return markByDefault;
-    }
-
-    /**
      * Gets the color.
      *
      * @return the current color
@@ -690,24 +647,6 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     }
 
     /**
-     * Gets the ID number of this track.
-     *
-     * @return the ID number
-     */
-    public int getID() {
-        return ID;
-    }
-
-    /**
-     * Gets the name of this track.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
      * Gets the name of this track.
      *
      * @param context ignored by default
@@ -740,14 +679,6 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
         }
     }
 
-    /**
-     * Gets the description of this track.
-     *
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
-    }
 
     /**
      * Sets the description of this track.
@@ -791,24 +722,6 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     }
 
     /**
-     * Determines whether views and track menu include this track.
-     *
-     * @param viewable <code>true</code> to include this track in views
-     */
-    public void setViewable(boolean viewable) {
-        this.viewable = viewable;
-    }
-
-    /**
-     * Reports whether or not this is viewable.
-     *
-     * @return <code>true</code> if this track is viewable
-     */
-    public boolean isViewable() {
-        return viewable;
-    }
-
-    /**
      * Reports whether or not this is dependent. A dependent track gets some
      * or all of its data from other tracks. Dependent tracks should override
      * this method to return true.
@@ -848,26 +761,6 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
      */
     public void setFootprints(Footprint[] choices, Step step) {
         setFootprints(choices);
-    }
-
-    /**
-     * Gets the footprint choices.
-     *
-     * @return the array of Footprints available to this track
-     */
-    public Footprint[] getFootprints() {
-        return footprints;
-    }
-
-    /**
-     * Gets the footprint choices. The step parameter may be
-     * used to get the footprints of secondary step arrays (veloc, accel, etc).
-     *
-     * @param step the step that identifies the step array
-     * @return the array of Footprints available to this track
-     */
-    public Footprint[] getFootprints(Step step) {
-        return footprints;
     }
 
     /**
@@ -926,15 +819,6 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
             s += "#" + cfp.getProperties(); //$NON-NLS-1$
         }
         return s;
-    }
-
-    /**
-     * Gets the current footprint.
-     *
-     * @return the footprint
-     */
-    public Footprint getFootprint() {
-        return footprint;
     }
 
     /**

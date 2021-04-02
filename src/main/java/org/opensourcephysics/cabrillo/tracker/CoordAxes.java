@@ -53,13 +53,19 @@ import java.util.Map;
 public class CoordAxes extends TTrack {
 
     protected static Icon gridOptionsIcon;
+
     protected static String[] dataVariables;
-    protected static String[] formatVariables; // used by NumberFormatSetter
-    protected static Map<String, ArrayList<String>> formatMap;
+
+    /**
+     * Used by NumberFormatSetter
+     */
+    protected static String[] formatVariables;
+
     protected static Map<String, String> formatDescriptionMap;
+    protected static Map<String, ArrayList<String>> formatMap;
 
     static {
-        dataVariables = new String[]{"x", "y", Tracker.THETA}; //$NON-NLS-2$ 
+        dataVariables = new String[]{"x", "y", Tracker.THETA};
         formatVariables = new String[]{"pixel", Tracker.THETA};
 
         // assemble format map
@@ -209,7 +215,7 @@ public class CoordAxes extends TTrack {
                         gridCheckbox.doClick(0);
                     }
 
-                    Color color = grid.getColor();
+                    Color color = grid.getLineColor();
                     Color newColor = chooseColor(color, TrackerRes.getString("CoordAxes.Dialog.GridColor.Title"));
                     if (newColor != color) {
                         grid.setColor(newColor);
@@ -310,14 +316,6 @@ public class CoordAxes extends TTrack {
     }
 
     /**
-     * Overrides TTrack setTrailVisible method to keep trails hidden.
-     *
-     * @param visible ignored
-     */
-    public void setTrailVisible(boolean visible) {
-    }
-
-    /**
      * Mimics step creation by setting the origin position.
      *
      * @param n the frame number
@@ -326,7 +324,6 @@ public class CoordAxes extends TTrack {
      * @return the step
      */
     public Step createStep(int n, double x, double y) {
-//    Step step = steps.getStep(n);
         Step step = getStep(0);
         if (trackerPanel.getSelectedPoint() instanceof CoordAxesStep.Handle) {
             ((CoordAxesStep) step).getHandle().setXY(x, y);
@@ -385,7 +382,6 @@ public class CoordAxes extends TTrack {
      */
     protected boolean isAutoTrackable(int pointIndex) {
         return true;
-//  	return pointIndex==0; // origin only
     }
 
     /**
@@ -399,7 +395,6 @@ public class CoordAxes extends TTrack {
             return TrackerRes.getString("CoordAxes.Origin.Name");
         }
         return TrackerRes.getString("CoordAxes.Handle.Name");
-//  	return null;
     }
 
     @Override
@@ -654,7 +649,7 @@ public class CoordAxes extends TTrack {
             }
             if (axes.grid.isCustom()) {
                 control.setValue("grid_alpha", axes.grid.getAlpha());
-                control.setValue("grid_RGB", axes.grid.getColor().getRGB());
+                control.setValue("grid_RGB", axes.grid.getLineColor().getRGB());
             }
         }
 

@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker.vector;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.cabrillo.tracker.*;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
@@ -49,6 +51,8 @@ import java.util.Set;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class VectorStep extends Step implements PropertyChangeListener {
 
     /**
@@ -69,7 +73,7 @@ public class VectorStep extends Step implements PropertyChangeListener {
         middle = new TPoint(x, y) { // used for layout positioning
             public int getFrameNumber(VideoPanel vidPanel) {
                 // needed to set layout position correctly on trails
-                return VectorStep.this.n;
+                return VectorStep.this.frameNumber;
             }
         };
         tip = new Tip(x, y);
@@ -139,42 +143,6 @@ public class VectorStep extends Step implements PropertyChangeListener {
     protected Map<TrackerPanel, Rectangle> layoutBounds = new HashMap<>();
 
     /**
-     * Gets the tip.
-     *
-     * @return the tip
-     */
-    public TPoint getTip() {
-        return tip;
-    }
-
-    /**
-     * Gets the tail.
-     *
-     * @return the tail
-     */
-    public TPoint getTail() {
-        return tail;
-    }
-
-    /**
-     * Gets the handle.
-     *
-     * @return the handle
-     */
-    public TPoint getHandle() {
-        return handle;
-    }
-
-    /**
-     * Gets the visible tip point.
-     *
-     * @return the visible tip
-     */
-    public TPoint getVisibleTip() {
-        return visibleTip;
-    }
-
-    /**
      * Sets the y component.
      *
      * @param y the y component
@@ -212,24 +180,6 @@ public class VectorStep extends Step implements PropertyChangeListener {
     }
 
     /**
-     * Sets the vector label visibility.
-     *
-     * @param visible <code>true</code> to make label visible
-     */
-    public void setLabelVisible(boolean visible) {
-        labelVisible = visible;
-    }
-
-    /**
-     * Sets the rollover visibility.
-     *
-     * @param visible <code>true</code> to make labels visible on rollover only
-     */
-    public void setRolloverVisible(boolean visible) {
-        rolloverVisible = visible;
-    }
-
-    /**
      * Snaps to point or vector within snapDistance of tail.
      *
      * @param trackerPanel the tracker panel drawing this
@@ -240,7 +190,7 @@ public class VectorStep extends Step implements PropertyChangeListener {
             // snap to position
             TTrack track = getTrack();
             if (track instanceof PointMass) {
-                p = ((PositionStep) track.getStep(n)).getPosition();
+                p = ((PositionStep) track.getStep(frameNumber)).getPosition();
                 if (p.distance(tail) < snapDistance) {
                     attach(p);
                     return;
@@ -283,15 +233,6 @@ public class VectorStep extends Step implements PropertyChangeListener {
     }
 
     /**
-     * Gets the vector chain containing this vector, if any.
-     *
-     * @return the chain
-     */
-    public VectorChain getChain() {
-        return chain;
-    }
-
-    /**
      * Attaches the tail of this vector to the specified point.
      * Detaches if the point is null.
      *
@@ -306,15 +247,6 @@ public class VectorStep extends Step implements PropertyChangeListener {
         if (pt.getX() != tail.getX() || pt.getY() != tail.getY()) {
             tail.setXY(pt.getX(), pt.getY());
         }
-    }
-
-    /**
-     * Gets the attachment point.
-     *
-     * @return the attachment point
-     */
-    public TPoint getAttachmentPoint() {
-        return attachmentPoint;
     }
 
     /**
@@ -567,16 +499,6 @@ public class VectorStep extends Step implements PropertyChangeListener {
     }
 
     /**
-     * Sets firePropertyChangeEvents flag.
-     *
-     * @param fireEvents <code>true</code> to request this to fire property
-     *                   change events
-     */
-    public void setFirePropertyChangeEvents(boolean fireEvents) {
-        firePropertyChangeEvents = fireEvents;
-    }
-
-    /**
      * Clones this Step.
      *
      * @return a clone of this step
@@ -590,7 +512,7 @@ public class VectorStep extends Step implements PropertyChangeListener {
             step.points[3] = step.visibleTip = step.new VisibleTip(visibleTip.getX(), visibleTip.getY());
             step.points[4] = step.middle = new TPoint(middle.getX(), middle.getY()) {
                 public int getFrameNumber(VideoPanel vidPanel) {
-                    return VectorStep.this.n;
+                    return VectorStep.this.frameNumber;
                 }
             };
             step.tipShapes = new HashMap<>();
@@ -608,7 +530,7 @@ public class VectorStep extends Step implements PropertyChangeListener {
      * @return a descriptive string
      */
     public String toString() {
-        return "VectorStep " + n //$NON-NLS-1$
+        return "VectorStep " + frameNumber //$NON-NLS-1$
                 + " [" + format.format(tail.x) //$NON-NLS-1$
                 + ", " + format.format(tail.y) //$NON-NLS-1$
                 + ", " + format.format(getXComponent()) //$NON-NLS-1$
@@ -638,7 +560,7 @@ public class VectorStep extends Step implements PropertyChangeListener {
         tipPoint.setLocation(tip);
         tailPoint.setLocation(tail);
         if (!trackerPanel.isDrawingInImageSpace()) {
-            AffineTransform at = trackerPanel.getCoords().getToWorldTransform(n);
+            AffineTransform at = trackerPanel.getCoords().getToWorldTransform(frameNumber);
             at.transform(tipPoint, tipPoint);
             tipPoint.y = -tipPoint.y;
             at.transform(tailPoint, tailPoint);
@@ -699,7 +621,7 @@ public class VectorStep extends Step implements PropertyChangeListener {
                 } else attach(null);
             }
             if (firePropertyChangeEvents)
-                getTrack().support.firePropertyChange("step", null, n); //$NON-NLS-1$
+                getTrack().support.firePropertyChange("step", null, frameNumber); //$NON-NLS-1$
             repaint();
         }
 
@@ -710,7 +632,7 @@ public class VectorStep extends Step implements PropertyChangeListener {
          * @return the containing VectorStep frame number
          */
         public int getFrameNumber(VideoPanel vidPanel) {
-            return n;
+            return frameNumber;
         }
 
         /**
@@ -799,7 +721,7 @@ public class VectorStep extends Step implements PropertyChangeListener {
                 return;
             super.setXY(x, y);
             if (firePropertyChangeEvents)
-                track.support.firePropertyChange("step", null, n); //$NON-NLS-1$
+                track.support.firePropertyChange("step", null, frameNumber); //$NON-NLS-1$
             repaint();
         }
 
@@ -812,9 +734,9 @@ public class VectorStep extends Step implements PropertyChangeListener {
             vidPanel.hideMouseBox();
             // put vector components into x and y fields
             ImageCoordSystem coords = vidPanel.getCoords();
-            double x = coords.imageToWorldXComponent(n, getXComponent(),
+            double x = coords.imageToWorldXComponent(frameNumber, getXComponent(),
                     getYComponent());
-            double y = coords.imageToWorldYComponent(n, getXComponent(),
+            double y = coords.imageToWorldYComponent(frameNumber, getXComponent(),
                     getYComponent());
             TTrack track = getTrack();
             if (track instanceof PointMass) {
@@ -850,7 +772,7 @@ public class VectorStep extends Step implements PropertyChangeListener {
          * @return the frame number
          */
         public int getFrameNumber(VideoPanel vidPanel) {
-            return n;
+            return frameNumber;
         }
 
     }
@@ -946,11 +868,10 @@ public class VectorStep extends Step implements PropertyChangeListener {
          * @return the frame number
          */
         public int getFrameNumber(VideoPanel vidPanel) {
-            return n;
+            return frameNumber;
         }
     }
 
-//__________________________ static methods ___________________________
 
     /**
      * Returns an ObjectLoader to save and load data for this class.

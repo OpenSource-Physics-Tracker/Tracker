@@ -36,9 +36,8 @@ import java.awt.geom.Line2D;
  *
  * @author Douglas Brown
  */
-public class DoubleCrosshairFootprint extends LineFootprint {
+public class DoubleCrossHairFootPrint extends LineFootprint {
 
-    // instance fields
     protected Shape targetShape;
     protected int size;
     protected Shape hitShape;
@@ -48,7 +47,7 @@ public class DoubleCrosshairFootprint extends LineFootprint {
      *
      * @param name the name
      */
-    public DoubleCrosshairFootprint(String name) {
+    public DoubleCrossHairFootPrint(String name) {
         super(name);
         setCrosshairSize(4, 0);
     }

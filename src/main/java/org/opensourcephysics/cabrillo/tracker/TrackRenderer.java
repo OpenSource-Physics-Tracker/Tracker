@@ -43,11 +43,8 @@ public class TrackRenderer extends JLabel implements ListCellRenderer {
         setBorder(BorderFactory.createEmptyBorder(1, 4, 1, 0));
     }
 
-    public Component getListCellRendererComponent(JList list,
-                                                  Object value,
-                                                  int index,
-                                                  boolean isSelected,
-                                                  boolean cellHasFocus) {
+    public Component getListCellRendererComponent(JList list, Object value, int index,
+                                                  boolean isSelected, boolean cellHasFocus) {
         if (isSelected) {
             setBackground(list.getSelectionBackground());
             setForeground(list.getSelectionForeground());

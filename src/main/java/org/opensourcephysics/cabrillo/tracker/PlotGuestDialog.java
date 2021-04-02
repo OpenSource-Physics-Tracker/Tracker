@@ -42,12 +42,20 @@ import org.opensourcephysics.tools.FontSizer;
 public class PlotGuestDialog extends JDialog {
 
     protected TrackPlottingPanel plot;
+
     protected TrackerPanel trackerPanel;
-    protected JButton okButton, selectAllButton;
+
+    protected JButton okButton;
+    protected JButton selectAllButton;
+
     protected JPanel checkboxPanel;
+
     protected ActionListener listener;
+
     protected TitledBorder instructions;
+
     protected TreeSet<Integer> allTracks = new TreeSet<>();
+
     protected boolean allTracksSelected;
 
     /**
@@ -77,7 +85,6 @@ public class PlotGuestDialog extends JDialog {
         updateDisplay();
     }
 
-//_____________________________ private methods ____________________________
 
     /**
      * Creates the visible components of this panel.

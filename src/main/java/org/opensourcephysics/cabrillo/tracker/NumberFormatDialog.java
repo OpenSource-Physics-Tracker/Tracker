@@ -45,7 +45,6 @@ public class NumberFormatDialog extends JDialog {
 
     private static final Map<TrackerPanel, NumberFormatDialog> formatSetters = new HashMap<>();
 
-    // static fields
     protected static String noPattern = TrackerRes.getString("NumberFormatSetter.NoPattern"); //$NON-NLS-1$
     protected static String mixedPattern = TrackerRes.getString("NumberFormatSetter.MixedPattern"); //$NON-NLS-1$
     protected static Map<Class<? extends TTrack>, TreeMap<String, String>> defaultFormatPatterns;
@@ -54,7 +53,6 @@ public class NumberFormatDialog extends JDialog {
     private static final Dimension scrollerDimension = new Dimension(200, 60);
 
     static {
-        // create list of formattable track types
         formattableTrackTypes = new ArrayList<>();
         formattableTrackTypes.add(PointMass.class);
         formattableTrackTypes.add(Vector.class);
@@ -67,7 +65,6 @@ public class NumberFormatDialog extends JDialog {
         formattableTrackTypes.add(OffsetOrigin.class);
         formattableTrackTypes.add(CoordAxes.class);
 
-        // set default number patterns
         defaultFormatPatterns = new HashMap<>();
         for (Class<? extends TTrack> trackType : formattableTrackTypes) {
             TreeMap<String, String> patterns = new TreeMap<>();
@@ -100,7 +97,6 @@ public class NumberFormatDialog extends JDialog {
         }
     }
 
-    // instance fields
     TrackerPanel trackerPanel;
     int trackID = -1;
     JButton closeButton, helpButton, revertButton;

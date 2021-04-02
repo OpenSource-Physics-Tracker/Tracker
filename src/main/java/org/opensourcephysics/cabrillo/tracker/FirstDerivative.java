@@ -31,7 +31,9 @@ package org.opensourcephysics.cabrillo.tracker;
  */
 public class FirstDerivative implements Derivative {
 
-    private double[] xDeriv, yDeriv = new double[0];
+    private double[] xDeriv;
+    private double[] yDeriv = new double[0];
+
     private final Object[] result = new Object[4];
 
     /**

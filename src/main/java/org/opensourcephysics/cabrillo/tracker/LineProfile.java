@@ -32,6 +32,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.tools.FontSizer;
@@ -42,6 +44,8 @@ import org.opensourcephysics.controls.*;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class LineProfile extends TTrack {
 
     // static constants
@@ -87,7 +91,6 @@ public class LineProfile extends TTrack {
 
     }
 
-    // instance fields
     protected boolean fixedLine = true; // line is the same at all times
     protected JCheckBoxMenuItem fixedLineItem;
     protected JMenu orientationMenu;
@@ -261,14 +264,6 @@ public class LineProfile extends TTrack {
      */
     public void draw(DrawingPanel panel, Graphics _g) {
         super.draw(panel, _g);
-    }
-
-    /**
-     * Overrides TTrack setTrailVisible method to keep trails hidden.
-     *
-     * @param visible ignored
-     */
-    public void setTrailVisible(boolean visible) {
     }
 
     /**
@@ -559,7 +554,6 @@ public class LineProfile extends TTrack {
         return TrackerRes.getString("LineProfile.Name"); //$NON-NLS-1$
     }
 
-//_______________________ private and protected methods _______________________
 
     /**
      * Refreshes a step by setting it equal to a keyframe step.
@@ -570,7 +564,7 @@ public class LineProfile extends TTrack {
         if (step == null) return;
         int key = 0;
         for (int i : keyFrames) {
-            if (i <= step.n)
+            if (i <= step.frameNumber)
                 key = i;
         }
         // compare step with keyStep
@@ -591,7 +585,6 @@ public class LineProfile extends TTrack {
         step.rotate();
     }
 
-//__________________________ static methods ___________________________
 
     /**
      * Returns an ObjectLoader to save and load data for this class.

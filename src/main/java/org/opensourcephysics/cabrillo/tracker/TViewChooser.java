@@ -32,6 +32,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.controls.*;
 import org.opensourcephysics.display.OSPRuntime;
 import org.opensourcephysics.display.ResizableIcon;
@@ -42,6 +44,8 @@ import org.opensourcephysics.tools.FontSizer;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class TViewChooser extends JPanel implements PropertyChangeListener {
 
     protected static ImageIcon maxIcon = new ImageIcon(TViewChooser.class.getResource("/images/maximize.gif"));
@@ -160,15 +164,6 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
     }
 
     /**
-     * gets the TrackerPanel containing the tracks
-     *
-     * @return the tracker panel
-     */
-    public TrackerPanel getTrackerPanel() {
-        return trackerPanel;
-    }
-
-    /**
      * Adds a view of the tracker panel
      *
      * @param view the view being added
@@ -190,15 +185,6 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
         views.remove(view);
         if (view == selectedView) selectedView = null;
         refreshViewPanel();
-    }
-
-    /**
-     * Gets a list of the available views.
-     *
-     * @return the list of views
-     */
-    public Collection<TView> getViews() {
-        return views;
     }
 
     /**
@@ -235,15 +221,6 @@ public class TViewChooser extends JPanel implements PropertyChangeListener {
             if (view.getClass() == c) return view;
         }
         return null;
-    }
-
-    /**
-     * Gets the selected view
-     *
-     * @return the selected view
-     */
-    public TView getSelectedView() {
-        return selectedView;
     }
 
     /**

@@ -907,7 +907,6 @@ public class DynamicSystem extends DynamicParticlePolar {
         return polarState;
     }
 
-//______________________________ private methods __________________________
 
     private Parameter createParameter(String name, String expression, String description) {
         Parameter p = new Parameter(name, expression);
@@ -916,8 +915,6 @@ public class DynamicSystem extends DynamicParticlePolar {
         p.setDescription(description);
         return p;
     }
-
-//________________________ static methods and classes ______________________
 
     /**
      * Returns an ObjectLoader to save and load data for this class.

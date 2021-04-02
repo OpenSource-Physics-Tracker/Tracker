@@ -20,6 +20,7 @@ public class ParticleDataTrackFunctionPanel extends ModelFunctionPanel {
 
     private final DataTrackClipControl clipControl;
     private final DataTrackTimeControl timeControl;
+
     private JPanel customControl;
     private JPanel customTitle;
 

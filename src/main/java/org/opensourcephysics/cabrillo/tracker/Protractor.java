@@ -35,6 +35,8 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.*;
 import javax.swing.border.Border;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.controls.*;
@@ -44,6 +46,8 @@ import org.opensourcephysics.controls.*;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class Protractor extends TTrack {
 
     protected static String[] dataVariables;
@@ -205,7 +209,7 @@ public class Protractor extends TTrack {
                 if (angleField.getBackground() == Color.yellow) {
                     int n = trackerPanel.getFrameNumber();
                     ProtractorStep step = (ProtractorStep) getStep(n);
-                    if (!isFixed()) {
+                    if (!isFixedPosition()) {
                         keyFrames.add(n);
                     }
                     step = getKeyStep(step);
@@ -246,15 +250,6 @@ public class Protractor extends TTrack {
     }
 
     /**
-     * Gets the fixed property.
-     *
-     * @return <code>true</code> if fixed
-     */
-    public boolean isFixed() {
-        return fixedPosition;
-    }
-
-    /**
      * Responds to property change events. Overrides TTrack method.
      *
      * @param e the property change event
@@ -286,14 +281,6 @@ public class Protractor extends TTrack {
             refreshAttachments();
         }
         super.propertyChange(e);
-    }
-
-    /**
-     * Overrides TTrack setTrailVisible method to keep trails hidden.
-     *
-     * @param visible ignored
-     */
-    public void setTrailVisible(boolean visible) {
     }
 
     /**
@@ -545,9 +532,8 @@ public class Protractor extends TTrack {
     public JMenu getMenu(TrackerPanel trackerPanel) {
         JMenu menu = super.getMenu(trackerPanel);
 
-//    lockedItem.setEnabled(!trackerPanel.getCoords().isLocked());
         fixedItem.setText(TrackerRes.getString("TapeMeasure.MenuItem.Fixed")); //$NON-NLS-1$
-        fixedItem.setSelected(isFixed());
+        fixedItem.setSelected(isFixedPosition());
         boolean hasAttachments = attachments != null;
         if (hasAttachments) {
             hasAttachments = false;
@@ -556,10 +542,6 @@ public class Protractor extends TTrack {
             }
         }
         fixedItem.setEnabled(!hasAttachments);
-
-//    // remove end items and last separator
-//    menu.remove(deleteTrackItem);
-//    menu.remove(menu.getMenuComponent(menu.getMenuComponentCount()-1));
 
         // put fixed item after locked item
         for (int i = 0; i < menu.getItemCount(); i++) {
@@ -718,7 +700,6 @@ public class Protractor extends TTrack {
         return popup;
     }
 
-//__________________________ protected methods ________________________
 
     /**
      * Overrides TTrack setTrackerPanel method.
@@ -735,7 +716,7 @@ public class Protractor extends TTrack {
             trackerPanel.addMouseListener(editListener);
             trackerPanel.addPropertyChangeListener("stepnumber", this); //$NON-NLS-1$
         }
-        setFixed(isFixed());
+        setFixed(isFixedPosition());
     }
 
     /**
@@ -746,7 +727,6 @@ public class Protractor extends TTrack {
     @Override
     protected void setAnglesInRadians(boolean radians) {
         super.setAnglesInRadians(radians);
-//    inputField.setDecimalPlaces(radians? 3: 1);
         inputField.setConversionFactor(radians ? 1.0 : 180 / Math.PI);
         Step step = getStep(trackerPanel.getFrameNumber());
         step.repaint(); // refreshes angle readout
@@ -784,9 +764,9 @@ public class Protractor extends TTrack {
      */
     private ProtractorStep getKeyStep(ProtractorStep step) {
         int key = 0;
-        if (!this.isFixed()) {
+        if (!this.isFixedPosition()) {
             for (int i : keyFrames) {
-                if (i <= step.n)
+                if (i <= step.frameNumber)
                     key = i;
             }
         }
@@ -804,8 +784,8 @@ public class Protractor extends TTrack {
         editing = edit;
         if (!editing) {
             // if not fixed, add target frame to key frames
-            if (!isFixed())
-                keyFrames.add(target.n);
+            if (!isFixedPosition())
+                keyFrames.add(target.frameNumber);
             // replace target with key frame step
             target = getKeyStep(target);
         }
@@ -849,8 +829,6 @@ public class Protractor extends TTrack {
         EventQueue.invokeLater(runner);
     }
 
-//__________________________ static methods ___________________________
-
     /**
      * Returns an ObjectLoader to save and load data for this class.
      *
@@ -876,11 +854,11 @@ public class Protractor extends TTrack {
             // save track data
             XML.getLoader(TTrack.class).saveObject(control, obj);
             // save fixed property
-            control.setValue("fixed", protractor.isFixed()); //$NON-NLS-1$
+            control.setValue("fixed", protractor.isFixedPosition()); //$NON-NLS-1$
             // save steps
             Step[] steps = protractor.getSteps();
             int count = steps.length;
-            if (protractor.isFixed()) count = 1;
+            if (protractor.isFixedPosition()) count = 1;
             double[][] data = new double[count][];
             for (int n = 0; n < count; n++) {
                 // save only key frames

@@ -140,7 +140,6 @@ public class CenterOfMassInspector extends JDialog implements PropertyChangeList
         super.dispose();
     }
 
-//_____________________________ private methods ____________________________
 
     /**
      * Creates the visible components of this panel.

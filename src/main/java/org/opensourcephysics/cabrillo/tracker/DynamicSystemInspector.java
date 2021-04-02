@@ -41,10 +41,8 @@ import java.beans.PropertyChangeEvent;
  *
  * @author Douglas Brown
  */
-public class DynamicSystemInspector extends JDialog
-        implements PropertyChangeListener {
+public class DynamicSystemInspector extends JDialog implements PropertyChangeListener {
 
-    // instance fields
     protected DynamicSystem system;
     protected TrackerPanel trackerPanel;
     protected boolean isVisible;
@@ -142,7 +140,6 @@ public class DynamicSystemInspector extends JDialog
         super.dispose();
     }
 
-//_____________________________ private methods ____________________________
 
     /**
      * Creates the visible components of this panel.

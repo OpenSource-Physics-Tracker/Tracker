@@ -199,8 +199,6 @@ public class ThumbnailDialog extends JDialog {
         return formatNames[formatDropdown.getSelectedIndex()];
     }
 
-//_____________________ private constructor and methods ____________________________
-
     /**
      * Constructs a ThumbnailDialog.
      *
@@ -473,7 +471,6 @@ public class ThumbnailDialog extends JDialog {
             sizedImage = new BufferedImage(size.width, size.height, source.getType());
         }
         Graphics2D g2 = sizedImage.createGraphics();
-//    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);  
         g2.drawImage(source, 0, 0, size.width, size.height,
                 0, 0, source.getWidth(), source.getHeight(), null);
         g2.dispose();

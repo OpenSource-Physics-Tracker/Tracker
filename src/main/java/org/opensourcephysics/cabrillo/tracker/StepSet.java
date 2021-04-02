@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.controls.XMLControlElement;
@@ -35,6 +37,8 @@ import java.util.HashSet;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class StepSet extends HashSet<Step> {
 
     TrackerPanel trackerPanel;
@@ -164,24 +168,6 @@ public class StepSet extends HashSet<Step> {
         trackUndoXML = null;
         changed = false;
         isModified = false;
-    }
-
-    /**
-     * Sets the changed property. When true, the steps in this set have been changed.
-     *
-     * @param changed true if changed
-     */
-    public void setChanged(boolean changed) {
-        this.changed = changed;
-    }
-
-    /**
-     * Gets the changed property. When true, the steps in this set have been changed.
-     *
-     * @return true if changed
-     */
-    public boolean isChanged() {
-        return changed;
     }
 
     /**

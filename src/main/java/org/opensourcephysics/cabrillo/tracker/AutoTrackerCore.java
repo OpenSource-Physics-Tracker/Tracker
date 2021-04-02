@@ -1,5 +1,7 @@
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.media.core.BufferedImageUtils;
 import org.opensourcephysics.media.core.ImageCoordSystem;
 import org.opensourcephysics.media.core.TPoint;
@@ -11,6 +13,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.*;
 
+@Getter
+@Setter
 public class AutoTrackerCore {
 
     public AutoTrackerCore(AutoTrackerControl c, AutoTrackerFeedback f) {
@@ -27,8 +31,9 @@ public class AutoTrackerCore {
     private final AutoTrackerFeedback feedback;
 
     public int trackID;
+
     /**
-     * trackFrameData maps tracks to indexFrameData which maps point index
+     * TrackFrameData maps tracks to indexFrameData which maps point index
      * to frameData which maps frame number to individual FrameData objects
      */
     public Map<TTrack, Map<Integer, Map<Integer, FrameData>>> trackFrameData = new HashMap<>();
@@ -695,33 +700,58 @@ public class AutoTrackerCore {
     /**
      * A class to hold frame data.
      */
+    @Getter
+    @Setter
     protected class FrameData {
 
         private final int index;
-        private final int frameNum;
+        private final int frameNumber;
+
         private int templateAlpha;
         private int matcherHashCode;
+
         private double[] targetOffset = {0, 0};
         private double[] matchWidthAndHeight;
+
         private TPoint[] matchPoints;
         private TPoint[] searchPoints;
+
         TPoint trackPoint;
+
         private double[] autoMarkLoc;
+
         private BufferedImage template;
-        private Icon templateIcon; // shows template used for search
-        private Icon matchIcon; // only if match is found
-        boolean searched; // true when searched
-        boolean decided; // true when accepted, skipped or marked point is dragged; assumed false for calibration tools and axes
+
+        /**
+         * Shows template used for search
+         */
+        private Icon templateIcon;
+
+        /**
+         * Only if match is found
+         */
+        private Icon matchIcon;
+
+        /**
+         * True when searched
+         */
+        boolean searched;
+
+        /**
+         * True when accepted, skipped or marked point is dragged; assumed false for calibration tools and axes
+         */
+        boolean decided;
+
         int[] workingPixels;
 
         FrameData(int pointIndex, int frameNumber) {
             index = pointIndex;
-            frameNum = frameNumber;
+            this.frameNumber = frameNumber;
         }
 
         FrameData(KeyFrame keyFrame) {
             index = keyFrame.getIndex();
-            frameNum = keyFrame.getFrameNumber();
+            frameNumber = keyFrame.getFrameNumber();
             matchWidthAndHeight = keyFrame.getMatchWidthAndHeight();
             matchPoints = keyFrame.getMatchPoints();
             searchPoints = keyFrame.getSearchPoints(false);
@@ -731,10 +761,6 @@ public class AutoTrackerCore {
             autoMarkLoc = keyFrame.getAutoMarkLoc();
             trackPoint = keyFrame.trackPoint;
             searched = keyFrame.searched;
-        }
-
-        int getFrameNumber() {
-            return frameNum;
         }
 
 
@@ -748,29 +774,15 @@ public class AutoTrackerCore {
             );
         }
 
-        Icon getTemplateIcon() {
-            return templateIcon;
-        }
-
         void setTemplateImage(BufferedImage image) {
             setTemplateIcon(createMagnifiedIcon(image));
         }
 
-        void setTemplateIcon(Icon icon) {
-            templateIcon = icon;
-        }
-
-        Icon getMatchIcon() {
-            return matchIcon;
-        }
 
         void setMatchImage(BufferedImage image) {
             setMatchIcon(createMagnifiedIcon(image));
         }
 
-        void setMatchIcon(Icon icon) {
-            matchIcon = icon;
-        }
 
         /**
          * Sets the template to the current template of a TemplateMatcher.
@@ -812,7 +824,7 @@ public class AutoTrackerCore {
             boolean different = matcher.getAlphas()[0] != templateAlpha
                     || matcher.hashCode() != matcherHashCode;
             // TODO: reverse ?
-            boolean appropriate = matcher.getIndex() < frameNum;
+            boolean appropriate = matcher.getIndex() < frameNumber;
             return different && appropriate;
         }
 
@@ -832,7 +844,7 @@ public class AutoTrackerCore {
 
         TemplateMatcher getTemplateMatcher() {
             KeyFrame frame = getKeyFrame();
-            return frame == null ? null : frame.matcher;
+            return frame == null ? null : frame.templateMatcher;
         }
 
         void setTargetOffset(double dx, double dy) {
@@ -853,7 +865,7 @@ public class AutoTrackerCore {
             if (!inherit || searchPoints != null || this.isKeyFrame()) return searchPoints;
             Map<Integer, FrameData> frames = getFrameData(index);
             //TODO: reverse?
-            for (int i = frameNum; i >= 0; i--) {
+            for (int i = frameNumber; i >= 0; i--) {
                 FrameData frame = frames.get(i);
                 if (frame != null) {
                     if (frame.searchPoints != null || frame.isKeyFrame()) {
@@ -864,34 +876,19 @@ public class AutoTrackerCore {
             return null;
         }
 
-        void setMatchPoints(TPoint[] points) {
-            matchPoints = points;
-        }
-
-        TPoint[] getMatchPoints() {
-            return matchPoints;
-        }
-
-        void setMatchWidthAndHeight(double[] matchData) {
-            matchWidthAndHeight = matchData;
-        }
-
-        double[] getMatchWidthAndHeight() {
-            return matchWidthAndHeight;
-        }
 
         KeyFrame getKeyFrame() {
             if (this.isKeyFrame()) return (KeyFrame) this;
             Map<Integer, FrameData> frames = getFrameData(index);
             if (!control.isReverse()) {
-                for (int i = frameNum; i >= 0; i--) {
+                for (int i = frameNumber; i >= 0; i--) {
                     FrameData frame = frames.get(i);
                     if (frame != null && frame.isKeyFrame())
                         return (KeyFrame) frame;
                 }
             } else {
                 int fin = control.getFrameCount();
-                for (int i = frameNum; i < fin; i++) {
+                for (int i = frameNumber; i < fin; i++) {
                     FrameData frame = frames.get(i);
                     if (frame != null && frame.isKeyFrame())
                         return (KeyFrame) frame;
@@ -900,13 +897,9 @@ public class AutoTrackerCore {
             return null;
         }
 
-        int getIndex() {
-            return index;
-        }
-
         boolean isMarked() {
             TTrack track = getTrack();
-            return track != null && track.getStep(frameNum) != null;
+            return track != null && track.getStep(frameNumber) != null;
         }
 
         //TODO: to be splitted and overridden?
@@ -914,7 +907,7 @@ public class AutoTrackerCore {
             if (autoMarkLoc == null || trackPoint == null) return false;
             if (trackPoint instanceof CoordAxes.AnglePoint) {
                 ImageCoordSystem coords = control.getCoords();
-                double theta = coords.getAngle(frameNum);
+                double theta = coords.getAngle(frameNumber);
                 CoordAxes.AnglePoint p = (CoordAxes.AnglePoint) trackPoint;
                 return Math.abs(theta - p.getAngle()) < 0.001;
             }
@@ -928,10 +921,6 @@ public class AutoTrackerCore {
             autoMarkLoc = point == null ? null : new double[]{point.getX(), point.getY()};
         }
 
-        double[] getAutoMarkLoc() {
-            return autoMarkLoc;
-        }
-
         boolean isKeyFrame() {
             return false;
         }
@@ -940,7 +929,7 @@ public class AutoTrackerCore {
             if (!isMarked()) return null;
             if (trackPoint != null) return trackPoint;
             TTrack track = getTrack();
-            return track.getMarkedPoint(frameNum, index);
+            return track.getMarkedPoint(frameNumber, index);
         }
 
         void clear() {
@@ -965,12 +954,17 @@ public class AutoTrackerCore {
     /**
      * A class to hold keyframe data.
      */
+    @Getter
+    @Setter
     protected class KeyFrame extends FrameData {
 
         private final Shape mask;
+
         private final TPoint target;
+
         private final TPoint[] maskPoints = {new TPoint(), new TPoint()};
-        private TemplateMatcher matcher;
+
+        private TemplateMatcher templateMatcher;
 
         KeyFrame(TPoint keyPt, Shape mask, TPoint target, int index, TPoint center, TPoint corner) {
             super(index, control.getFrameNumber(keyPt));
@@ -979,26 +973,6 @@ public class AutoTrackerCore {
             // TODO: calculate corner using mask and center
             maskPoints[0].setLocation(center);
             maskPoints[1].setLocation(corner);
-        }
-
-        boolean isKeyFrame() {
-            return true;
-        }
-
-        Shape getMask() {
-            return mask;
-        }
-
-        TPoint getTarget() {
-            return target;
-        }
-
-        TPoint[] getMaskPoints() {
-            return maskPoints;
-        }
-
-        void setTemplateMatcher(TemplateMatcher matcher) {
-            this.matcher = matcher;
         }
     }
 }

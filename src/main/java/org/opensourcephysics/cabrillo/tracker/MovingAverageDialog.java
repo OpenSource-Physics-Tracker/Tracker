@@ -27,7 +27,6 @@ public class MovingAverageDialog extends JDialog {
         JPanel contentPane = new JPanel();
 
         JLabel stepSpinnerLabel = new JLabel(TrackerRes.getString("MovingAverageDialog.PointsToAverage"));
-        //stepSpinnerLabel.setText("Points to average:");
 
 
         JButton buttonOK = new JButton(TrackerRes.getString("MovingAverageDialog.OK"));

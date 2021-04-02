@@ -130,8 +130,8 @@ public class MultiPositionStep extends PositionStep {
      * @return a descriptive string
      */
     public String toString() {
-        return "MultiPositionStep " + n + " [" + format.format(p.x) //$NON-NLS-1$ //$NON-NLS-2$
-                + ", " + format.format(p.y) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+        return "MultiPositionStep " + frameNumber + " [" + format.format(position.x) //$NON-NLS-1$ //$NON-NLS-2$
+                + ", " + format.format(position.y) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /**
@@ -156,8 +156,8 @@ public class MultiPositionStep extends PositionStep {
          */
         public void saveObject(XMLControl control, Object obj) {
             PositionStep step = (PositionStep) obj;
-            control.setValue("x", step.p.x); //$NON-NLS-1$
-            control.setValue("y", step.p.y); //$NON-NLS-1$
+            control.setValue("x", step.position.x); //$NON-NLS-1$
+            control.setValue("y", step.position.y); //$NON-NLS-1$
         }
 
         /**
@@ -183,7 +183,7 @@ public class MultiPositionStep extends PositionStep {
             PositionStep step = (PositionStep) obj;
             double x = control.getDouble("x"); //$NON-NLS-1$
             double y = control.getDouble("y"); //$NON-NLS-1$
-            step.p.setXY(x, y);
+            step.position.setXY(x, y);
             return obj;
         }
     }

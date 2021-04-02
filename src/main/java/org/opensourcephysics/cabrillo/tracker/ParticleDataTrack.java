@@ -23,6 +23,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.controls.OSPLog;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
@@ -56,12 +58,16 @@ import java.util.ArrayList;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class ParticleDataTrack extends ParticleModel implements DataTrack {
 
     private static final String startupFootprint = "CircleFootprint.FilledCircle#5 outline"; //$NON-NLS-1$
 
     private DataClip dataClip;
+
     private Data sourceData;
+
     private double[] xData = {0};
     private double[] yData = {0};
     private double[] tData = {0};
@@ -70,6 +76,7 @@ public class ParticleDataTrack extends ParticleModel implements DataTrack {
      * Used by getNextTracePositions() method
      */
     private final Point2D[] tracePosition;
+
     private int stepCounter;
 
     /**
@@ -870,15 +877,6 @@ public class ParticleDataTrack extends ParticleModel implements DataTrack {
                 dtPanel.refreshTimeSource();
             }
         }
-    }
-
-    /**
-     * Gets the model data. This can return null if loaded from XMLControl.
-     *
-     * @return the data (may return null)
-     */
-    public Data getData() {
-        return sourceData;
     }
 
     /**

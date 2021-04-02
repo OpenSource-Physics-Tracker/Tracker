@@ -26,6 +26,8 @@ package org.opensourcephysics.cabrillo.tracker;
 
 import java.awt.*;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.tools.FontSizer;
 
@@ -35,12 +37,16 @@ import org.opensourcephysics.tools.FontSizer;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class OffsetOriginStep extends Step {
 
-    // instance fields
     private final OffsetOrigin offset;
-    private Position p;
-    protected double worldX, worldY;
+
+    private Position position;
+
+    protected double worldX;
+    protected double worldY;
 
     /**
      * Constructs a OffsetOriginStep with specified image coordinates.
@@ -55,18 +61,10 @@ public class OffsetOriginStep extends Step {
         offset = track;
         screenPoints = new Point[getLength()];
         points = new TPoint[getLength()];
-        p = new Position(x, y); // sets initial worldX and worldY
-        points[0] = p;
+        position = new Position(x, y); // sets initial worldX and worldY
+        points[0] = position;
     }
 
-    /**
-     * Gets the position.
-     *
-     * @return the position
-     */
-    public Position getPosition() {
-        return p;
-    }
 
     /**
      * Sets the world coordinates. This moves the origin so the
@@ -87,7 +85,7 @@ public class OffsetOriginStep extends Step {
         } else {
             worldX = x;
             worldY = y;
-            offset.keyFrames.add(n);
+            offset.keyFrames.add(frameNumber);
         }
 
         if (offset.trackerPanel == null) return;
@@ -100,7 +98,7 @@ public class OffsetOriginStep extends Step {
         double x1 = coords.worldToImageX(n, x, y);
         double y1 = coords.worldToImageY(n, x, y);
         // translate the origin
-        coords.setOriginXY(n, x0 + p.x - x1, y0 + p.y - y1);
+        coords.setOriginXY(n, x0 + position.x - x1, y0 + position.y - y1);
     }
 
     /**
@@ -118,7 +116,7 @@ public class OffsetOriginStep extends Step {
             // set position location to image position of world coordinates
             double x = coords.worldToImageX(n, worldX, worldY);
             double y = coords.worldToImageY(n, worldX, worldY);
-            p.setLocation(x, y);
+            position.setLocation(x, y);
             // get point shape
             Shape shape;
             selection = trackerPanel.getSelectedPoint();
@@ -162,7 +160,7 @@ public class OffsetOriginStep extends Step {
      */
     public Object clone() {
         OffsetOriginStep step = (OffsetOriginStep) super.clone();
-        step.points[0] = step.p = step.new Position(p.x, p.y);
+        step.points[0] = step.position = step.new Position(position.x, position.y);
         return step;
     }
 
@@ -172,14 +170,13 @@ public class OffsetOriginStep extends Step {
      * @return a descriptive string
      */
     public String toString() {
-        String s = "Offset Origin Step " + n //$NON-NLS-1$
+        String s = "Offset Origin Step " + frameNumber //$NON-NLS-1$
                 + " [" + format.format(worldX) //$NON-NLS-1$
                 + ", " + format.format(worldY) //$NON-NLS-1$
                 + "]"; //$NON-NLS-1$
         return s;
     }
 
-    //______________________ inner Position class ________________________
 
     /**
      * A class to represent the position of the offset origin.
@@ -246,7 +243,7 @@ public class OffsetOriginStep extends Step {
             super.setAdjusting(adjusting);
             if (wasAdjusting && !adjusting) {
                 setXY(lastX, lastY);
-                getTrack().firePropertyChange("step", null, n); //$NON-NLS-1$
+                getTrack().firePropertyChange("step", null, frameNumber); //$NON-NLS-1$
             }
         }
 

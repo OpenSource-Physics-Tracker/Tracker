@@ -80,7 +80,6 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     protected boolean anglesInRadians = Tracker.isRadians;
     protected File tabsetFile; // used when saving tabsets
     protected int framesLoaded;
-    //  protected JProgressBar monitor;
     protected PrefsDialog prefsDialog;
     protected ClipboardListener clipboardListener;
     protected boolean alwaysListenToClipboard;
@@ -887,7 +886,6 @@ public class TFrame extends OSPFrame implements PropertyChangeListener {
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (!Tracker.splash.isVisible()) return;
-//    Tracker.setProgress(100);
         // dispose of splash automatically after short time
         Timer timer = new Timer(1500, e -> Tracker.splash.dispose());
         timer.setRepeats(false);

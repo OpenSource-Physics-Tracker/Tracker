@@ -62,9 +62,16 @@ public class FileDropHandler extends TransferHandler {
     static FileFilter[] imageFilters = new ImageVideoType().getFileFilters();
 
     TFrame frame;
-    DataFlavor uriListFlavor; // for Linux
+
+    /**
+     * For Linux
+     */
+    DataFlavor uriListFlavor;
+
     List<?> dropList;
+
     Component dropComponent;
+
     DropTargetListener dropListener = new DropListener();
 
     /**
@@ -264,6 +271,5 @@ public class FileDropHandler extends TransferHandler {
         public void drop(DropTargetDropEvent e) {
             dropList = null;
         }
-
     }
 }

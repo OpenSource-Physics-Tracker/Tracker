@@ -29,6 +29,8 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.*;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.tools.FontSizer;
@@ -39,33 +41,91 @@ import org.opensourcephysics.tools.FontSizer;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class LineProfileStep extends Step {
 
     static TPoint center = new TPoint();
 
-    // instance fields
     protected TPoint lineEnd0;
     protected TPoint lineEnd1;
+
     protected Handle handle;
+
     protected boolean endsEnabled = true;
+
     protected Map<TrackerPanel, Shape> end0Shapes = new HashMap<>();
     protected Map<TrackerPanel, Shape> end1Shapes = new HashMap<>();
     protected Map<TrackerPanel, Shape> shaftShapes = new HashMap<>();
+
     protected LineProfile line;
-    protected Corner[][] corners; // corners at ends 0,1 of sweep lines 0,1
-    protected GridIntersection[] endX; // end 0,1 x-intersections
-    protected GridIntersection[] endY; // end 0,1 y-intersections
-    protected GridIntersection[][] sweepX; // x-intersections along sweep line 0,1
-    protected GridIntersection[][] sweepY; // y-intersections along sweep line 0,1
-    protected TreeSet<Intersection> sorter = new TreeSet<>(); // used to sort Intersections
-    protected ArrayList<GridVertex> vertices = new ArrayList<>(); // GridVertex collection
-    private double sin, cos; // sine and cosine of line profile angle
-    private final TreeSet<GridSegment> xSegments; // vertical GridSegments
-    private final TreeSet<GridSegment> ySegments; // horizontal GridSegments
-    private int leadingIndex; // toggles between 0,1 to leapfrog
-    private final Intersection[] polygon = new Intersection[8]; // polygon shape vertices
+
+    /**
+     * Corners at ends 0,1 of sweep lines 0,1
+     */
+    protected Corner[][] corners;
+
+    /**
+     * End 0,1 x-intersections
+     */
+    protected GridIntersection[] endX;
+
+    /**
+     * End 0,1 y-intersections
+     */
+    protected GridIntersection[] endY;
+
+    /**
+     * X-intersections along sweep line 0,1
+     */
+    protected GridIntersection[][] sweepX;
+
+    /**
+     * Y-intersections along sweep line 0,1
+     */
+    protected GridIntersection[][] sweepY;
+
+    /**
+     * Used to sort Intersections
+     */
+    protected TreeSet<Intersection> sorter = new TreeSet<>();
+
+    /**
+     * GridVertex collection
+     */
+    protected ArrayList<GridVertex> vertices = new ArrayList<>();
+
+    /**
+     * Sine and cosine of line profile angle
+     */
+    private double sin, cos;
+
+    /**
+     * Vertical GridSegments
+     */
+    private final TreeSet<GridSegment> xSegments;
+
+    /**
+     * Horizontal GridSegments
+     */
+    private final TreeSet<GridSegment> ySegments;
+
+    /**
+     * Toggles between 0,1 to leapfrog
+     */
+    private int leadingIndex;
+
+    /**
+     * Polygon shape vertices
+     */
+    private final Intersection[] polygon = new Intersection[8];
+
     private final Point polyLoc = new Point();
-    private final double[] quadAreas = new double[4]; // used for GridVertex quadrant areas
+
+    /**
+     * Used for GridVertex quadrant areas
+     */
+    private final double[] quadAreas = new double[4];
 
     /**
      * Constructs a LineProfileStep with specified end point coordinates in image
@@ -101,41 +161,6 @@ public class LineProfileStep extends Step {
         }
     }
 
-    /**
-     * Gets end 1.
-     *
-     * @return end 1
-     */
-    public TPoint getLineEnd0() {
-        return lineEnd0;
-    }
-
-    /**
-     * Gets end 2.
-     *
-     * @return end 2
-     */
-    public TPoint getLineEnd1() {
-        return lineEnd1;
-    }
-
-    /**
-     * Gets the center handle.
-     *
-     * @return the handle
-     */
-    public TPoint getHandle() {
-        return handle;
-    }
-
-    /**
-     * Enables and disables the interactivity of the ends.
-     *
-     * @param enabled <code>true</code> to enable the ends
-     */
-    public void setEndsEnabled(boolean enabled) {
-        endsEnabled = enabled;
-    }
 
     /**
      * Gets whether the ends are enabled.
@@ -310,7 +335,7 @@ public class LineProfileStep extends Step {
      * @return a descriptive string
      */
     public String toString() {
-        return "LineProfileStep " + n //$NON-NLS-1$
+        return "LineProfileStep " + frameNumber //$NON-NLS-1$
                 + " [" + format.format(lineEnd0.x) //$NON-NLS-1$
                 + ", " + format.format(lineEnd0.y) //$NON-NLS-1$
                 + ", " + format.format(lineEnd1.x) //$NON-NLS-1$
@@ -340,7 +365,7 @@ public class LineProfileStep extends Step {
      */
     protected void rotate() {
         if (line.trackerPanel == null) return;
-        double theta_x = line.trackerPanel.getCoords().getAngle(n);
+        double theta_x = line.trackerPanel.getCoords().getAngle(frameNumber);
         if (line.isHorizontal) theta_x = 0;
         double theta_step = lineEnd0.angle(lineEnd1);
         if (theta_step > Math.PI / 2 || theta_step < -Math.PI / 2) {
@@ -1035,7 +1060,6 @@ public class LineProfileStep extends Step {
         return 3;
     }
 
-    //______________________ inner Handle class ________________________
 
     class Handle extends Step.Handle {
 
@@ -1060,7 +1084,7 @@ public class LineProfileStep extends Step {
             TTrack track = getTrack();
             if (track.isLocked()) return;
             if (!line.isFixed()) {
-                line.keyFrames.add(n);
+                line.keyFrames.add(frameNumber);
             }
             double dx = x - getX();
             double dy = y - getY();
@@ -1075,10 +1099,10 @@ public class LineProfileStep extends Step {
                 lineEnd0.setLocation(lineEnd0.getX() + dx, lineEnd0.getY() + dy);
                 lineEnd1.setLocation(lineEnd1.getX() + dx, lineEnd1.getY() + dy);
                 setLocation(x, y);
-                line.keyFrames.add(n);
+                line.keyFrames.add(frameNumber);
             }
             repaint();
-            track.support.firePropertyChange("step", null, n); //$NON-NLS-1$
+            track.support.firePropertyChange("step", null, frameNumber); //$NON-NLS-1$
         }
 
         /**
@@ -1088,7 +1112,7 @@ public class LineProfileStep extends Step {
          * @return the containing TapeStep frame number
          */
         public int getFrameNumber(VideoPanel vidPanel) {
-            return n;
+            return frameNumber;
         }
 
         /**
@@ -1105,7 +1129,6 @@ public class LineProfileStep extends Step {
         }
     }
 
-    //______________________ inner LineEnd class ________________________
 
     class LineEnd extends TPoint {
 
@@ -1140,7 +1163,7 @@ public class LineProfileStep extends Step {
             double dy = y - getY();
             double hyp = Math.sqrt(dx * dx + dy * dy);
             // get angles of x-axis and mouse displacement from horizontal
-            double theta1 = -track.trackerPanel.getCoords().getAngle(n);
+            double theta1 = -track.trackerPanel.getCoords().getAngle(frameNumber);
             LineProfile profile = (LineProfile) getTrack();
             if (profile.isHorizontal) theta1 = 0;
             double theta2 = Math.atan2(dy, dx);
@@ -1159,10 +1182,10 @@ public class LineProfileStep extends Step {
                 line.refreshStep(LineProfileStep.this); // sets properties of this step
             } else {
                 setLocation(getX() + dx, getY() + dy);
-                line.keyFrames.add(n);
+                line.keyFrames.add(frameNumber);
             }
             repaint();
-            track.support.firePropertyChange("step", null, n); //$NON-NLS-1$
+            track.support.firePropertyChange("step", null, frameNumber); //$NON-NLS-1$
         }
 
         /**
@@ -1172,11 +1195,9 @@ public class LineProfileStep extends Step {
          * @return the containing TapeStep frame number
          */
         public int getFrameNumber(VideoPanel vidPanel) {
-            return n;
+            return frameNumber;
         }
     }
-
-    //______________________ Intersection classes ______________________________
 
   /*
     The classes below help measure the tilted line profile. How they work:
@@ -1224,7 +1245,6 @@ public class LineProfileStep extends Step {
         }
     }
 
-    //______________________ inner Corner class ________________________
 
     /**
      * A corner point is connected to one end and one sweep intersection.
@@ -1237,7 +1257,6 @@ public class LineProfileStep extends Step {
         }
     }
 
-    //______________________ inner GridIntersection class ________________________
 
     /**
      * A class to hold intersections with grid lines. Every grid intersection
@@ -1253,7 +1272,6 @@ public class LineProfileStep extends Step {
         }
     }
 
-    //______________________ inner GridSegment class ________________________
 
     /**
      * A class to hold grid segments. Each segment has an integer value

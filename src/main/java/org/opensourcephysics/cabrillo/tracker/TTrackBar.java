@@ -426,7 +426,7 @@ public class TTrackBar extends JToolBar implements PropertyChangeListener {
                     }
                 }
                 trackButton.setTrack(track);
-// listen to tracks for property changes that affect icon or name
+                // listen to tracks for property changes that affect icon or name
                 track.addPropertyChangeListener("name", TTrackBar.this); //$NON-NLS-1$
                 track.addPropertyChangeListener("color", TTrackBar.this); //$NON-NLS-1$
                 track.addPropertyChangeListener("footprint", TTrackBar.this); //$NON-NLS-1$
@@ -452,10 +452,10 @@ public class TTrackBar extends JToolBar implements PropertyChangeListener {
                     }
                     add(c);
                 }
-// selected point items
+                // selected point items
                 TPoint p = trackerPanel.getSelectedPoint();
                 if (p != null) {
-// a point is selected
+                // a point is selected
                     list = track.getToolbarPointComponents(trackerPanel, p);
                     for (Component c : list) {
                         if (c instanceof JComponent
@@ -488,7 +488,7 @@ public class TTrackBar extends JToolBar implements PropertyChangeListener {
                 add(newVersionButton);
             }
             memoryButton.setToolTipText(TrackerRes.getString("TTrackBar.Button.Memory.Tooltip")); //$NON-NLS-1$
-//        refreshMemoryButton();
+            //        refreshMemoryButton();
             add(memoryButton);
             revalidate();
             repaint();

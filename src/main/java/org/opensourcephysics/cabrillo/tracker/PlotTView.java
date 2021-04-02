@@ -26,6 +26,7 @@ package org.opensourcephysics.cabrillo.tracker;
 
 import javax.swing.*;
 
+import lombok.Getter;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.controls.XMLProperty;
@@ -35,9 +36,10 @@ import org.opensourcephysics.controls.XMLProperty;
  *
  * @author Douglas Brown
  */
+@Getter
 public class PlotTView extends TrackChooserTView {
 
-    protected Icon icon;
+    protected Icon viewIcon;
 
     /**
      * Constructs a TrackChooserView for the specified tracker panel.
@@ -46,7 +48,7 @@ public class PlotTView extends TrackChooserTView {
      */
     public PlotTView(TrackerPanel panel) {
         super(panel);
-        icon = new ImageIcon(PlotTView.class.getResource("/images/plot.gif"));
+        viewIcon = new ImageIcon(PlotTView.class.getResource("/images/plot.gif"));
     }
 
     /**
@@ -56,15 +58,6 @@ public class PlotTView extends TrackChooserTView {
      */
     public String getViewName() {
         return TrackerRes.getString("TFrame.View.Plot"); //$NON-NLS-1$
-    }
-
-    /**
-     * Gets the icon for this view
-     *
-     * @return the icon
-     */
-    public Icon getViewIcon() {
-        return icon;
     }
 
     /**

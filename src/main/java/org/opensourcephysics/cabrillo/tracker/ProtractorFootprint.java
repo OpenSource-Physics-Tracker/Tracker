@@ -36,6 +36,8 @@ import java.util.HashSet;
 
 import javax.swing.Icon;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.tools.FontSizer;
 
 /**
@@ -45,6 +47,8 @@ import org.opensourcephysics.tools.FontSizer;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class ProtractorFootprint implements Footprint, Cloneable {
 
     public static final float[] DOTTED_LINE = new float[]{1, 6};
@@ -82,15 +86,6 @@ public class ProtractorFootprint implements Footprint, Cloneable {
         radius = r;
         circle = new Ellipse2D.Double(-r, -r, 2 * r, 2 * r);
         setStroke(new BasicStroke());
-    }
-
-    /**
-     * Gets the name of this footprint.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
     }
 
     /**
@@ -176,15 +171,6 @@ public class ProtractorFootprint implements Footprint, Cloneable {
     }
 
     /**
-     * Gets the hit shapes {vertex, end1, end2, line1, line2, rotator}.
-     *
-     * @return the hit shapes
-     */
-    public Shape[] getHitShapes() {
-        return hitShapes;
-    }
-
-    /**
      * Sets the stroke.
      *
      * @param stroke the desired stroke
@@ -209,33 +195,6 @@ public class ProtractorFootprint implements Footprint, Cloneable {
                 8,
                 STIPPLED_LINE,
                 stroke.getDashPhase());
-    }
-
-    /**
-     * Gets the stroke.
-     *
-     * @return the stroke
-     */
-    public BasicStroke getStroke() {
-        return baseStroke;
-    }
-
-    /**
-     * Sets the color.
-     *
-     * @param color the desired color
-     */
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    /**
-     * Gets the color.
-     *
-     * @return the color
-     */
-    public Color getColor() {
-        return color;
     }
 
     /**

@@ -42,7 +42,6 @@ import java.awt.*;
  */
 public class CalibrationStep extends Step {
 
-    // instance fields
     private final Calibration cal;
 
     protected double worldX0;
@@ -231,7 +230,7 @@ public class CalibrationStep extends Step {
             worldY0 = y1;
             worldX1 = x2;
             worldY1 = y2;
-            cal.keyFrames.add(n);
+            cal.keyFrames.add(frameNumber);
         }
 
         if (points[1] != null) {
@@ -256,7 +255,7 @@ public class CalibrationStep extends Step {
      * @return a descriptive string
      */
     public String toString() {
-        String s = "Calibration Points Step " + n //$NON-NLS-1$
+        String s = "Calibration Points Step " + frameNumber //$NON-NLS-1$
                 + " [" + format.format(worldX0) //$NON-NLS-1$
                 + ", " + format.format(worldY0); //$NON-NLS-1$
         if (points[1] != null) {
@@ -431,7 +430,8 @@ public class CalibrationStep extends Step {
      */
     public class Position extends TPoint {
 
-        private double lastX, lastY;
+        private double lastX;
+        private double lastY;
 
         /**
          * Constructs a position with specified image coordinates,
@@ -533,7 +533,7 @@ public class CalibrationStep extends Step {
             super.setAdjusting(adjusting);
             if (wasAdjusting && !adjusting) {
                 setXY(lastX, lastY);
-                getTrack().firePropertyChange("step", null, n); //$NON-NLS-1$
+                getTrack().firePropertyChange("step", null, frameNumber); //$NON-NLS-1$
             }
         }
 

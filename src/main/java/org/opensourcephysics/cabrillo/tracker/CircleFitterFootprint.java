@@ -24,6 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.tools.FontSizer;
 
 import javax.swing.*;
@@ -39,6 +41,8 @@ import java.util.HashSet;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class CircleFitterFootprint implements Footprint, Cloneable {
 
     /**
@@ -93,7 +97,7 @@ public class CircleFitterFootprint implements Footprint, Cloneable {
 
     protected Ellipse2D circle;
 
-    protected double radius;
+    protected double pixelRadius;
 
     protected Shape marker;
     protected Shape crosshatch;
@@ -105,14 +109,6 @@ public class CircleFitterFootprint implements Footprint, Cloneable {
 
     protected boolean drawCircle = true;
 
-    /**
-     * Gets the name of this footprint.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
 
     /**
      * Gets the display name of the footprint.
@@ -211,65 +207,10 @@ public class CircleFitterFootprint implements Footprint, Cloneable {
     }
 
     /**
-     * Gets the stroke.
-     *
-     * @return the stroke
-     */
-    public BasicStroke getStroke() {
-        return baseStroke;
-    }
-
-    /**
-     * Sets the color.
-     *
-     * @param color the desired color
-     */
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    /**
-     * Gets the color.
-     *
-     * @return the color
-     */
-    public Color getColor() {
-        return color;
-    }
-
-    /**
-     * Sets the radius of the datapoint circle.
-     *
-     * @param r the radius
-     */
-    protected void setPixelRadius(double r) {
-        radius = r;
-    }
-
-    /**
      * Sets the visibility of the circle.
      */
     protected void setCircleVisible() {
         drawCircle = false;
-    }
-
-    /**
-     * Sets the selected screen point. The selected point is not drawn so CircleStep
-     * can draw a selection shape instead.
-     *
-     * @param p the selected screen point (may be null)
-     */
-    protected void setSelectedPoint(Point p) {
-        selectedPoint = p;
-    }
-
-    /**
-     * Sets the marked point count. Marked points are drawn differently than attached points.
-     *
-     * @param n the number of user-marked points in the step
-     */
-    protected void setMarkedPointCount(int n) {
-        markedPointCount = n;
     }
 
     /**
@@ -292,7 +233,7 @@ public class CircleFitterFootprint implements Footprint, Cloneable {
         // draw shapes only if there are 3 or more data points (plus center & edge)
         if (drawCircle && points.length >= 5) {
             // special case: infinite or very large radius, so draw straight line thru edge
-            if (Double.isInfinite(radius) || radius > MAX_RADIUS) {
+            if (Double.isInfinite(pixelRadius) || pixelRadius > MAX_RADIUS) {
                 double x = edge.getX();
                 double y = edge.getY();
                 // get slope of line
@@ -314,7 +255,8 @@ public class CircleFitterFootprint implements Footprint, Cloneable {
                 hitShapes.add(hitStroke.createStrokedShape(line));
             } else { // standard case
                 // circle
-                circle.setFrameFromCenter(center.x, center.y, center.x + radius, center.y + radius);
+                circle.setFrameFromCenter(center.x, center.y,
+                        center.x + pixelRadius, center.y + pixelRadius);
                 drawMe.add(new Area(stroke.createStrokedShape(circle)));
                 hitShapes.add(stroke.createStrokedShape(circle));
 

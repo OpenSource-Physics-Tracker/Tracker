@@ -29,6 +29,8 @@ import java.awt.*;
 import java.awt.font.*;
 import java.awt.geom.*;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.tools.FontSizer;
@@ -41,6 +43,8 @@ import org.opensourcephysics.controls.*;
  *
  * @author Douglas Brown
  */
+@Getter
+@Setter
 public class TapeStep extends Step {
 
     /**
@@ -54,15 +58,20 @@ public class TapeStep extends Step {
     protected static TPoint endPoint2 = new TPoint();
 
     protected TapeMeasure tape;
+
     protected TPoint end1;
     protected TPoint end2;
     protected TPoint middle;
+
     protected Handle handle;
+
     protected double worldLength;
     protected double xAxisToTapeAngle, tapeAngle;
+
     protected boolean endsEnabled = true;
     protected boolean drawLayoutBounds;
     protected boolean adjustingTips;
+
     protected Map<TrackerPanel, Shape> end1Shapes = new HashMap<>();
     protected Map<TrackerPanel, Shape> end2Shapes = new HashMap<>();
     protected Map<TrackerPanel, Shape> shaftShapes = new HashMap<>();
@@ -92,51 +101,6 @@ public class TapeStep extends Step {
         handle.setTrackEditTrigger(true);
         points = new TPoint[]{end1, end2, handle, middle};
         screenPoints = new Point[getLength()];
-    }
-
-    /**
-     * Gets end 1.
-     *
-     * @return end 1
-     */
-    public TPoint getEnd1() {
-        return end1;
-    }
-
-    /**
-     * Gets end 2.
-     *
-     * @return end 2
-     */
-    public TPoint getEnd2() {
-        return end2;
-    }
-
-    /**
-     * Gets the handle.
-     *
-     * @return the handle
-     */
-    public TPoint getHandle() {
-        return handle;
-    }
-
-    /**
-     * Enables and disables the interactivity of the ends.
-     *
-     * @param enabled <code>true</code> to enable the ends
-     */
-    public void setEndsEnabled(boolean enabled) {
-        endsEnabled = enabled;
-    }
-
-    /**
-     * Gets whether the ends are enabled.
-     *
-     * @return <code>true</code> if the ends are enabled
-     */
-    public boolean isEndsEnabled() {
-        return endsEnabled;
     }
 
     /**
@@ -180,7 +144,6 @@ public class TapeStep extends Step {
         Rectangle layoutRect = layoutBounds.get(trackerPanel);
         if (hit == null && layoutRect != null
                 && layoutRect.intersects(hitRect)) {
-//      drawLayout = !tape.readOnly;
             drawLayout = true;
             hit = tape;
         }
@@ -343,9 +306,9 @@ public class TapeStep extends Step {
         double scaleY = 1;
         double axisTiltAngle = 0;
         if (tape.trackerPanel != null) {
-            scaleX = tape.trackerPanel.getCoords().getScaleX(n);
-            scaleY = tape.trackerPanel.getCoords().getScaleY(n);
-            axisTiltAngle = tape.trackerPanel.getCoords().getAngle(n);
+            scaleX = tape.trackerPanel.getCoords().getScaleX(frameNumber);
+            scaleY = tape.trackerPanel.getCoords().getScaleY(frameNumber);
+            axisTiltAngle = tape.trackerPanel.getCoords().getAngle(frameNumber);
         }
         double dx = (end2.getX() - end1.getX()) / scaleX;
         double dy = (end1.getY() - end2.getY()) / scaleY;
@@ -397,15 +360,15 @@ public class TapeStep extends Step {
                 TapeStep step = (TapeStep) tape.steps.getStep(0);
                 step.worldLength = length;
             } else {
-                tape.lengthKeyFrames.add(n);
+                tape.lengthKeyFrames.add(frameNumber);
                 worldLength = length;
             }
         }
-        double scaleX = factor * tape.trackerPanel.getCoords().getScaleX(n);
-        double scaleY = factor * tape.trackerPanel.getCoords().getScaleY(n);
+        double scaleX = factor * tape.trackerPanel.getCoords().getScaleX(frameNumber);
+        double scaleY = factor * tape.trackerPanel.getCoords().getScaleY(frameNumber);
         XMLControl coordsControl = new XMLControlElement(tape.trackerPanel.getCoords());
         tape.isStepChangingScale = true;
-        tape.trackerPanel.getCoords().setScaleXY(n, scaleX, scaleY);
+        tape.trackerPanel.getCoords().setScaleXY(frameNumber, scaleX, scaleY);
         tape.isStepChangingScale = false;
         if (tape.isStickMode()) {
             Undo.postTrackAndCoordsEdit(tape, trackControl, coordsControl);
@@ -435,8 +398,8 @@ public class TapeStep extends Step {
         double dTheta = theta - xAxisToTapeAngle;
         ImageCoordSystem coords = tape.trackerPanel.getCoords();
         XMLControl state = new XMLControlElement(coords);
-        double angle = coords.getAngle(n);
-        coords.setAngle(n, angle - dTheta);
+        double angle = coords.getAngle(frameNumber);
+        coords.setAngle(frameNumber, angle - dTheta);
         Undo.postCoordsEdit(tape.trackerPanel, state);
     }
 
@@ -471,7 +434,7 @@ public class TapeStep extends Step {
      * @return a descriptive string
      */
     public String toString() {
-        return "TapeStep " + n //$NON-NLS-1$
+        return "TapeStep " + frameNumber //$NON-NLS-1$
                 + " [" + format.format(end1.x) //$NON-NLS-1$
                 + ", " + format.format(end1.y) //$NON-NLS-1$
                 + ", " + format.format(end2.x) //$NON-NLS-1$
@@ -505,7 +468,7 @@ public class TapeStep extends Step {
             sin = 0;
             cos = 1;
             d = 1;
-            double scaleX = tape.trackerPanel.getCoords().getScaleX(n);
+            double scaleX = tape.trackerPanel.getCoords().getScaleX(frameNumber);
             factor = worldLength * scaleX;
         }
 
@@ -561,7 +524,7 @@ public class TapeStep extends Step {
     protected void adjustTipsToAngle() {
         if (adjustingTips) return;
         adjustingTips = true;
-        double axisTiltAngle = tape.trackerPanel.getCoords().getAngle(n);
+        double axisTiltAngle = tape.trackerPanel.getCoords().getAngle(frameNumber);
         tapeAngle = xAxisToTapeAngle + axisTiltAngle;
         double sin = Math.sin(tapeAngle);
         double cos = Math.cos(tapeAngle);
@@ -627,7 +590,7 @@ public class TapeStep extends Step {
         endPoint2.setLocation(end2);
         // the following code is to determine the position on a world view
         if (!trackerPanel.isDrawingInImageSpace()) {
-            AffineTransform at = trackerPanel.getCoords().getToWorldTransform(n);
+            AffineTransform at = trackerPanel.getCoords().getToWorldTransform(frameNumber);
             at.transform(endPoint1, endPoint1);
             endPoint1.y = -endPoint1.y;
             at.transform(endPoint2, endPoint2);
@@ -679,7 +642,7 @@ public class TapeStep extends Step {
             } else {
                 end1.setLocation(end1.getX() + dx, end1.getY() + dy);
                 end2.setLocation(end2.getX() + dx, end2.getY() + dy);
-                tape.keyFrames.add(n);
+                tape.keyFrames.add(frameNumber);
             }
             repaint();
         }
@@ -691,7 +654,7 @@ public class TapeStep extends Step {
          * @return the containing TapeStep frame number
          */
         public int getFrameNumber(VideoPanel vidPanel) {
-            return n;
+            return frameNumber;
         }
 
         /**
@@ -752,7 +715,7 @@ public class TapeStep extends Step {
                 tape.refreshStep(TapeStep.this); // sets properties of this step
             } else {
                 setLocation(x, y);
-                tape.keyFrames.add(n);
+                tape.keyFrames.add(frameNumber);
             }
 
             if (tape.isStickMode() && worldLength > 0) {
@@ -760,10 +723,10 @@ public class TapeStep extends Step {
                 coords.setAdjusting(isAdjusting());
                 double newLength = getTapeLength(true); // newly calculated
                 double factor = newLength / getTapeLength(false); // current worldLength
-                double scaleX = factor * coords.getScaleX(n);
-                double scaleY = factor * coords.getScaleY(n);
+                double scaleX = factor * coords.getScaleX(frameNumber);
+                double scaleY = factor * coords.getScaleY(frameNumber);
                 tape.isStepChangingScale = true;
-                tape.trackerPanel.getCoords().setScaleXY(n, scaleX, scaleY);
+                tape.trackerPanel.getCoords().setScaleXY(frameNumber, scaleX, scaleY);
                 tape.isStepChangingScale = false;
             }
             tape.dataValid = false;
@@ -778,7 +741,7 @@ public class TapeStep extends Step {
          * @return the containing TapeStep frame number
          */
         public int getFrameNumber(VideoPanel vidPanel) {
-            return n;
+            return frameNumber;
         }
 
         /**
