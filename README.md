@@ -60,3 +60,28 @@ Step 4. Verifying installation:<br>
 <b>Fifth step:</b><br>
 Download the Tracker project from the GitHub repository: https://github.com/OpenSource-Physics-Tracker/Tracker <br>
 If you do not clone, but download the `.zip` file, you will need to unzip it. <br>
+
+<b>Sixth step:</b><br>
+Build project(-jar file) with Gradle Wrapper
+
+The Gradle Wrapper is the preferred way of starting a Gradle build. It consists of a batch script for Windows and a shell script for OS X and Linux. These scripts allow you to run a Gradle build without requiring that Gradle be installed on your system. This used to be something added to your build file, but it’s been folded into Gradle, so there is no longer any need. Instead, you simply use the following command.<br>
+
+`gradle wrapper --gradle-version 6.0.1`
+
+After this task completes, you will notice a few new files. The two scripts are in the root of the folder, while the wrapper jar and properties files have been added to a new gradle/wrapper folder.<br>
+
+![image](https://user-images.githubusercontent.com/49695119/113479123-c7ea6f80-9495-11eb-962f-6bebb749be9c.png)
+            
+The Gradle Wrapper is now available for building your project. Add it to your version control system, and everyone that clones your project can build it just the same. It can be used in the exact same way as an installed version of Gradle. Run the wrapper script to perform the build task, just like you did previously:<br>
+
+`./gradlew build`<br>
+
+The first time you run the wrapper for a specified version of Gradle, it downloads and caches the Gradle binaries for that version. The Gradle Wrapper files are designed to be committed to source control so that anyone can build the project without having to first install and configure a specific version of Gradle.<br>
+
+At this stage, you will have built your code. You can see the results here:<br>
+
+In folder `libs` you can see your `jar`file.<br>
+
+Folder `libs` path: `rojectFolder -> build -> libs`<br>
+
+        
