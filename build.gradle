@@ -7,6 +7,11 @@ jar {
         // This is where the Main class is specified for launching applications (otherwise the jar will not start)
         attributes 'Main-Class': 'org.opensourcephysics.cabrillo.tracker.Tracker'
     }
+
+    // Create fat-jar file
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 group 'org.osptracker'
