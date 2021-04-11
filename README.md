@@ -90,7 +90,6 @@ Assign path to FFMpeg and Tracker. To do this, we need to execute the command, a
 `java -cp build/libs/yourTrackerJarFile.jar:$FFMPEG_HOME/ffmpeg.jar:$FFMPEG_HOME/bridj.jar org.opensourcephysics.cabrillo.tracker.Tracker $*`
 
 <b>Eighth step:</b><br>
-
 Run Tracker application with jar file:
 
 `java -jar your/jarFile/path/YourTrackerFile.jar`
