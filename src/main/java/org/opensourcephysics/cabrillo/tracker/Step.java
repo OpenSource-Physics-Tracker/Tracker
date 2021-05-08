@@ -52,8 +52,7 @@ public abstract class Step implements Cloneable {
   protected static AffineTransform transform = new AffineTransform();
   protected static NumberFormat format = NumberFormat.getNumberInstance(Locale.US);
   protected static Font textLayoutFont = new JTextField().getFont();
-  protected static FontRenderContext frc
-		  = new FontRenderContext(null,   // no AffineTransform
+  protected static FontRenderContext frc = new FontRenderContext(null,   // no AffineTransform
 		                          false,  // no antialiasing
 		                          false); // no fractional metrics
   

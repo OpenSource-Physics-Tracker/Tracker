@@ -24,11 +24,11 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import javax.swing.*;
-
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.controls.XMLProperty;
+
+import javax.swing.*;
 
 /**
  * This displays plot track views selected from a dropdown list.
@@ -37,164 +37,163 @@ import org.opensourcephysics.controls.XMLProperty;
  */
 public class PlotTView extends TrackChooserTView {
 
-  protected Icon icon;
-
-  /**
-   * Constructs a TrackChooserView for the specified tracker panel.
-   *
-   * @param panel the tracker panel
-   */
-  public PlotTView(TrackerPanel panel) {
-    super(panel);
-    icon = new ImageIcon(PlotTView.class.getResource("/images/plot.gif"));
-  }
-
-  /**
-   * Gets the name of the view
-   *
-   * @return the name
-   */
-  public String getViewName() {
-    return TrackerRes.getString("TFrame.View.Plot"); //$NON-NLS-1$
-  }
-
-  /**
-   * Gets the icon for this view
-   *
-   * @return the icon
-   */
-  public Icon getViewIcon() {
-    return icon;
-  }
-
-  /**
-   * Creates a view for the specified track
-   *
-   * @param track the track
-   * @return the track view
-   */
-  protected TrackView createTrackView(TTrack track) {
-    return new PlotTrackView(track, trackerPanel, this);
-  }
-
-  /**
-   * Refreshes the popup menus.
-   */
-  @Override
-  protected void refreshMenus() { 
-  	for (TrackView next: trackViews.values()) {
-  		PlotTrackView plots = (PlotTrackView)next;
-  		for (TrackPlottingPanel panel: plots.plots) {
-  			panel.buildPopupmenu();
-  		}
-  	}
-  }
-  
-  /**
-   * Overrides TrackChooserTView method.
-   *
-   * @param track the track to be selected
-   */
-  @Override
-  public void setSelectedTrack(TTrack track) {
-  	if (track == null) {
-    	noDataLabel.setText(TrackerRes.getString("PlotTView.Label.NoData")); //$NON-NLS-1$
-  	}
-  	super.setSelectedTrack(track);
-  }
-  
-  /**
-   * Returns an XML.ObjectLoader to save and load object data.
-   *
-   * @return the XML.ObjectLoader
-   */
-  public static XML.ObjectLoader getLoader() {
-    return new Loader();
-  }
-
-  /**
-   * A class to save and load object data.
-   */
-  static class Loader implements XML.ObjectLoader {
+    protected Icon icon;
 
     /**
-     * Saves object data.
+     * Constructs a TrackChooserView for the specified tracker panel.
      *
-     * @param control the control to save to
-     * @param obj the TrackerPanel object to save
+     * @param panel the tracker panel
      */
-    public void saveObject(XMLControl control, Object obj) {
-      PlotTView view = (PlotTView)obj;
-      TTrack track = view.getSelectedTrack();
-      if (track != null) {
-        control.setValue("selected_track", track.getName()); //$NON-NLS-1$
-        java.util.ArrayList<TrackView> list = new java.util.ArrayList<>();
-        for (TrackView next: view.trackViews.values()) {
-        	if (next.isCustomState())
-        		list.add(next);
-        }
-//        list.addAll(view.trackViews.values());
-        if (!list.isEmpty())
-        	control.setValue("track_views", list); //$NON-NLS-1$
-      }
+    public PlotTView(TrackerPanel panel) {
+        super(panel);
+        icon = new ImageIcon(PlotTView.class.getResource("/images/plot.gif"));
     }
 
     /**
-     * Creates an object.
+     * Gets the name of the view
      *
-     * @param control the control
-     * @return the newly created object
+     * @return the name
      */
-    public Object createObject(XMLControl control){
-      return null;
+    public String getViewName() {
+        return TrackerRes.getString("TFrame.View.Plot"); //$NON-NLS-1$
     }
 
     /**
-     * Loads an object with data from an XMLControl.
+     * Gets the icon for this view
      *
-     * @param control the control
-     * @param obj the object
-     * @return the loaded object
+     * @return the icon
      */
-    public Object loadObject(XMLControl control, Object obj) {
-      PlotTView view = (PlotTView)obj;
-      TTrack track = view.getTrack(control.getString("selected_track")); //$NON-NLS-1$
-      if (track != null) {
-      	view.setSelectedTrack(track);
-      	// following code is for legacy xml only
-        PlotTrackView trackView = (PlotTrackView)view.getTrackView(track);
-        TrackPlottingPanel[] plots = trackView.plots;
-        for (int i = 0; i < plots.length; i++) {
-        	XMLControl child = control.getChildControl("plot"+i); //$NON-NLS-1$ 
-        	if (child != null) {
-        		child.loadObject(plots[i]);
-        	}
-        	else {
-            trackView.setPlotCount(Math.max(1, i));
-            break;
-        	}
-        }
-      	// end legacy code
-      }
-	    // load the track_views property, if any
-      java.util.List<Object> props = control.getPropertyContent();
-        for (Object o : props) {
-            XMLProperty prop = (XMLProperty) o;
-            if (prop.getPropertyName().equals("track_views")) { //$NON-NLS-1$
-                XMLControl[] controls = prop.getChildControls();
-                for (XMLControl xmlControl : controls) {
-                    // get name of track, find its track view and load it
-                    String trackName = xmlControl.getString("track"); //$NON-NLS-1$
-                    track = view.getTrack(trackName);
-                    if (track != null) {
-                        PlotTrackView trackView = (PlotTrackView) view.getTrackView(track);
-                        xmlControl.loadObject(trackView);
-                    }
-                }
-                break;
+    public Icon getViewIcon() {
+        return icon;
+    }
+
+    /**
+     * Creates a view for the specified track
+     *
+     * @param track the track
+     * @return the track view
+     */
+    protected TrackView createTrackView(TTrack track) {
+        return new PlotTrackView(track, trackerPanel, this);
+    }
+
+    /**
+     * Refreshes the popup menus.
+     */
+    @Override
+    protected void refreshMenus() {
+        for (TrackView next : trackViews.values()) {
+            PlotTrackView plots = (PlotTrackView) next;
+            for (TrackPlottingPanel panel : plots.plots) {
+                panel.buildPopupmenu();
             }
         }
-      return obj;
     }
-  }
+
+    /**
+     * Overrides TrackChooserTView method.
+     *
+     * @param track the track to be selected
+     */
+    @Override
+    public void setSelectedTrack(TTrack track) {
+        if (track == null) {
+            noDataLabel.setText(TrackerRes.getString("PlotTView.Label.NoData")); //$NON-NLS-1$
+        }
+        super.setSelectedTrack(track);
+    }
+
+    /**
+     * Returns an XML.ObjectLoader to save and load object data.
+     *
+     * @return the XML.ObjectLoader
+     */
+    public static XML.ObjectLoader getLoader() {
+        return new Loader();
+    }
+
+    /**
+     * A class to save and load object data.
+     */
+    static class Loader implements XML.ObjectLoader {
+
+        /**
+         * Saves object data.
+         *
+         * @param control the control to save to
+         * @param obj     the TrackerPanel object to save
+         */
+        public void saveObject(XMLControl control, Object obj) {
+            PlotTView view = (PlotTView) obj;
+            TTrack track = view.getSelectedTrack();
+            if (track != null) {
+                control.setValue("selected_track", track.getName()); //$NON-NLS-1$
+                java.util.ArrayList<TrackView> list = new java.util.ArrayList<>();
+                for (TrackView next : view.trackViews.values()) {
+                    if (next.isCustomState())
+                        list.add(next);
+                }
+//        list.addAll(view.trackViews.values());
+                if (!list.isEmpty())
+                    control.setValue("track_views", list); //$NON-NLS-1$
+            }
+        }
+
+        /**
+         * Creates an object.
+         *
+         * @param control the control
+         * @return the newly created object
+         */
+        public Object createObject(XMLControl control) {
+            return null;
+        }
+
+        /**
+         * Loads an object with data from an XMLControl.
+         *
+         * @param control the control
+         * @param obj     the object
+         * @return the loaded object
+         */
+        public Object loadObject(XMLControl control, Object obj) {
+            PlotTView view = (PlotTView) obj;
+            TTrack track = view.getTrack(control.getString("selected_track")); //$NON-NLS-1$
+            if (track != null) {
+                view.setSelectedTrack(track);
+                // following code is for legacy xml only
+                PlotTrackView trackView = (PlotTrackView) view.getTrackView(track);
+                TrackPlottingPanel[] plots = trackView.plots;
+                for (int i = 0; i < plots.length; i++) {
+                    XMLControl child = control.getChildControl("plot" + i); //$NON-NLS-1$
+                    if (child != null) {
+                        child.loadObject(plots[i]);
+                    } else {
+                        trackView.setPlotCount(Math.max(1, i));
+                        break;
+                    }
+                }
+                // end legacy code
+            }
+            // load the track_views property, if any
+            java.util.List<Object> props = control.getPropertyContent();
+            for (Object o : props) {
+                XMLProperty prop = (XMLProperty) o;
+                if (prop.getPropertyName().equals("track_views")) { //$NON-NLS-1$
+                    XMLControl[] controls = prop.getChildControls();
+                    for (XMLControl xmlControl : controls) {
+                        // get name of track, find its track view and load it
+                        String trackName = xmlControl.getString("track"); //$NON-NLS-1$
+                        track = view.getTrack(trackName);
+                        if (track != null) {
+                            PlotTrackView trackView = (PlotTrackView) view.getTrackView(track);
+                            xmlControl.loadObject(trackView);
+                        }
+                    }
+                    break;
+                }
+            }
+            return obj;
+        }
+    }
 }

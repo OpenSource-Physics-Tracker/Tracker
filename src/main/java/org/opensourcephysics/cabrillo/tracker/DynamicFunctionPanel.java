@@ -7,7 +7,7 @@
 
 package org.opensourcephysics.cabrillo.tracker;
 
-import org.opensourcephysics.tools.*;
+import org.opensourcephysics.tools.UserFunctionEditor;
 
 /**
  * This is a FunctionPanel for dynamic particles.
@@ -16,23 +16,23 @@ import org.opensourcephysics.tools.*;
  */
 public class DynamicFunctionPanel extends ModelFunctionPanel {
 
-  /**
-   * Constructor with user function editor and track.
-   *
-   * @param editor the user function editor
-   * @param track a DynamicParticle
-   */
-  public DynamicFunctionPanel(UserFunctionEditor editor, DynamicParticle track) {
-  	super(editor, track);
-  }
+    /**
+     * Constructor with user function editor and track.
+     *
+     * @param editor the user function editor
+     * @param track  a DynamicParticle
+     */
+    public DynamicFunctionPanel(UserFunctionEditor editor, DynamicParticle track) {
+        super(editor, track);
+    }
 
-  /**
-	 * Refreshes the GUI.
-	 */
-  protected void refreshGUI() {
-  	super.refreshGUI();
-  	functionEditor.setBorderTitle(TrackerRes.getString("DynamicFunctionPanel.FunctionEditor.Border.Title")); //$NON-NLS-1$
-  }
+    /**
+     * Refreshes the GUI.
+     */
+    protected void refreshGUI() {
+        super.refreshGUI();
+        functionEditor.setBorderTitle(TrackerRes.getString("DynamicFunctionPanel.FunctionEditor.Border.Title")); //$NON-NLS-1$
+    }
 
 }
 

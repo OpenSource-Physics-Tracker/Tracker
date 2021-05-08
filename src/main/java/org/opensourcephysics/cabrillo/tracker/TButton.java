@@ -36,166 +36,165 @@ import org.opensourcephysics.tools.FontSizer;
  * @author Douglas Brown
  */
 public class TButton extends JButton {
-	
-	private int trackID;
-  private boolean hidePopup = false;
-  private JPopupMenu popup;
-  protected String context = "track"; //$NON-NLS-1$
 
-  /**
-   * Constructs a TButton.
-   */
-  public TButton() {
-		setOpaque(false);
-		setBorderPainted(false);
-    addMouseListener(new MouseAdapter() {
-    	public void mouseEntered(MouseEvent e) {
-    		setBorderPainted(true);
-        hidePopup = popup!=null && popup.isVisible();
-        TTrack track = getTrack();
-      	if (Tracker.showHints && track!=null && track.trackerPanel!=null) {
-        	if (track.trackerPanel.getSelectedTrack() == track)
-        		track.trackerPanel.setMessage(track.getMessage());
-        	else {
-          	String s = track.getClass().getSimpleName()+" " //$NON-NLS-1$
-              	+ track.getName() + " (" //$NON-NLS-1$
-                + TrackerRes.getString("TTrack.Unselected.Hint")+")"; //$NON-NLS-1$ //$NON-NLS-2$
-          	track.trackerPanel.setMessage(s);
-        	}
-      	}    		
-    	}
+    private int trackID;
+    private boolean hidePopup = false;
+    private JPopupMenu popup;
+    protected String context = "track"; //$NON-NLS-1$
 
-    	public void mouseExited(MouseEvent e) {
-    		setBorderPainted(false);
-    	}
+    /**
+     * Constructs a TButton.
+     */
+    public TButton() {
+        setOpaque(false);
+        setBorderPainted(false);
+        addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                setBorderPainted(true);
+                hidePopup = popup != null && popup.isVisible();
+                TTrack track = getTrack();
+                if (Tracker.showHints && track != null && track.trackerPanel != null) {
+                    if (track.trackerPanel.getSelectedTrack() == track)
+                        track.trackerPanel.setMessage(track.getMessage());
+                    else {
+                        String s = track.getClass().getSimpleName() + " " //$NON-NLS-1$
+                                + track.getName() + " (" //$NON-NLS-1$
+                                + TrackerRes.getString("TTrack.Unselected.Hint") + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+                        track.trackerPanel.setMessage(s);
+                    }
+                }
+            }
 
-    	public void mousePressed(MouseEvent e) {
-        TTrack track = getTrack();
-    		if (track!=null && track.trackerPanel!=null
-    				&& track != track.trackerPanel.getSelectedTrack()) {
-    			track.trackerPanel.setSelectedTrack(track);
-    			track.trackerPanel.setSelectedPoint(null);
-          track.trackerPanel.selectedSteps.clear();
-        	hidePopup = true;
+            public void mouseExited(MouseEvent e) {
+                setBorderPainted(false);
+            }
+
+            public void mousePressed(MouseEvent e) {
+                TTrack track = getTrack();
+                if (track != null && track.trackerPanel != null
+                        && track != track.trackerPanel.getSelectedTrack()) {
+                    track.trackerPanel.setSelectedTrack(track);
+                    track.trackerPanel.setSelectedPoint(null);
+                    track.trackerPanel.selectedSteps.clear();
+                    hidePopup = true;
+                }
+            }
+
+            public void mouseClicked(MouseEvent e) {
+                popup = getPopup();
+                if (popup != null) {
+                    if (e.getClickCount() == 2)
+                        hidePopup = false;
+                    if (hidePopup) {
+                        hidePopup = false;
+                        popup.setVisible(false);
+                    } else {
+                        hidePopup = true;
+                        popup.show(TButton.this, 0, TButton.this.getHeight());
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Constructs an icon-only TButton with an AbstractAction.
+     *
+     * @param action the AbstractAction
+     */
+    public TButton(AbstractAction action) {
+        this();
+        addActionListener(action);
+        setIcon((Icon) action.getValue(Action.SMALL_ICON));
+    }
+
+    /**
+     * Constructs a TButton with a TTrack.
+     *
+     * @param track the track
+     */
+    public TButton(TTrack track) {
+        this();
+        setTrack(track);
+    }
+
+    /**
+     * Constructs a TButton with an Icon.
+     *
+     * @param icon the icon
+     */
+    public TButton(Icon icon) {
+        this();
+        setIcon(icon);
+    }
+
+    /**
+     * Constructs a TButton with icons for selected and unselected states.
+     *
+     * @param off the unselected state icon
+     * @param on  the selected state icon
+     */
+    public TButton(Icon off, Icon on) {
+        this();
+        setIcons(off, on);
+    }
+
+    /**
+     * Sets the icons for selected and unselected states.
+     *
+     * @param off the unselected state icon
+     * @param on  the selected state icon
+     */
+    public void setIcons(Icon off, Icon on) {
+        super.setIcon(off);
+        setSelectedIcon(on);
+    }
+
+    /**
+     * Sets the track associated with this button.
+     *
+     * @param track the track
+     */
+    public void setTrack(TTrack track) {
+        if (track != null) {
+            trackID = track.getID();
+            setIcon(track.getIcon(21, 16, context));
+            setText(track.getName(context));
+            setToolTipText(TrackerRes.getString("TButton.Track.ToolTip") //$NON-NLS-1$
+                    + " " + track.getName(context));  //$NON-NLS-1$
+            FontSizer.setFonts(this, FontSizer.getLevel());
+        } else {
+            trackID = -1;
+            setIcon(null);
+            setText(" "); //$NON-NLS-1$
+            setToolTipText(null);
         }
-    	}
+    }
 
-    	public void mouseClicked(MouseEvent e) {
-    		popup = getPopup();
-    		if (popup!=null) {
-    			if (e.getClickCount()==2)
-    				hidePopup = false;
-	        if (hidePopup) {
-	          hidePopup = false;
-	          popup.setVisible(false);
-	        }
-	        else {
-	          hidePopup = true;
-	          popup.show(TButton.this, 0, TButton.this.getHeight());
-	        }
-    		}
-    	}
-    });
-  }
-  
-  /**
-   * Constructs an icon-only TButton with an AbstractAction.
-   *
-   * @param action the AbstractAction
-   */
-  public TButton(AbstractAction action) {
-  	this();
-  	addActionListener(action);
-  	setIcon((Icon)action.getValue(Action.SMALL_ICON));
-  }  
-  
-  /**
-   * Constructs a TButton with a TTrack.
-   *
-   * @param track the track
-   */
-  public TButton(TTrack track) {
-  	this();
-  	setTrack(track);
-  }  
-  
-  /**
-   * Constructs a TButton with an Icon.
-   *
-   * @param icon the icon
-   */
-  public TButton(Icon icon) {
-  	this();
-		setIcon(icon);
-  }
-  
-  /**
-   * Constructs a TButton with icons for selected and unselected states.
-   *
-   * @param off the unselected state icon
-   * @param on the selected state icon
-   */
-  public TButton(Icon off, Icon on) {
-		this();
-		setIcons(off, on);
-  }
-  
-  /**
-   * Sets the icons for selected and unselected states.
-   *
-   * @param off the unselected state icon
-   * @param on the selected state icon
-   */
-  public void setIcons(Icon off, Icon on) {
-		super.setIcon(off);
-		setSelectedIcon(on);
-  }
-  
-  /**
-   * Sets the track associated with this button.
-   *
-   * @param track the track
-   */
-  public void setTrack(TTrack track) {
-  	if (track!=null) {
-	  	trackID = track.getID();
-		  setIcon(track.getIcon(21, 16, context));
-		  setText(track.getName(context)); 
-		  setToolTipText(TrackerRes.getString("TButton.Track.ToolTip") //$NON-NLS-1$
-		  		+" "+track.getName(context));  //$NON-NLS-1$
-		  FontSizer.setFonts(this, FontSizer.getLevel());
-  	}
-  	else {
-  		trackID = -1;
-		  setIcon(null);
-		  setText(" "); //$NON-NLS-1$
-		  setToolTipText(null);
-  	}
-  }
-  
-  /**
-   * Gets the track associated with this button.
-   * @return the track
-   */
-  public TTrack getTrack() {
-  	return TTrack.getTrack(trackID);
-  }
-  
-  /**
-   * Gets a popup menu to display. If a track is associated with this button,
-   * the track menu is returned, but subclasses can override this method
-   * to return any popup menu.
-   *
-   * @return the popup menu, or null if none
-   */
-  protected JPopupMenu getPopup() {
-    TTrack track = getTrack();
-  	if (track!=null && track.trackerPanel!=null) {
-    	JMenu trackMenu = track.getMenu(track.trackerPanel);
-    	FontSizer.setFonts(trackMenu, FontSizer.getLevel());
-  		return trackMenu.getPopupMenu();
-  	}
-  	return null;
-  }
+    /**
+     * Gets the track associated with this button.
+     *
+     * @return the track
+     */
+    public TTrack getTrack() {
+        return TTrack.getTrack(trackID);
+    }
+
+    /**
+     * Gets a popup menu to display. If a track is associated with this button,
+     * the track menu is returned, but subclasses can override this method
+     * to return any popup menu.
+     *
+     * @return the popup menu, or null if none
+     */
+    protected JPopupMenu getPopup() {
+        TTrack track = getTrack();
+        if (track != null && track.trackerPanel != null) {
+            JMenu trackMenu = track.getMenu(track.trackerPanel);
+            FontSizer.setFonts(trackMenu, FontSizer.getLevel());
+            return trackMenu.getPopupMenu();
+        }
+        return null;
+    }
 
 }

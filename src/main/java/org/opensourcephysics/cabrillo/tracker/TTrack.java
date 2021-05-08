@@ -922,8 +922,8 @@ public abstract class TTrack implements Interactive,
     /**
      * Gets this track's current icon.
      *
-     * @param w       the icon width
-     * @param h       the icon height
+     * @param w the icon width
+     * @param h the icon height
      * @return the icon
      */
     public Icon getIcon(int w, int h, String context) {

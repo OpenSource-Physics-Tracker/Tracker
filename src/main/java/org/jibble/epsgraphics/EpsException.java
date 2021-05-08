@@ -6,14 +6,16 @@
  */
 
 package org.jibble.epsgraphics;
+
 public class EpsException extends RuntimeException {
-  /**
-   * Constructor EpsException
-   * @param message
-   */
-  public EpsException(String message) {
-    super(message);
-  }
+    /**
+     * Constructor EpsException
+     *
+     * @param message
+     */
+    public EpsException(String message) {
+        super(message);
+    }
 
 }
 

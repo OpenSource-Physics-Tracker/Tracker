@@ -64,15 +64,15 @@ public class TMouseHandler implements InteractiveMouseHandler {
     Dimension dim = new Dimension();
 
     static {
-        ImageIcon icon = new ImageIcon(TMouseHandler.class.getResource("/images/creatept.gif")); 
+        ImageIcon icon = new ImageIcon(TMouseHandler.class.getResource("/images/creatept.gif"));
         markPointCursor = GUIUtils.createCustomCursor(icon.getImage(), new Point(8, 8),
-                TrackerRes.getString("Tracker.Cursor.Crosshair.Description"), Cursor.MOVE_CURSOR);  	
-        icon = new ImageIcon(TMouseHandler.class.getResource("/images/autotrack.gif")); 
+                TrackerRes.getString("Tracker.Cursor.Crosshair.Description"), Cursor.MOVE_CURSOR);
+        icon = new ImageIcon(TMouseHandler.class.getResource("/images/autotrack.gif"));
         autoTrackCursor = GUIUtils.createCustomCursor(icon.getImage(), new Point(9, 9),
-                TrackerRes.getString("PointMass.Cursor.Autotrack.Description"), Cursor.MOVE_CURSOR); 
-        icon = new ImageIcon(TMouseHandler.class.getResource("/images/autotrack_mark.gif")); 
+                TrackerRes.getString("PointMass.Cursor.Autotrack.Description"), Cursor.MOVE_CURSOR);
+        icon = new ImageIcon(TMouseHandler.class.getResource("/images/autotrack_mark.gif"));
         autoTrackMarkCursor = GUIUtils.createCustomCursor(icon.getImage(), new Point(9, 9),
-                TrackerRes.getString("Tracker.Cursor.Autotrack.Keyframe.Description"), Cursor.MOVE_CURSOR);  	
+                TrackerRes.getString("Tracker.Cursor.Autotrack.Keyframe.Description"), Cursor.MOVE_CURSOR);
     }
 
     /**
@@ -140,7 +140,7 @@ public class TMouseHandler implements InteractiveMouseHandler {
             case InteractivePanel.MOUSE_PRESSED:
                 if (Tracker.startupHintShown) {
                     Tracker.startupHintShown = false;
-                    trackerPanel.setMessage(""); 
+                    trackerPanel.setMessage("");
                 }
                 TrackControl.getControl(trackerPanel).popup.setVisible(false);
                 marking = selectedTrack != null
@@ -271,7 +271,7 @@ public class TMouseHandler implements InteractiveMouseHandler {
                         }
                     }
                     if (selectedStepsChanged && stepTrack != null) {
-                        stepTrack.firePropertyChange("steps", null, null); 
+                        stepTrack.firePropertyChange("steps", null, null);
                     }
 
                     if (step != null) step.erase();
@@ -300,7 +300,7 @@ public class TMouseHandler implements InteractiveMouseHandler {
                     }
                     trackerPanel.selectedSteps.clear(); // triggers undoable edit if changed
                     for (TTrack next : tracks) {
-                        next.firePropertyChange("steps", null, null); 
+                        next.firePropertyChange("steps", null, null);
                     }
 
                     if (!trackerPanel.isShowCoordinates()) {
