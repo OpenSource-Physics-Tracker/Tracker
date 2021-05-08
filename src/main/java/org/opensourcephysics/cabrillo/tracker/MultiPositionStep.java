@@ -25,9 +25,11 @@
 package org.opensourcephysics.cabrillo.tracker;
 
 import java.awt.*;
+
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.media.core.*;
+
 import java.util.*;
 
 /**
@@ -36,22 +38,22 @@ import java.util.*;
  * @author Douglas Brown
  */
 public class MultiPositionStep extends PositionStep {
-	
-  // instance fields
-	ParticleDataTrack dataTrack;
 
-  /**
-   * Constructs a MultiPositionStep with specified image coordinates.
-   *
-   * @param track the ParticleDataTrack
-   * @param n the frame number
-   * @param x the x coordinate
-   * @param y the y coordinate
-   */
-  public MultiPositionStep(ParticleDataTrack track, int n, double x, double y) {
-    super(track, n, x, y);
-    dataTrack = track;
-  }
+    // instance fields
+    ParticleDataTrack dataTrack;
+
+    /**
+     * Constructs a MultiPositionStep with specified image coordinates.
+     *
+     * @param track the ParticleDataTrack
+     * @param n     the frame number
+     * @param x     the x coordinate
+     * @param y     the y coordinate
+     */
+    public MultiPositionStep(ParticleDataTrack track, int n, double x, double y) {
+        super(track, n, x, y);
+        dataTrack = track;
+    }
 
 //  /**
 //   * Overrides Step draw method.
@@ -66,138 +68,139 @@ public class MultiPositionStep extends PositionStep {
 //    }
 //  }
 //
-  /**
-   * Overrides Step getMark method.
-   *
-   * @param trackerPanel the tracker panel
-   * @return the mark
-   */
-  protected Mark getMark(TrackerPanel trackerPanel) {
-    Mark mark = marks.get(trackerPanel);
-    if (mark == null) {
-    	Mark aMark = null;
-    	if (dataTrack.modelFootprintVisible) {
-		    // get mark from modelFootprint
-		    ArrayList<ParticleDataTrack> tracks = dataTrack.allPoints();
-		    TPoint[] points = new TPoint[tracks.size()];
-		    for (int i=0; i<points.length; i++) {
-		    	ParticleDataTrack next = tracks.get(i);
-		    	Step step = next.getStep(this.getFrameNumber());
-		    	points[i] = step==null? null: step.getPoints()[0];
-		    }
-		    Point[] screenPoints = new Point[points.length];
-		    for (int i = 0; i < points.length; i++) {
-		    	if (points[i]==null || Double.isNaN(points[i].x) || Double.isNaN(points[i].y)) {
-		    		screenPoints[i] = null;
-		    	}
-		    	else 
-		    		screenPoints[i] = points[i].getScreenPosition(trackerPanel);
-		    }
-		    aMark = dataTrack.getModelFootprint().getMark(screenPoints);
-    	}
-      final Mark modelMark = aMark;
-      final Mark positionMark = super.getMark(trackerPanel);
-      
-      mark = new Mark() {
-        public void draw(Graphics2D g, boolean highlighted) {
-        	if (!valid) {
-        		return;
-        	}
-          if (modelMark!=null) modelMark.draw(g, highlighted);
-          positionMark.draw(g, highlighted);
+
+    /**
+     * Overrides Step getMark method.
+     *
+     * @param trackerPanel the tracker panel
+     * @return the mark
+     */
+    protected Mark getMark(TrackerPanel trackerPanel) {
+        Mark mark = marks.get(trackerPanel);
+        if (mark == null) {
+            Mark aMark = null;
+            if (dataTrack.modelFootprintVisible) {
+                // get mark from modelFootprint
+                ArrayList<ParticleDataTrack> tracks = dataTrack.allPoints();
+                TPoint[] points = new TPoint[tracks.size()];
+                for (int i = 0; i < points.length; i++) {
+                    ParticleDataTrack next = tracks.get(i);
+                    Step step = next.getStep(this.getFrameNumber());
+                    points[i] = step == null ? null : step.getPoints()[0];
+                }
+                Point[] screenPoints = new Point[points.length];
+                for (int i = 0; i < points.length; i++) {
+                    if (points[i] == null || Double.isNaN(points[i].x) || Double.isNaN(points[i].y)) {
+                        screenPoints[i] = null;
+                    } else
+                        screenPoints[i] = points[i].getScreenPosition(trackerPanel);
+                }
+                aMark = dataTrack.getModelFootprint().getMark(screenPoints);
+            }
+            final Mark modelMark = aMark;
+            final Mark positionMark = super.getMark(trackerPanel);
+
+            mark = new Mark() {
+                public void draw(Graphics2D g, boolean highlighted) {
+                    if (!valid) {
+                        return;
+                    }
+                    if (modelMark != null) modelMark.draw(g, highlighted);
+                    positionMark.draw(g, highlighted);
+                }
+
+                public Rectangle getBounds(boolean highlighted) {
+                    Rectangle bounds = positionMark.getBounds(highlighted);
+                    if (modelMark != null) bounds.union(modelMark.getBounds(highlighted));
+                    return bounds;
+                }
+            };
+            marks.put(trackerPanel, mark);
         }
-        public Rectangle getBounds(boolean highlighted) {
-        	Rectangle bounds = positionMark.getBounds(highlighted);
-        	if (modelMark!=null) bounds.union(modelMark.getBounds(highlighted));
-          return bounds;
+        return mark;
+    }
+
+    /**
+     * Overrides Step getBounds method.
+     *
+     * @param trackerPanel the tracker panel drawing the step
+     * @return the bounding rectangle
+     */
+    public Rectangle getBounds(TrackerPanel trackerPanel) {
+        return getMark(trackerPanel).getBounds(false);
+    }
+
+    /**
+     * Clones this Step.
+     *
+     * @return a cloned step
+     */
+    public Object clone() {
+        return super.clone();
+    }
+
+    /**
+     * Returns a String describing this.
+     *
+     * @return a descriptive string
+     */
+    public String toString() {
+        return "MultiPositionStep " + n + " [" + format.format(p.x) //$NON-NLS-1$ //$NON-NLS-2$
+                + ", " + format.format(p.y) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    /**
+     * Returns an ObjectLoader to save and load data for this class.
+     *
+     * @return the object loader
+     */
+    public static XML.ObjectLoader getLoader() {
+        return new Loader();
+    }
+
+    /**
+     * A class to save and load data for this class.
+     */
+    static class Loader implements XML.ObjectLoader {
+
+        /**
+         * Saves an object's data to an XMLControl.
+         *
+         * @param control the control to save to
+         * @param obj     the object to save
+         */
+        public void saveObject(XMLControl control, Object obj) {
+            PositionStep step = (PositionStep) obj;
+            control.setValue("x", step.p.x); //$NON-NLS-1$
+            control.setValue("y", step.p.y); //$NON-NLS-1$
         }
-      };
-      marks.put(trackerPanel, mark);
+
+        /**
+         * Creates a new object with data from an XMLControl.
+         *
+         * @param control the control
+         * @return the newly created object
+         */
+        public Object createObject(XMLControl control) {
+            // this loader is not intended to be used to create new steps,
+            // but only for undo/redo step edits.
+            return null;
+        }
+
+        /**
+         * Loads an object with data from an XMLControl.
+         *
+         * @param control the control
+         * @param obj     the object
+         * @return the loaded object
+         */
+        public Object loadObject(XMLControl control, Object obj) {
+            PositionStep step = (PositionStep) obj;
+            double x = control.getDouble("x"); //$NON-NLS-1$
+            double y = control.getDouble("y"); //$NON-NLS-1$
+            step.p.setXY(x, y);
+            return obj;
+        }
     }
-    return mark;
-  }
-
-  /**
-   * Overrides Step getBounds method.
-   *
-   * @param trackerPanel the tracker panel drawing the step
-   * @return the bounding rectangle
-   */
-  public Rectangle getBounds(TrackerPanel trackerPanel) {
-      return getMark(trackerPanel).getBounds(false);
-  }
-
-  /**
-   * Clones this Step.
-   *
-   * @return a cloned step
-   */
-  public Object clone() {
-    return super.clone();
-  }
-
-  /**
-   * Returns a String describing this.
-   *
-   * @return a descriptive string
-   */
-  public String toString() {
-    return "MultiPositionStep " + n + " [" + format.format(p.x) //$NON-NLS-1$ //$NON-NLS-2$
-                               + ", " + format.format(p.y) + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-  }
-
-  /**
-   * Returns an ObjectLoader to save and load data for this class.
-   *
-   * @return the object loader
-   */
-  public static XML.ObjectLoader getLoader() {
-    return new Loader();
-  }
-
-  /**
-   * A class to save and load data for this class.
-   */
-  static class Loader implements XML.ObjectLoader {
-
-    /**
-     * Saves an object's data to an XMLControl.
-     *
-     * @param control the control to save to
-     * @param obj the object to save
-     */
-    public void saveObject(XMLControl control, Object obj) {
-      PositionStep step = (PositionStep) obj;
-      control.setValue("x", step.p.x); //$NON-NLS-1$
-      control.setValue("y", step.p.y); //$NON-NLS-1$
-    }
-
-    /**
-     * Creates a new object with data from an XMLControl.
-     *
-     * @param control the control
-     * @return the newly created object
-     */
-    public Object createObject(XMLControl control) {
-    	// this loader is not intended to be used to create new steps,
-    	// but only for undo/redo step edits.
-      return null;
-    }
-
-    /**
-     * Loads an object with data from an XMLControl.
-     *
-     * @param control the control
-     * @param obj the object
-     * @return the loaded object
-     */
-    public Object loadObject(XMLControl control, Object obj) {
-    	PositionStep step = (PositionStep)obj;
-    	double x = control.getDouble("x"); //$NON-NLS-1$
-      double y = control.getDouble("y"); //$NON-NLS-1$
-      step.p.setXY(x, y);
-    	return obj;
-    }
-  }
 }
 

@@ -24,9 +24,12 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.util.*;
+import org.opensourcephysics.controls.XML;
+import org.opensourcephysics.controls.XMLControl;
 
-import org.opensourcephysics.controls.*;
+import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * This manages a set of enabled configuration properties.
@@ -36,88 +39,89 @@ import org.opensourcephysics.controls.*;
  */
 public class Configuration {
 
-  Set<String> enabled;
-
-  /**
-   * Creates an empty Configuration.
-   */
-  public Configuration() {
-    enabled = new TreeSet<>();
-  }
-
-  /**
-   * Creates a Configuration and initializes it with a configuration.
-   * @param enabled a Set of enabled properties
-   */
-  public Configuration(Set<String> enabled) {
-    this.enabled = enabled;
-  }
-
-  /**
-   * Creates a Configuration and initializes it with the specified tracker panel
-   * configuration.
-   *
-   * @param trackerPanel the tracker panel
-   */
-  public Configuration(TrackerPanel trackerPanel) {
-    enabled = trackerPanel.getEnabled();
-  }
-
-  /**
-   * Returns an XML.ObjectLoader to save and load object data.
-   *
-   * @return the XML.ObjectLoader
-   */
-  public static XML.ObjectLoader getLoader() {
-    return new Loader();
-  }
-
-  /**
-   * A class to save and load object data.
-   */
-  static class Loader implements XML.ObjectLoader {
+    Set<String> enabled;
 
     /**
-     * Saves object data.
-     *
-     * @param control the control to save to
-     * @param obj the TrackerPanel object to save
+     * Creates an empty Configuration.
      */
-    public void saveObject(XMLControl control, Object obj) {
-      Configuration config  = (Configuration) obj;
-      // save the configuration
-      control.setValue("enabled", config.enabled); //$NON-NLS-1$
+    public Configuration() {
+        enabled = new TreeSet<>();
     }
 
     /**
-     * Creates an object.
+     * Creates a Configuration and initializes it with a configuration.
      *
-     * @param control the control
-     * @return the newly created object
+     * @param enabled a Set of enabled properties
      */
-    public Object createObject(XMLControl control) {
-      return new Configuration();
+    public Configuration(Set<String> enabled) {
+        this.enabled = enabled;
     }
 
     /**
-     * Loads an object with data from an XMLControl.
+     * Creates a Configuration and initializes it with the specified tracker panel
+     * configuration.
      *
-     * @param control the control
-     * @param obj the object
-     * @return the loaded object
+     * @param trackerPanel the tracker panel
      */
-    public Object loadObject(XMLControl control, Object obj) {
-      Configuration config  = (Configuration) obj;
-      // load the configuration
-      Object set = control.getObject("enabled"); //$NON-NLS-1$
-      if (set != null) {
-      	TreeSet<String> enabled = new TreeSet<>();
-      	for (Object next: (Collection) set) {
-      		enabled.add((String)next);
-      	}
-        config.enabled = enabled;
-      }
-      return obj;
+    public Configuration(TrackerPanel trackerPanel) {
+        enabled = trackerPanel.getEnabled();
     }
-  }
+
+    /**
+     * Returns an XML.ObjectLoader to save and load object data.
+     *
+     * @return the XML.ObjectLoader
+     */
+    public static XML.ObjectLoader getLoader() {
+        return new Loader();
+    }
+
+    /**
+     * A class to save and load object data.
+     */
+    static class Loader implements XML.ObjectLoader {
+
+        /**
+         * Saves object data.
+         *
+         * @param control the control to save to
+         * @param obj     the TrackerPanel object to save
+         */
+        public void saveObject(XMLControl control, Object obj) {
+            Configuration config = (Configuration) obj;
+            // save the configuration
+            control.setValue("enabled", config.enabled); //$NON-NLS-1$
+        }
+
+        /**
+         * Creates an object.
+         *
+         * @param control the control
+         * @return the newly created object
+         */
+        public Object createObject(XMLControl control) {
+            return new Configuration();
+        }
+
+        /**
+         * Loads an object with data from an XMLControl.
+         *
+         * @param control the control
+         * @param obj     the object
+         * @return the loaded object
+         */
+        public Object loadObject(XMLControl control, Object obj) {
+            Configuration config = (Configuration) obj;
+            // load the configuration
+            Object set = control.getObject("enabled"); //$NON-NLS-1$
+            if (set != null) {
+                TreeSet<String> enabled = new TreeSet<>();
+                for (Object next : (Collection) set) {
+                    enabled.add((String) next);
+                }
+                config.enabled = enabled;
+            }
+            return obj;
+        }
+    }
 }

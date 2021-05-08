@@ -7,11 +7,10 @@
 
 package org.opensourcephysics.cabrillo.tracker;
 
-import java.beans.PropertyChangeEvent;
-
-import javax.swing.Icon;
-
 import org.opensourcephysics.tools.*;
+
+import javax.swing.*;
+import java.beans.PropertyChangeEvent;
 
 /**
  * This is a FunctionPanel for particle models.
@@ -20,176 +19,174 @@ import org.opensourcephysics.tools.*;
  */
 public class ModelFunctionPanel extends FunctionPanel {
 
-	InitialValueEditor initEditor;
-	ParticleModel model;
-	
-  /**
-   * Constructor with user function editor.
-   *
-   * @param editor the user function editor
-   * @param track a ParticleModel
-   */
-  public ModelFunctionPanel(UserFunctionEditor editor, ParticleModel track) {
-  	super(editor);
-  	model = track;
-  	setName(track.getName("model")); //$NON-NLS-1$
-  }
+    InitialValueEditor initEditor;
+    ParticleModel model;
 
-	/**
-	 * Gets the function type.
-	 * 
-	 * @return a string describing the type of function
-	 */
-	public String getLabel() {
-		return TrackerRes.getString("ModelFunctionPanel.Label"); //$NON-NLS-1$
-	}
+    /**
+     * Constructor with user function editor.
+     *
+     * @param editor the user function editor
+     * @param track  a ParticleModel
+     */
+    public ModelFunctionPanel(UserFunctionEditor editor, ParticleModel track) {
+        super(editor);
+        model = track;
+        setName(track.getName("model")); //$NON-NLS-1$
+    }
 
-  /**
-   * Gets the display name for the FunctionTool dropdown.
-   *
-   * @return the display name
-   */
-  public String getDisplayName() {
-  	if (model != null)
-  		return model.getDisplayName();
-  	return super.getDisplayName();
-  }
+    /**
+     * Gets the function type.
+     *
+     * @return a string describing the type of function
+     */
+    public String getLabel() {
+        return TrackerRes.getString("ModelFunctionPanel.Label"); //$NON-NLS-1$
+    }
 
-  /**
-   * Returns the function editor.
-   *
-   * @return UserFunctionEditor
-   */
-  public UserFunctionEditor getUserFunctionEditor() {
-    return (UserFunctionEditor)functionEditor;
-  }
+    /**
+     * Gets the display name for the FunctionTool dropdown.
+     *
+     * @return the display name
+     */
+    public String getDisplayName() {
+        if (model != null)
+            return model.getDisplayName();
+        return super.getDisplayName();
+    }
 
-  /**
-   * Gets the initial value editor.
-   *
-   * @return the initial value editor
-   */
-  public InitialValueEditor getInitEditor() {
-    return initEditor;
-  }
+    /**
+     * Returns the function editor.
+     *
+     * @return UserFunctionEditor
+     */
+    public UserFunctionEditor getUserFunctionEditor() {
+        return (UserFunctionEditor) functionEditor;
+    }
 
-	/**
-	 * Creates the GUI.
-	 */
-	protected void createGUI() {
-		super.createGUI();
-		initEditor = new InitialValueEditor(getParamEditor());
-		box.add(initEditor, 1);
-		initEditor.addPropertyChangeListener(this);
-		paramEditor.addPropertyChangeListener(initEditor);
-		functionEditor.addPropertyChangeListener(initEditor);
-		initEditor.addPropertyChangeListener(paramEditor);
-		initEditor.addPropertyChangeListener(functionEditor);
-		FunctionEditor[] editors = new FunctionEditor[] {functionEditor, initEditor};
-		paramEditor.setFunctionEditors(editors);
-	}
-	
-  /**
-   * Gets an Icon associated with this panel, if any.
-   * 
-   * @return the icon
-   */
-  public Icon getIcon() {
-  	if (model != null)
-  		return model.getIcon(21, 16, "model"); //$NON-NLS-1$
-    return null;
-  }
+    /**
+     * Gets the initial value editor.
+     *
+     * @return the initial value editor
+     */
+    public InitialValueEditor getInitEditor() {
+        return initEditor;
+    }
 
-  /**
-	 * Refreshes the GUI.
-	 */
-  protected void refreshGUI() {
-  	super.refreshGUI();
-    initEditor.refreshGUI();
-  }
+    /**
+     * Creates the GUI.
+     */
+    protected void createGUI() {
+        super.createGUI();
+        initEditor = new InitialValueEditor(getParamEditor());
+        box.add(initEditor, 1);
+        initEditor.addPropertyChangeListener(this);
+        paramEditor.addPropertyChangeListener(initEditor);
+        functionEditor.addPropertyChangeListener(initEditor);
+        initEditor.addPropertyChangeListener(paramEditor);
+        initEditor.addPropertyChangeListener(functionEditor);
+        FunctionEditor[] editors = new FunctionEditor[]{functionEditor, initEditor};
+        paramEditor.setFunctionEditors(editors);
+    }
 
-	/**
-   * Refreshes the functions.
-   */
-  protected void refreshFunctions() {
-  	if (paramEditor != null) {
-    	UserFunction[] functions = ((UserFunctionEditor)functionEditor).getMainFunctions();
-		for (UserFunction function : functions) {
-			function.setParameters(paramEditor.getNames(), paramEditor.getValues(), paramEditor.getDescriptions());
-		}
-    	functions = ((UserFunctionEditor)functionEditor).getSupportFunctions();
-		for (UserFunction function : functions) {
-			function.setParameters(paramEditor.getNames(), paramEditor.getValues(), paramEditor.getDescriptions());
-		}
-  	}
-  	// evaluate the initial values 
-    initEditor.evaluateAll();
-  	// evaluate the functions 
-    functionEditor.evaluateAll();
-  }
+    /**
+     * Gets an Icon associated with this panel, if any.
+     *
+     * @return the icon
+     */
+    public Icon getIcon() {
+        if (model != null)
+            return model.getIcon(21, 16, "model"); //$NON-NLS-1$
+        return null;
+    }
 
-	/**
-	 * Clears the selection.
-	 */
-	protected void clearSelection() {
-		super.clearSelection();
-  	initEditor.getTable().clearSelection();
-	}
-	
-  /**
-   * Disposes of this panel.
-   */
-  protected void dispose() {
-  	if (paramEditor==null) {
-  		// already disposed!
-  		return;
-  	}
-		initEditor.removePropertyChangeListener(this);
-		paramEditor.removePropertyChangeListener(initEditor);
-		functionEditor.removePropertyChangeListener(initEditor);
-		initEditor.removePropertyChangeListener(paramEditor);
-		initEditor.removePropertyChangeListener(functionEditor);
-    initEditor.setFunctionPanel(null);
-		initEditor.setFunctionEditors(null);
-		paramEditor.setFunctionEditors(null);
-    model = null;
-    super.dispose();
-  }
+    /**
+     * Refreshes the GUI.
+     */
+    protected void refreshGUI() {
+        super.refreshGUI();
+        initEditor.refreshGUI();
+    }
 
-	/**
-	 * Tabs to the next editor.
-	 * 
-	 * @param editor the current editor
-	 */
-	protected void tabToNext(FunctionEditor editor) {
-		if (editor == paramEditor) {
-			initEditor.getTable().requestFocusInWindow();
-		}
-		else super.tabToNext(editor);
-	}
+    /**
+     * Refreshes the functions.
+     */
+    protected void refreshFunctions() {
+        if (paramEditor != null) {
+            UserFunction[] functions = ((UserFunctionEditor) functionEditor).getMainFunctions();
+            for (UserFunction function : functions) {
+                function.setParameters(paramEditor.getNames(), paramEditor.getValues(), paramEditor.getDescriptions());
+            }
+            functions = ((UserFunctionEditor) functionEditor).getSupportFunctions();
+            for (UserFunction function : functions) {
+                function.setParameters(paramEditor.getNames(), paramEditor.getValues(), paramEditor.getDescriptions());
+            }
+        }
+        // evaluate the initial values
+        initEditor.evaluateAll();
+        // evaluate the functions
+        functionEditor.evaluateAll();
+    }
 
-  /**
-   * Listens for property changes "edit" and "function"
-   *
-   * @param e the event
-   */
-	public void propertyChange(PropertyChangeEvent e) {
-		super.propertyChange(e);
-		String name = e.getPropertyName();
- 	  if (e.getSource() == paramEditor && name.equals("edit")) { //$NON-NLS-1$
-	  	initEditor.getTable().selectOnFocus = false;
- 	  } 
- 	  else if (name.equals("angles_in_radians") && model.trackerPanel!=null) {   //$NON-NLS-1$
- 	  	model.trackerPanel.getTFrame().setAnglesInRadians((Boolean)e.getNewValue());
-	  }
-	}
-	
-	@Override
-  protected boolean hasInvalidExpressions() {
-    return functionEditor.containsInvalidExpressions() 
-    		|| paramEditor.containsInvalidExpressions()
-    		|| initEditor.containsInvalidExpressions();
-  }
+    /**
+     * Clears the selection.
+     */
+    protected void clearSelection() {
+        super.clearSelection();
+        initEditor.getTable().clearSelection();
+    }
+
+    /**
+     * Disposes of this panel.
+     */
+    protected void dispose() {
+        if (paramEditor == null) {
+            // already disposed!
+            return;
+        }
+        initEditor.removePropertyChangeListener(this);
+        paramEditor.removePropertyChangeListener(initEditor);
+        functionEditor.removePropertyChangeListener(initEditor);
+        initEditor.removePropertyChangeListener(paramEditor);
+        initEditor.removePropertyChangeListener(functionEditor);
+        initEditor.setFunctionPanel(null);
+        initEditor.setFunctionEditors(null);
+        paramEditor.setFunctionEditors(null);
+        model = null;
+        super.dispose();
+    }
+
+    /**
+     * Tabs to the next editor.
+     *
+     * @param editor the current editor
+     */
+    protected void tabToNext(FunctionEditor editor) {
+        if (editor == paramEditor) {
+            initEditor.getTable().requestFocusInWindow();
+        } else super.tabToNext(editor);
+    }
+
+    /**
+     * Listens for property changes "edit" and "function"
+     *
+     * @param e the event
+     */
+    public void propertyChange(PropertyChangeEvent e) {
+        super.propertyChange(e);
+        String name = e.getPropertyName();
+        if (e.getSource() == paramEditor && name.equals("edit")) { //$NON-NLS-1$
+            initEditor.getTable().selectOnFocus = false;
+        } else if (name.equals("angles_in_radians") && model.trackerPanel != null) {   //$NON-NLS-1$
+            model.trackerPanel.getTFrame().setAnglesInRadians((Boolean) e.getNewValue());
+        }
+    }
+
+    @Override
+    protected boolean hasInvalidExpressions() {
+        return functionEditor.containsInvalidExpressions()
+                || paramEditor.containsInvalidExpressions()
+                || initEditor.containsInvalidExpressions();
+    }
 
 }
 

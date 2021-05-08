@@ -7,21 +7,15 @@
 
 package org.opensourcephysics.cabrillo.tracker.analytics;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import org.opensourcephysics.tools.Resource;
+
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
-import org.opensourcephysics.tools.Resource;
 
 /**
  * A program to read the PHP download counter and update the download counter file.
@@ -30,123 +24,123 @@ import org.opensourcephysics.tools.Resource;
  * @version 1.0
  */
 public class DownloadCounter {
-	
-	static String dataFile = "C:/Users/Doug/Eclipse/workspace_deploy/analytics/download_counts.csv"; //$NON-NLS-1$
-	static String NEW_LINE = System.getProperty("line.separator", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-	
-  public static void main(String[] args) {
-    
-    // create StringBuffer and append date/time
-    StringBuilder buffer = new StringBuilder();
-  	buffer.append(getDateAndTime());
-  	
-    // get file names (first line of dataFile except data/time)
-  	String[] filenames = getFileNames(dataFile);
-  	
-  	// go through file names and append tabs and download counts
-      for (String filename : filenames) {
-          String count = getDownloadCount(filename);
-          buffer.append("\t").append(count); //$NON-NLS-1$
-      }
-		
-		// get current contents and add StringBuffer at end
-		String contents = read(dataFile);
-		contents += buffer.toString();
-		
-		// write the new contents to dataFile
-		write(contents, dataFile);
-  }
-  
-  /**
-   * Reads the first line of the data file and returns an array of file names.
-   *
-   * @return the file names
-   */
-  static String[] getFileNames(String dataFile) {
-    File file = new File(dataFile);
-    try {
-      BufferedReader in = new BufferedReader(new FileReader(file));
-      String firstLine = in.readLine();
-      in.close();
-      if (firstLine!=null) {
-    		String[] split = firstLine.split("\t");
-    		if (split.length>0) {
-    			String[] fileNames = new String[split.length-1];
-    			System.arraycopy(split, 1, fileNames, 0, fileNames.length);
-    			return fileNames;
-    		}
-      }
-    } catch(IOException ex) {
-        ex.printStackTrace();
-    }
-    return new String[0];
-  }
 
-  /**
-   * Reads a file.
-   *
-   * @param fileName the name of the file
-   * @return the contents as a String
-   */
-  static String read(String fileName) {
-    File file = new File(fileName);
-    StringBuffer buffer = null;
-    try {
-      BufferedReader in = new BufferedReader(new FileReader(file));
-      buffer = new StringBuffer();
-      String line = in.readLine();
-      while(line!=null) {
-        buffer.append(line).append(NEW_LINE);
-        line = in.readLine();
-      }
-      in.close();
-    } catch(IOException ex) {
-        ex.printStackTrace();
+    static String dataFile = "C:/Users/Doug/Eclipse/workspace_deploy/analytics/download_counts.csv"; //$NON-NLS-1$
+    static String NEW_LINE = System.getProperty("line.separator", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    public static void main(String[] args) {
+
+        // create StringBuffer and append date/time
+        StringBuilder buffer = new StringBuilder();
+        buffer.append(getDateAndTime());
+
+        // get file names (first line of dataFile except data/time)
+        String[] filenames = getFileNames(dataFile);
+
+        // go through file names and append tabs and download counts
+        for (String filename : filenames) {
+            String count = getDownloadCount(filename);
+            buffer.append("\t").append(count); //$NON-NLS-1$
+        }
+
+        // get current contents and add StringBuffer at end
+        String contents = read(dataFile);
+        contents += buffer.toString();
+
+        // write the new contents to dataFile
+        write(contents, dataFile);
     }
-      assert buffer != null;
-      return buffer.toString();
-  }
-  
-  /**
-   * Writes a file.
-   *
-   * @param contents the contents to write
-   * @param fileName the name of the file
-   */
-  static void write(String contents, String fileName) {
-    File file = new File(fileName);
-		try {
-			FileOutputStream stream = new FileOutputStream(file);
-			Charset charset = StandardCharsets.UTF_8;
-			OutputStreamWriter out = new OutputStreamWriter(stream, charset);
-			BufferedWriter writer = new BufferedWriter(out);
-			writer.write(contents);
-			writer.flush();
-			writer.close();
-		} catch (IOException ex) {
+
+    /**
+     * Reads the first line of the data file and returns an array of file names.
+     *
+     * @return the file names
+     */
+    static String[] getFileNames(String dataFile) {
+        File file = new File(dataFile);
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(file));
+            String firstLine = in.readLine();
+            in.close();
+            if (firstLine != null) {
+                String[] split = firstLine.split("\t");
+                if (split.length > 0) {
+                    String[] fileNames = new String[split.length - 1];
+                    System.arraycopy(split, 1, fileNames, 0, fileNames.length);
+                    return fileNames;
+                }
+            }
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
-  }
-  
-  
-  static String getDateAndTime() {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm"); //$NON-NLS-1$
-		Calendar cal = Calendar.getInstance();
-		return sdf.format(cal.getTime());
-  }
-	
-  static String getDownloadCount(String filename) {
-  	String path = "http://physlets.org/tracker/installers/download.php?file="+filename+"__read"; //$NON-NLS-1$ //$NON-NLS-2$
-    try {
-			URL url = new URL(path);
-			Resource res = new Resource(url);
-    	return res.getString().trim();
-		} catch (MalformedURLException e) {
-        e.printStackTrace();
+        return new String[0];
     }
-  	return null;
-  }
-  
+
+    /**
+     * Reads a file.
+     *
+     * @param fileName the name of the file
+     * @return the contents as a String
+     */
+    static String read(String fileName) {
+        File file = new File(fileName);
+        StringBuffer buffer = null;
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(file));
+            buffer = new StringBuffer();
+            String line = in.readLine();
+            while (line != null) {
+                buffer.append(line).append(NEW_LINE);
+                line = in.readLine();
+            }
+            in.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        assert buffer != null;
+        return buffer.toString();
+    }
+
+    /**
+     * Writes a file.
+     *
+     * @param contents the contents to write
+     * @param fileName the name of the file
+     */
+    static void write(String contents, String fileName) {
+        File file = new File(fileName);
+        try {
+            FileOutputStream stream = new FileOutputStream(file);
+            Charset charset = StandardCharsets.UTF_8;
+            OutputStreamWriter out = new OutputStreamWriter(stream, charset);
+            BufferedWriter writer = new BufferedWriter(out);
+            writer.write(contents);
+            writer.flush();
+            writer.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
+    static String getDateAndTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm"); //$NON-NLS-1$
+        Calendar cal = Calendar.getInstance();
+        return sdf.format(cal.getTime());
+    }
+
+    static String getDownloadCount(String filename) {
+        String path = "http://physlets.org/tracker/installers/download.php?file=" + filename + "__read"; //$NON-NLS-1$ //$NON-NLS-2$
+        try {
+            URL url = new URL(path);
+            Resource res = new Resource(url);
+            return res.getString().trim();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
 
 /*

@@ -78,7 +78,7 @@ public class BounceMatrix {
     public double[][] getArrayCopy() {
         double[][] arrayCopy = new double[rowDimension][columnDimension];
         for (int i = 0; i < rowDimension; i++) {
-            if (columnDimension >= 0){
+            if (columnDimension >= 0) {
                 System.arraycopy(array[i], 0, arrayCopy[i], 0, columnDimension);
             }
         }

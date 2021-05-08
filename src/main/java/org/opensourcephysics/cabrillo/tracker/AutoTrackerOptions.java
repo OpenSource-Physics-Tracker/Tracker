@@ -18,140 +18,144 @@ import java.beans.PropertyChangeSupport;
  * @author Nikolai Avdeev aka NickKolok
  */
 public class AutoTrackerOptions implements Cloneable {
-	private int goodMatch=4;
-	private final int possibleMatch=1;
-	private int evolveAlpha=63;
-	private int autoskipCount=2;
-	private int lineSpread = -1;  // positive for 1D, negative for 2D tracking
-	private double maskWidth=16.0, maskHeight=16.0;
-	private boolean lookAhead=true;
-	private int maskShapeType = 0; // 0 for ellipse, 1 for rect
+    private int goodMatch = 4;
+    private final int possibleMatch = 1;
+    private int evolveAlpha = 63;
+    private int autoskipCount = 2;
+    private int lineSpread = -1;  // positive for 1D, negative for 2D tracking
+    private double maskWidth = 16.0, maskHeight = 16.0;
+    private boolean lookAhead = true;
+    private int maskShapeType = 0; // 0 for ellipse, 1 for rect
 
-	private int predictionLookback = 4;
-	public static final int maxEvolveRate = 100;
+    private int predictionLookback = 4;
+    public static final int maxEvolveRate = 100;
 
-	// TODO: make private?
-	public PropertyChangeSupport changes = new PropertyChangeSupport(this);
+    // TODO: make private?
+    public PropertyChangeSupport changes = new PropertyChangeSupport(this);
 
-	public int getGoodMatch() {
-		return goodMatch;
-	}
+    public int getGoodMatch() {
+        return goodMatch;
+    }
 
-	public void setGoodMatch(int goodMatch) {
-		int oldMatch = this.goodMatch;
-		this.goodMatch = goodMatch;
-		changes.firePropertyChange("goodMatch", oldMatch, goodMatch);
-	}
+    public void setGoodMatch(int goodMatch) {
+        int oldMatch = this.goodMatch;
+        this.goodMatch = goodMatch;
+        changes.firePropertyChange("goodMatch", oldMatch, goodMatch);
+    }
 
-	public boolean isMatchGood(double match){
-		return match > goodMatch;
-	}
-	public int getPossibleMatch() {
-		return possibleMatch;
-	}
+    public boolean isMatchGood(double match) {
+        return match > goodMatch;
+    }
 
-	public boolean isMatchPossible(double match){
-		return match > possibleMatch;
-	}
+    public int getPossibleMatch() {
+        return possibleMatch;
+    }
 
-	public int getEvolveAlpha() {
-		return evolveAlpha;
-	}
+    public boolean isMatchPossible(double match) {
+        return match > possibleMatch;
+    }
 
-	public void setEvolveAlpha(int evolveAlpha) {
-		int oldAlpha = this.evolveAlpha;
-		this.evolveAlpha = evolveAlpha;
-		changes.firePropertyChange("evolveAlpha", oldAlpha, evolveAlpha);
-	}
+    public int getEvolveAlpha() {
+        return evolveAlpha;
+    }
 
-	protected void setEvolveAlphaFromRate(int evolveRate) {
-		double max = maxEvolveRate;
-		int alpha = (int)(1.0*evolveRate*255/max);
-		if (evolveRate>=max) alpha = 255;
-		if (evolveRate<=0) alpha = 0;
-		setEvolveAlpha(alpha);
-	}
+    public void setEvolveAlpha(int evolveAlpha) {
+        int oldAlpha = this.evolveAlpha;
+        this.evolveAlpha = evolveAlpha;
+        changes.firePropertyChange("evolveAlpha", oldAlpha, evolveAlpha);
+    }
 
-	public int getAutoskipCount() {
-		return autoskipCount;
-	}
+    protected void setEvolveAlphaFromRate(int evolveRate) {
+        double max = maxEvolveRate;
+        int alpha = (int) (1.0 * evolveRate * 255 / max);
+        if (evolveRate >= max) alpha = 255;
+        if (evolveRate <= 0) alpha = 0;
+        setEvolveAlpha(alpha);
+    }
 
-	public void setAutoskipCount(int autoskipCount) {
-		this.autoskipCount = autoskipCount;
-	}
+    public int getAutoskipCount() {
+        return autoskipCount;
+    }
 
-	public boolean isLookAhead() {
-		return lookAhead;
-	}
+    public void setAutoskipCount(int autoskipCount) {
+        this.autoskipCount = autoskipCount;
+    }
 
-	public void setLookAhead(boolean lookAhead) {
-		this.lookAhead = lookAhead;
-	}
+    public boolean isLookAhead() {
+        return lookAhead;
+    }
 
-	public double getMaskWidth() {
-		return maskWidth;
-	}
+    public void setLookAhead(boolean lookAhead) {
+        this.lookAhead = lookAhead;
+    }
 
-	public void setMaskWidth(double maskWidth) {
-		if(this.maskWidth == maskWidth){
-			return;
-		}
-		double old = this.maskWidth;
-		this.maskWidth = maskWidth;
-		changes.firePropertyChange("maskWidth", old, this.maskWidth);
-	}
+    public double getMaskWidth() {
+        return maskWidth;
+    }
 
-	public double getMaskHeight() {
-		return maskHeight;
-	}
+    public void setMaskWidth(double maskWidth) {
+        if (this.maskWidth == maskWidth) {
+            return;
+        }
+        double old = this.maskWidth;
+        this.maskWidth = maskWidth;
+        changes.firePropertyChange("maskWidth", old, this.maskWidth);
+    }
 
-	public void setMaskHeight(double maskHeight) {
-		if(this.maskHeight == maskHeight){
-			return;
-		}
-		double old = this.maskHeight;
-		this.maskHeight = maskHeight;
-		changes.firePropertyChange("maskHeight", old, this.maskHeight);
-	}
+    public double getMaskHeight() {
+        return maskHeight;
+    }
 
-	public int getLineSpread() {
-		return lineSpread;
-	}
+    public void setMaskHeight(double maskHeight) {
+        if (this.maskHeight == maskHeight) {
+            return;
+        }
+        double old = this.maskHeight;
+        this.maskHeight = maskHeight;
+        changes.firePropertyChange("maskHeight", old, this.maskHeight);
+    }
 
-	public void setLineSpread(int spread) {
-		if(this.lineSpread == spread){
-			return;
-		}
-		int old = this.lineSpread;
-		this.lineSpread = spread;
-		changes.firePropertyChange("lineSpread", old, this.lineSpread);
-	}
+    public int getLineSpread() {
+        return lineSpread;
+    }
 
-	public int getPredictionLookback() {
-		return predictionLookback;
-	}
+    public void setLineSpread(int spread) {
+        if (this.lineSpread == spread) {
+            return;
+        }
+        int old = this.lineSpread;
+        this.lineSpread = spread;
+        changes.firePropertyChange("lineSpread", old, this.lineSpread);
+    }
 
-	public int getMaskShapeType() {
-		return maskShapeType;
-	}
+    public int getPredictionLookback() {
+        return predictionLookback;
+    }
 
-	public void setMaskShapeType(int maskShapeType) {
-		if(this.maskShapeType == maskShapeType){
-			return;
-		}
-		this.maskShapeType = maskShapeType;
-		int old = this.maskShapeType;
-		changes.firePropertyChange("maskShapeType", old, maskShapeType);
-	}
+    public int getMaskShapeType() {
+        return maskShapeType;
+    }
 
-	public Shape getMaskShape(){
-		switch(maskShapeType){
-			case 0: return new Ellipse2D.Double(0,0,maskWidth,maskHeight);
-			case 1: return new Rectangle2D.Double(0,0,maskWidth,maskHeight);
-			default: return null;
-		}
-	}
-	// TODO: fire messages for all properties
-	// TODO: cloning without cloning `changes`
-	// TODO: fire message only if the property has been changed indeed
+    public void setMaskShapeType(int maskShapeType) {
+        if (this.maskShapeType == maskShapeType) {
+            return;
+        }
+        this.maskShapeType = maskShapeType;
+        int old = this.maskShapeType;
+        changes.firePropertyChange("maskShapeType", old, maskShapeType);
+    }
+
+    public Shape getMaskShape() {
+        switch (maskShapeType) {
+            case 0:
+                return new Ellipse2D.Double(0, 0, maskWidth, maskHeight);
+            case 1:
+                return new Rectangle2D.Double(0, 0, maskWidth, maskHeight);
+            default:
+                return null;
+        }
+    }
+    // TODO: fire messages for all properties
+    // TODO: cloning without cloning `changes`
+    // TODO: fire message only if the property has been changed indeed
 }

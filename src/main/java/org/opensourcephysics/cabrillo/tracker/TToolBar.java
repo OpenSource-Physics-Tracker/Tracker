@@ -255,7 +255,6 @@ public class TToolBar extends JToolBar implements PropertyChangeListener {
     protected ArrayList<PageTView.TabData> pageViewTabs = new ArrayList<>();
 
 
-
     /**
      * Creates the GUI
      */
