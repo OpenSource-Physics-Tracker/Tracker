@@ -24,10 +24,11 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import java.awt.Component;
+import java.beans.*;
+import java.util.*;
+
 import javax.swing.*;
-import java.awt.*;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 
 /**
  * This is a view of a tracker panel that can be added to a TViewChooser.
@@ -37,58 +38,59 @@ import java.util.ArrayList;
  */
 public interface TView extends PropertyChangeListener {
 
-    /**
-     * Initializes the view
-     */
-    void init();
+  /**
+   * Initializes the view
+   */
+  void init();
 
-    /**
-     * Refreshes the view
-     */
-    void refresh();
+  /**
+   * Refreshes the view
+   */
+  void refresh();
 
-    /**
-     * Cleans up the view
-     */
-    void cleanup();
+  /**
+   * Cleans up the view
+   */
+  void cleanup();
 
-    /**
-     * Disposes of the view
-     */
-    void dispose();
+  /**
+   * Disposes of the view
+   */
+  void dispose();
 
-    /**
-     * Gets the TrackerPanel containing the track data
-     *
-     * @return the tracker panel containing the data to be viewed
-     */
-    TrackerPanel getTrackerPanel();
+  /**
+   * Gets the TrackerPanel containing the track data
+   *
+   * @return the tracker panel containing the data to be viewed
+   */
+  TrackerPanel getTrackerPanel();
 
-    /**
-     * Gets the name of the view
-     *
-     * @return the name of the view
-     */
-    String getViewName();
+  /**
+   * Gets the name of the view
+   *
+   * @return the name of the view
+   */
+  String getViewName();
 
-    /**
-     * Gets the icon for this view
-     *
-     * @return the icon for the view
-     */
-    Icon getViewIcon();
+  /**
+   * Gets the icon for this view
+   *
+   * @return the icon for the view
+   */
+  Icon getViewIcon();
 
-    /**
-     * Gets the toolbar components for this view
-     *
-     * @return an ArrayList of components to be added to a toolbar
-     */
-    ArrayList<Component> getToolBarComponents();
+  /**
+   * Gets the toolbar components for this view
+   *
+   * @return an ArrayList of components to be added to a toolbar
+   */
+  ArrayList<Component> getToolBarComponents();
 
-    /**
-     * Returns true if this view is in a custom state.
-     *
-     * @return true if in a custom state, false if in the default state
-     */
-    boolean isCustomState();
+  /**
+   * Returns true if this view is in a custom state.
+   *
+   * @return true if in a custom state, false if in the default state
+   */
+  boolean isCustomState();
+
 }

@@ -35,96 +35,96 @@ import javax.swing.*;
  *
  * @author Douglas Brown
  */
-public abstract class TrackView extends JScrollPane implements PropertyChangeListener {
+public abstract class TrackView extends JScrollPane
+                                implements PropertyChangeListener {
 
-    protected TrackView(TTrack track, TrackerPanel panel, TrackChooserTView view) {
-        trackID = track.getID();
-        trackerPanel = panel;
-        trackerPanel.addPropertyChangeListener("selectedpoint", this); //$NON-NLS-1$
-        trackerPanel.addPropertyChangeListener("units", this); //$NON-NLS-1$
-        parent = view;
+  // instance fields
+  private final int trackID;
+  protected TrackerPanel trackerPanel;
+  protected ArrayList<Component> toolbarComponents = new ArrayList<>();
+  protected TrackChooserTView parent;
+
+  // constructor
+  protected TrackView(TTrack track, TrackerPanel panel, TrackChooserTView view) {
+    trackID = track.getID();
+    trackerPanel = panel;
+    trackerPanel.addPropertyChangeListener("selectedpoint", this); //$NON-NLS-1$
+    trackerPanel.addPropertyChangeListener("units", this); //$NON-NLS-1$
+    parent = view;
+  }
+
+  protected void dispose() {
+    for (Integer n: TTrack.activeTracks.keySet()) {
+      TTrack track = TTrack.activeTracks.get(n);
+	    track.removePropertyChangeListener("step", this); //$NON-NLS-1$
+	    track.removePropertyChangeListener("steps", this); //$NON-NLS-1$
     }
+    trackerPanel.removePropertyChangeListener("selectedpoint", this); //$NON-NLS-1$
+    trackerPanel.removePropertyChangeListener("units", this); //$NON-NLS-1$
+    trackerPanel = null;
+  }
 
-    private final int trackID;
+  abstract void refresh(int stepNumber);
 
-    protected TrackerPanel trackerPanel;
+  abstract void refreshGUI();
 
-    protected ArrayList<Component> toolbarComponents = new ArrayList<>();
+  abstract boolean isCustomState();
 
-    protected TrackChooserTView parent;
+  abstract JButton getViewButton();
+  
+  public String getName() {
+  	TTrack track = getTrack();
+    return track.getName();
+  }
 
+  Icon getIcon() {
+  	TTrack track = getTrack();
+    return track.getIcon(21, 16, "point"); //$NON-NLS-1$
+  }
 
-    protected void dispose() {
-        for (Integer n : TTrack.activeTracks.keySet()) {
-            TTrack track = TTrack.activeTracks.get(n);
-            track.removePropertyChangeListener("step", this); //$NON-NLS-1$
-            track.removePropertyChangeListener("steps", this); //$NON-NLS-1$
-        }
-        trackerPanel.removePropertyChangeListener("selectedpoint", this); //$NON-NLS-1$
-        trackerPanel.removePropertyChangeListener("units", this); //$NON-NLS-1$
-        trackerPanel = null;
-    }
+  TTrack getTrack() {
+  	return TTrack.getTrack(trackID);
+  }
 
-    abstract void refresh(int stepNumber);
+  /**
+   * Gets toolbar components for toolbar of parent view
+   *
+   * @return an ArrayList of components to be added to a toolbar
+   */
+  public ArrayList<Component> getToolBarComponents() {
+    return toolbarComponents;
+  }
 
-    abstract void refreshGUI();
-
-    abstract boolean isCustomState();
-
-    abstract JButton getViewButton();
-
-    public String getName() {
+  /**
+   * Responds to property change events. TrackView receives the following
+   * events: "step" or "steps" from the track.
+   *
+   * @param e the property change event
+   */
+  public void propertyChange(PropertyChangeEvent e) {
+    String name = e.getPropertyName();
+    switch (name) {
+      case "step":  // from track //$NON-NLS-1$
+        Integer i = (Integer) e.getNewValue();
+        refresh(i);
+        break;
+      case "steps":  // from particle model tracks //$NON-NLS-1$
+        refresh(trackerPanel.getFrameNumber());
+        break;
+      case "selectedpoint":  // from tracker panel //$NON-NLS-1$
+        Step step = trackerPanel.getSelectedStep();
         TTrack track = getTrack();
-        return track.getName();
-    }
-
-    Icon getIcon() {
-        TTrack track = getTrack();
-        return track.getIcon(21, 16, "point"); //$NON-NLS-1$
-    }
-
-    TTrack getTrack() {
-        return TTrack.getTrack(trackID);
-    }
-
-    /**
-     * Gets toolbar components for toolbar of parent view
-     *
-     * @return an ArrayList of components to be added to a toolbar
-     */
-    public ArrayList<Component> getToolBarComponents() {
-        return toolbarComponents;
-    }
-
-    /**
-     * Responds to property change events. TrackView receives the following
-     * events: "step" or "steps" from the track.
-     *
-     * @param e the property change event
-     */
-    public void propertyChange(PropertyChangeEvent e) {
-        String name = e.getPropertyName();
-        switch (name) {
-            case "step":  // from track //$NON-NLS-1$
-                Integer i = (Integer) e.getNewValue();
-                refresh(i);
-                break;
-            case "steps":  // from particle model tracks //$NON-NLS-1$
-                refresh(trackerPanel.getFrameNumber());
-                break;
-            case "selectedpoint":  // from tracker panel //$NON-NLS-1$
-                Step step = trackerPanel.getSelectedStep();
-                TTrack track = getTrack();
-                if (step != null && trackerPanel.getSelectedTrack() == track) {
-                    refresh(step.getFrameNumber());
-                } else {
-                    refresh(trackerPanel.getFrameNumber());
-                }
-                break;
+        if (step != null && trackerPanel.getSelectedTrack() == track) {
+          refresh(step.getFrameNumber());
+        } else {
+          refresh(trackerPanel.getFrameNumber());
         }
+        break;
     }
+  }
+  
+  protected boolean isRefreshEnabled() {
+  	return !trackerPanel.isAutoRefresh || !parent.isTrackViewDisplayed(getTrack());
+  }
 
-    protected boolean isRefreshEnabled() {
-        return !trackerPanel.isAutoRefresh || !parent.isTrackViewDisplayed(getTrack());
-    }
 }

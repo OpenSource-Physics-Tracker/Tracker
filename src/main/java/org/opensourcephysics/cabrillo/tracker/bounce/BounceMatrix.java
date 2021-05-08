@@ -70,15 +70,15 @@ public class BounceMatrix {
     }
 
 
-    private double[][] array;
+    private double[][] array; // a
 
-    private int rowDimension;
-    private int columnDimension;
+    private int rowDimension; // m
+    private int columnDimension; // n
 
     public double[][] getArrayCopy() {
         double[][] arrayCopy = new double[rowDimension][columnDimension];
         for (int i = 0; i < rowDimension; i++) {
-            if (columnDimension >= 0) {
+            if (columnDimension >= 0){
                 System.arraycopy(array[i], 0, arrayCopy[i], 0, columnDimension);
             }
         }
@@ -170,15 +170,12 @@ public class BounceMatrix {
 
 //_______________________ LUDecomposition class __________________________
 
-    private static class LUDecomposition {
-
-        private final int m;
-        private final int n;
-
-        private final int[] piv;
+    static class LUDecomposition {
 
         private final double[][] LU;
-
+        private final int m;
+        private final int n;
+        private final int[] piv;
 
         public LUDecomposition(BounceMatrix A) {
 
@@ -280,20 +277,18 @@ public class BounceMatrix {
 
 //_________________________ QRDecomposition class __________________________  
 
-    private static class QRDecomposition {
-
-        private final int m;
-        private final int n;
-
-        private final double[] RDiag;
+    static class QRDecomposition {
 
         private final double[][] QR;
+        private final int m;
+        private final int n;
+        private final double[] Rdiag;
 
         public QRDecomposition(BounceMatrix A) {
             QR = A.getArrayCopy();
             m = A.getRowDimension();
             n = A.getColumnDimension();
-            RDiag = new double[n];
+            Rdiag = new double[n];
 
             for (int k = 0; k < n; k++) {
                 // Compute 2-norm of k-th column without under/overflow.
@@ -324,13 +319,13 @@ public class BounceMatrix {
                         }
                     }
                 }
-                RDiag[k] = -nrm;
+                Rdiag[k] = -nrm;
             }
         }
 
         public boolean isFullRank() {
             for (int j = 0; j < n; j++) {
-                if (RDiag[j] == 0)
+                if (Rdiag[j] == 0)
                     return false;
             }
             return true;
@@ -364,7 +359,7 @@ public class BounceMatrix {
             // Solve R*X = Y;
             for (int k = n - 1; k >= 0; k--) {
                 for (int j = 0; j < nx; j++) {
-                    X[k][j] /= RDiag[k];
+                    X[k][j] /= Rdiag[k];
                 }
                 for (int i = 0; i < k; i++) {
                     for (int j = 0; j < nx; j++) {
@@ -388,5 +383,6 @@ public class BounceMatrix {
             }
             return r;
         }
+
     }
 }

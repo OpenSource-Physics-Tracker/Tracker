@@ -24,8 +24,6 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.opensourcephysics.cabrillo.tracker.pencil.PencilDrawer;
 import org.opensourcephysics.cabrillo.tracker.pencil.PencilDrawing;
 import org.opensourcephysics.cabrillo.tracker.pencil.PencilScene;
@@ -54,34 +52,31 @@ import java.util.*;
  *
  * @author Douglas Brown
  */
-@Getter
-@Setter
 public class TrackerPanel extends VideoPanel implements Scrollable {
 
+    // static fields
     /**
      * The minimum zoom level
      */
     public static final double MIN_ZOOM = 0.15;
-
     /**
      * The maximum zoom level
      */
     public static final double MAX_ZOOM = 12;
-
     /**
      * The zoom step size
      */
     public static final double ZOOM_STEP = Math.pow(2, 1.0 / 6);
-
     /**
      * The fixed zoom levels
      */
     public static final double[] ZOOM_LEVELS = {0.25, 0.5, 1, 2, 4, 8};
     public static final String TAPE = "CalibrationTapeMeasure"; //$NON-NLS-1$ //$NON-NLS-2$
-    public static final String CALIBRATION = "Calibration";
+            public static final String CALIBRATION = "Calibration";
     public static final String OFFSET = "OffsetOrigin"; //$NON-NLS-1$ //$NON-NLS-2$
     protected static String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //$NON-NLS-1$
 
+    // instance fields
     protected double defaultImageBorder;
     protected String description = ""; //$NON-NLS-1$
     protected TPoint selectedPoint;
@@ -299,6 +294,15 @@ public class TrackerPanel extends VideoPanel implements Scrollable {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the description of this panel.
+     *
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
     }
 
     /**
@@ -2692,7 +2696,7 @@ public class TrackerPanel extends VideoPanel implements Scrollable {
         for (TTrack track : getTracks()) {
             Step step = track.getStep(pt, this);
             if (step != null) {
-                step = track.deleteStep(step.frameNumber);
+                step = track.deleteStep(step.n);
                 if (step == null) return;
                 setSelectedPoint(null);
                 selectedSteps.clear();
@@ -3575,7 +3579,9 @@ public class TrackerPanel extends VideoPanel implements Scrollable {
                     }
                 }
             }
+
             return obj;
         }
     }
 }
+

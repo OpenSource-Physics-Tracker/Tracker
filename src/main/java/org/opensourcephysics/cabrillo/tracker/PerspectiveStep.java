@@ -24,10 +24,9 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import org.opensourcephysics.media.core.PerspectiveFilter;
-import org.opensourcephysics.media.core.TPoint;
+import java.awt.Point;
 
-import java.awt.*;
+import org.opensourcephysics.media.core.*;
 
 /**
  * This is a Step for a PerspectiveTrack.
@@ -35,96 +34,98 @@ import java.awt.*;
  * @author Douglas Brown
  */
 public class PerspectiveStep extends Step {
+	
+  /**
+   * Constructs a PerspectiveStep with specified image coordinates.
+   *
+   * @param track the PerspectiveTrack track
+   * @param n the frame number
+   */
+  public PerspectiveStep(PerspectiveTrack track, int n) {
+    super(track, n);
+    points = new TPoint[] {new Corner(), new Corner(), new Corner(), new Corner()};
+    screenPoints = new Point[getLength()];
+  }
 
-    /**
-     * Constructs a PerspectiveStep with specified image coordinates.
-     *
-     * @param track the PerspectiveTrack track
-     * @param n     the frame number
-     */
-    public PerspectiveStep(PerspectiveTrack track, int n) {
-        super(track, n);
-        points = new TPoint[]{new Corner(), new Corner(), new Corner(), new Corner()};
-        screenPoints = new Point[getLength()];
+  /**
+   * Gets the index of a position or perspective filter corner point. 
+   * 
+   * @param p the point
+   * @return the index, or -1 if not found
+   */
+  public int getPointIndex(TPoint p) {
+  	if (p instanceof PerspectiveFilter.Corner) {
+	  	PerspectiveFilter.Corner corner = (PerspectiveFilter.Corner)p;
+	  	PerspectiveTrack ptrack = (PerspectiveTrack)getTrack();
+	  	int i = ptrack.filter.getCornerIndex(corner);
+	  	if (i<4) return i;
+  	}
+  	for (int i=0; i<points.length; i++) {
+  		if (p==points[i]) return i;
+  	}
+  	return -1;
+  }
+
+  /**
+   * Gets the default point.
+   *
+   * @return the default TPoint
+   */
+  public TPoint getDefaultPoint() {
+  	PerspectiveTrack ptrack = (PerspectiveTrack)getTrack();
+  	int index = ptrack.getTargetIndex();
+    return ptrack.filter.getCorner(index);
+  }
+
+  /**
+   * Overrides Step getMark method.
+   *
+   * @param trackerPanel the tracker panel
+   * @return the mark
+   */
+  protected Mark getMark(TrackerPanel trackerPanel) {
+    Mark mark = marks.get(trackerPanel);
+    if (mark == null) {
+      mark = footprint.getMark(screenPoints);
+      marks.put(trackerPanel, mark);
     }
+    return mark;
+  }
 
-    /**
-     * Gets the index of a position or perspective filter corner point.
-     *
-     * @param p the point
-     * @return the index, or -1 if not found
-     */
-    public int getPointIndex(TPoint p) {
-        if (p instanceof PerspectiveFilter.Corner) {
-            PerspectiveFilter.Corner corner = (PerspectiveFilter.Corner) p;
-            PerspectiveTrack ptrack = (PerspectiveTrack) getTrack();
-            int i = ptrack.filter.getCornerIndex(corner);
-            if (i < 4) return i;
-        }
-        for (int i = 0; i < points.length; i++) {
-            if (p == points[i]) return i;
-        }
-        return -1;
-    }
+  /**
+   * Clones this Step.
+   *
+   * @return a cloned step
+   */
+  public Object clone() {
+    PerspectiveStep step = (PerspectiveStep)super.clone();
+    step.points = new TPoint[] {new Corner(), new Corner(), new Corner(), new Corner()};
+    return step;
+  }
 
-    /**
-     * Gets the default point.
-     *
-     * @return the default TPoint
-     */
-    public TPoint getDefaultPoint() {
-        PerspectiveTrack ptrack = (PerspectiveTrack) getTrack();
-        int index = ptrack.getTargetIndex();
-        return ptrack.filter.getCorner(index);
-    }
+  /**
+   * Returns a String describing this step.
+   *
+   * @return a descriptive string
+   */
+  public String toString() {
+    return "PerspectiveStep"; //$NON-NLS-1$
+  }
 
-    /**
-     * Overrides Step getMark method.
-     *
-     * @param trackerPanel the tracker panel
-     * @return the mark
-     */
-    protected Mark getMark(TrackerPanel trackerPanel) {
-        Mark mark = marks.get(trackerPanel);
-        if (mark == null) {
-            mark = footprint.getMark(screenPoints);
-            marks.put(trackerPanel, mark);
-        }
-        return mark;
-    }
-
-    /**
-     * Clones this Step.
-     *
-     * @return a cloned step
-     */
-    public Object clone() {
-        PerspectiveStep step = (PerspectiveStep) super.clone();
-        step.points = new TPoint[]{new Corner(), new Corner(), new Corner(), new Corner()};
-        return step;
-    }
-
-    /**
-     * Returns a String describing this step.
-     *
-     * @return a descriptive string
-     */
-    public String toString() {
-        return "PerspectiveStep"; //$NON-NLS-1$
-    }
-
-    /**
-     * A corner TPoint class to fire property change events
-     */
-    public class Corner extends TPoint {
-
-        public void setXY(double x, double y) {
-            super.setLocation(x, y);
-            PerspectiveTrack ptrack = (PerspectiveTrack) getTrack();
-            if (ptrack.trackerPanel != null) {
-                int n = ptrack.trackerPanel.getFrameNumber();
-                ptrack.support.firePropertyChange("step", null, n); //$NON-NLS-1$
-            }
-        }
-    }
+  /**
+   * A corner TPoint class to fire property change events
+   */
+  public class Corner extends TPoint {
+  	
+  	public void setXY(double x, double y) {
+  		super.setLocation(x, y);
+	  	PerspectiveTrack ptrack = (PerspectiveTrack)getTrack();
+	  	if (ptrack.trackerPanel!=null) {
+	  		int n = ptrack.trackerPanel.getFrameNumber();
+	  	  ptrack.support.firePropertyChange("step", null, n); //$NON-NLS-1$	  		
+	  	}
+  	}
+  }
+  
 }
+

@@ -24,8 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * A Footprint creates a mark for a track step.
@@ -34,84 +34,85 @@ import java.awt.*;
  */
 public interface Footprint {
 
-    /**
-     * Gets the name of the footprint.
-     *
-     * @return the name
-     */
-    String getName();
+  /**
+   * Gets the name of the footprint.
+   *
+   * @return the name
+   */
+  String getName();
 
-    /**
-     * Gets the display name of the footprint.
-     *
-     * @return the name
-     */
-    String getDisplayName();
+  /**
+   * Gets the display name of the footprint.
+   *
+   * @return the name
+   */
+  String getDisplayName();
 
-    /**
-     * Gets the point array length required by this footprint.
-     *
-     * @return the length
-     */
-    int getLength();
+  /**
+   * Gets the point array length required by this footprint.
+   *
+   * @return the length
+   */
+  int getLength();
 
-    /**
-     * Gets an icon representing the footprint.
-     *
-     * @param w width of the icon
-     * @param h height of the icon
-     * @return the icon
-     */
-    Icon getIcon(int w, int h);
+  /**
+   * Gets an icon representing the footprint.
+   *
+   * @param w width of the icon
+   * @param h height of the icon
+   * @return the icon
+   */
+  Icon getIcon(int w, int h);
 
-    /**
-     * Gets the hit shapes associated with the footprint.
-     *
-     * @return an array of hit shapes
-     */
-    Shape[] getHitShapes();
+  /**
+   * Gets the hit shapes associated with the footprint.
+   *
+   * @return an array of hit shapes
+   */
+  Shape[] getHitShapes();
 
-    /**
-     * Gets the footprint mark.
-     *
-     * @param points a Point array
-     * @return the mark
-     */
-    Mark getMark(Point[] points);
+  /**
+   * Gets the footprint mark.
+   *
+   * @param points a Point array
+   * @return the mark
+   */
+  Mark getMark(Point[] points);
 
-    /**
-     * Gets the footprint shape.
-     *
-     * @param points a Point array
-     * @return the shape
-     */
-    Shape getShape(Point[] points);
+  /**
+   * Gets the footprint shape.
+   *
+   * @param points a Point array
+   * @return the shape
+   */
+  Shape getShape(Point[] points);
 
-    /**
-     * Sets the stroke. Accepts only basic strokes.
-     *
-     * @param stroke the desired stroke
-     */
-    void setStroke(BasicStroke stroke);
+  /**
+   * Sets the stroke. Accepts only basic strokes.
+   *
+   * @param stroke the desired stroke
+   */
+  void setStroke(BasicStroke stroke);
 
-    /**
-     * Gets the stroke.
-     *
-     * @return the basic stroke
-     */
-    BasicStroke getStroke();
+  /**
+   * Gets the stroke.
+   *
+   * @return the basic stroke
+   */
+  BasicStroke getStroke();
 
-    /**
-     * Sets the color.
-     *
-     * @param color the desired color
-     */
-    void setColor(Color color);
+  /**
+   * Sets the color.
+   *
+   * @param color the desired color
+   */
+  void setColor(Color color);
 
-    /**
-     * Gets the color.
-     *
-     * @return the color
-     */
-    Color getColor();
+  /**
+   * Gets the color.
+   *
+   * @return the color
+   */
+  Color getColor();
+
 }

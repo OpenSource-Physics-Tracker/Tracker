@@ -24,119 +24,131 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
+import java.awt.geom.*;
+import javax.swing.*;
 
 /**
  * This Icon centers and fills the shape specified in its constructor.
  *
  * @author Douglas Brown
  */
-@Getter
-@Setter
 public class ShapeIcon implements Icon {
 
-    private final int iconWidth;
-    private final int iconHeight;
+  // instance fields
+  private final int w;
+  private final int h;
+  private final Shape shape;
+  private final Shape decoration;
+  private Color color = Color.black;
+  private Color decoColor = Color.black;
+  private final double offsetX;	// centers the shape horizontally
+  private final double offsetY;	// centers the shape vertically
 
-    private final Shape shape;
-    private final Shape decoration;
+  /**
+   * Constructs a ShapeIcon.
+   *
+   * @param shape the shape to draw
+   * @param decoration a decorating shape to draw
+   * @param width width of the icon
+   * @param height height of the icon
+   */
+  public ShapeIcon(Shape shape, Shape decoration, int width, int height) {
+    w = width;
+    h = height;
+    this.shape = shape;
+    this.decoration = decoration;
+    Rectangle rect = shape==null? new Rectangle(): shape.getBounds();
+    if (decoration!=null)
+    	rect = rect.union(decoration.getBounds());
+    offsetX = w/2 - rect.width/2 - rect.x;
+    offsetY = h/2 - rect.height/2 - rect.y;
+  }
 
-    private Color color = Color.black;
-    private Color decoColor = Color.black;
+  /**
+   * Constructs a ShapeIcon.
+   *
+   * @param shape the shape to draw
+   * @param width width of the icon
+   * @param height height of the icon
+   */
+  public ShapeIcon(Shape shape, int width, int height) {
+  	this(shape, null, width, height);
+  }
 
-    /**
-     * Centers the shape horizontally
-     */
-    private final double offsetX;
+  /**
+   * Sets the color.
+   *
+   * @param color the desired color
+   */
+  public void setColor(Color color) {
+    this.color = color;
+  }
 
-    /**
-     * Centers the shape vertically
-     */
-    private final double offsetY;
+  /**
+   * Sets the colors.
+   *
+   * @param color the desired color
+   * @param decorationColor the desired decoration color
+   */
+  public void setColor(Color color, Color decorationColor) {
+    this.color = color;
+    decoColor = decorationColor;
+  }
 
-    /**
-     * Constructs a ShapeIcon.
-     *
-     * @param shape      the shape to draw
-     * @param decoration a decorating shape to draw
-     * @param width      width of the icon
-     * @param height     height of the icon
-     */
-    public ShapeIcon(Shape shape, Shape decoration, int width, int height) {
-        iconWidth = width;
-        iconHeight = height;
-        this.shape = shape;
-        this.decoration = decoration;
-        Rectangle rect = shape == null ? new Rectangle() : shape.getBounds();
-        if (decoration != null)
-            rect = rect.union(decoration.getBounds());
-        offsetX = iconWidth / 2 - rect.width / 2 - rect.x;
-        offsetY = iconHeight / 2 - rect.height / 2 - rect.y;
+  /**
+   * Gets the icon width.
+   *
+   * @return the icon width
+   */
+  public int getIconWidth() {
+    return w;
+  }
+
+  /**
+   * Gets the icon height.
+   *
+   * @return the icon height
+   */
+  public int getIconHeight() {
+    return h;
+  }
+
+  /**
+   * Paints the icon.
+   *
+   * @param c the component on which it is painted
+   * @param _g the graphics context
+   * @param x the x coordinate of the icon
+   * @param y the y coordinate of the icon
+   */
+  public void paintIcon(Component c, Graphics _g, int x, int y) {
+    Graphics2D g = (Graphics2D)_g;
+    AffineTransform at = AffineTransform.getTranslateInstance(
+                         x + offsetX, y + offsetY);
+
+    // save current graphics paint and clip
+    Paint gPaint = g.getPaint();
+    Shape gClip = g.getClip();
+
+    // render shape(s)
+    g.setPaint(color);
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                       RenderingHints.VALUE_ANTIALIAS_ON);
+    g.clipRect(x, y, w, h);
+
+    // paint shape, if any
+    if (shape!=null) {
+    	g.fill(at.createTransformedShape(shape));
     }
-
-    /**
-     * Constructs a ShapeIcon.
-     *
-     * @param shape  the shape to draw
-     * @param width  width of the icon
-     * @param height height of the icon
-     */
-    public ShapeIcon(Shape shape, int width, int height) {
-        this(shape, null, width, height);
+    
+    // paint decoration, if any
+    if (decoration != null) {
+      g.setPaint(decoColor);
+      g.fill(at.createTransformedShape(decoration));
     }
-
-
-    /**
-     * Sets the colors.
-     *
-     * @param color           the desired color
-     * @param decorationColor the desired decoration color
-     */
-    public void setColor(Color color, Color decorationColor) {
-        this.color = color;
-        decoColor = decorationColor;
-    }
-
-    /**
-     * Paints the icon.
-     *
-     * @param c  the component on which it is painted
-     * @param _g the graphics context
-     * @param x  the x coordinate of the icon
-     * @param y  the y coordinate of the icon
-     */
-    public void paintIcon(Component c, Graphics _g, int x, int y) {
-        Graphics2D g = (Graphics2D) _g;
-        AffineTransform at = AffineTransform.getTranslateInstance(
-                x + offsetX, y + offsetY);
-
-        // save current graphics paint and clip
-        Paint gPaint = g.getPaint();
-        Shape gClip = g.getClip();
-
-        // render shape(s)
-        g.setPaint(color);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        g.clipRect(x, y, iconWidth, iconHeight);
-
-        // paint shape, if any
-        if (shape != null) {
-            g.fill(at.createTransformedShape(shape));
-        }
-
-        // paint decoration, if any
-        if (decoration != null) {
-            g.setPaint(decoColor);
-            g.fill(at.createTransformedShape(decoration));
-        }
-        // restore graphics paint and clip
-        g.setPaint(gPaint);
-        g.setClip(gClip);
-    }
+    // restore graphics paint and clip
+    g.setPaint(gPaint);
+    g.setClip(gClip);
+  }
 }

@@ -7,7 +7,7 @@
 
 package org.opensourcephysics.cabrillo.tracker;
 
-import org.opensourcephysics.tools.UserFunctionEditor;
+import org.opensourcephysics.tools.*;
 
 /**
  * This is a FunctionPanel for analytic particles.
@@ -16,24 +16,26 @@ import org.opensourcephysics.tools.UserFunctionEditor;
  */
 public class AnalyticFunctionPanel extends ModelFunctionPanel {
 
-    /**
-     * Constructor with user function editor.
-     *
-     * @param editor the user function editor
-     * @param track  an AnalyticParticle
-     */
-    public AnalyticFunctionPanel(UserFunctionEditor editor, AnalyticParticle track) {
-        super(editor, track);
-    }
+  /**
+   * Constructor with user function editor.
+   *
+   * @param editor the user function editor
+   * @param track an AnalyticParticle
+   */
+  public AnalyticFunctionPanel(UserFunctionEditor editor, AnalyticParticle track) {
+  	super(editor, track);
+  }
 
-    /**
-     * Refreshes the GUI.
-     */
-    protected void refreshGUI() {
-        super.refreshGUI();
-        functionEditor.setBorderTitle(TrackerRes.getString("AnalyticFunctionPanel.FunctionEditor.Border.Title")); //$NON-NLS-1$
-    }
+  /**
+	 * Refreshes the GUI.
+	 */
+  protected void refreshGUI() {
+  	super.refreshGUI();
+  	functionEditor.setBorderTitle(TrackerRes.getString("AnalyticFunctionPanel.FunctionEditor.Border.Title")); //$NON-NLS-1$
+  }
+
 }
+
 /*
  * Open Source Physics software is free software; you can redistribute
  * it and/or modify it under the terms of the GNU General Public License (GPL) as

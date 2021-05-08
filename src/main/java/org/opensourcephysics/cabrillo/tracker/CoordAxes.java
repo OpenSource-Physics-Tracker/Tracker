@@ -53,20 +53,14 @@ import java.util.Map;
 public class CoordAxes extends TTrack {
 
     protected static Icon gridOptionsIcon;
-
     protected static String[] dataVariables;
-
-    /**
-     * Used by NumberFormatSetter
-     */
-    protected static String[] formatVariables;
-
-    protected static Map<String, String> formatDescriptionMap;
+    protected static String[] formatVariables; // used by NumberFormatSetter
     protected static Map<String, ArrayList<String>> formatMap;
+    protected static Map<String, String> formatDescriptionMap;
 
     static {
-        dataVariables = new String[]{"x", "y", Tracker.THETA};
-        formatVariables = new String[]{"pixel", Tracker.THETA};
+        dataVariables = new String[]{"x", "y", Tracker.THETA}; //$NON-NLS-2$ 
+        formatVariables = new String[]{"pixel", Tracker.THETA}; 
 
         // assemble format map
         formatMap = new HashMap<>();
@@ -81,8 +75,8 @@ public class CoordAxes extends TTrack {
 
         // assemble format description map
         formatDescriptionMap = new HashMap<>();
-        formatDescriptionMap.put(formatVariables[0], TrackerRes.getString("CoordAxes.Origin.Label"));
-        formatDescriptionMap.put(formatVariables[1], TrackerRes.getString("CoordAxes.Label.Angle"));
+        formatDescriptionMap.put(formatVariables[0], TrackerRes.getString("CoordAxes.Origin.Label")); 
+        formatDescriptionMap.put(formatVariables[1], TrackerRes.getString("CoordAxes.Label.Angle")); 
 
     }
 
@@ -95,7 +89,7 @@ public class CoordAxes extends TTrack {
     protected boolean gridVisible;
 
     static {
-        gridOptionsIcon = new ImageIcon(CoordAxes.class.getResource("/images/restore.gif"));
+        gridOptionsIcon = new ImageIcon(CoordAxes.class.getResource( "/images/restore.gif")); 
         gridOptionsIcon = new ResizableIcon(gridOptionsIcon);
     }
 
@@ -104,17 +98,17 @@ public class CoordAxes extends TTrack {
      */
     public CoordAxes() {
         defaultColors = new Color[]{new Color(200, 0, 200)};
-        setName(TrackerRes.getString("CoordAxes.New.Name"));
+        setName(TrackerRes.getString("CoordAxes.New.Name")); 
         // set up footprint choices and color
         setFootprints(new Footprint[]
-                {PointShapeFootprint.getFootprint("Footprint.BoldSimpleAxes"),
-                        PointShapeFootprint.getFootprint("Footprint.SimpleAxes")});
+                {PointShapeFootprint.getFootprint("Footprint.BoldSimpleAxes"), 
+                        PointShapeFootprint.getFootprint("Footprint.SimpleAxes")}); 
         defaultFootprint = getFootprint();
         setColor(defaultColors[0]);
         setViewable(false); // views ignore this track
         // set initial hint
-        partName = TrackerRes.getString("TTrack.Selected.Hint");
-        hint = TrackerRes.getString("CoordAxes.Hint");
+        partName = TrackerRes.getString("TTrack.Selected.Hint"); 
+        hint = TrackerRes.getString("CoordAxes.Hint"); 
         // initialize the step array
         // step 0 is the only step needed
         Step step = new CoordAxesStep(this, 0);
@@ -208,14 +202,14 @@ public class CoordAxes extends TTrack {
             @Override
             protected JPopupMenu getPopup() {
                 JPopupMenu popup = new JPopupMenu();
-                JMenuItem colorItem = new JMenuItem(TrackerRes.getString("CoordAxes.MenuItem.GridColor"));
+                JMenuItem colorItem = new JMenuItem(TrackerRes.getString("CoordAxes.MenuItem.GridColor")); 
                 colorItem.addActionListener(e -> {
                     // show the grid if not visible
                     if (!grid.isVisible()) {
                         gridCheckbox.doClick(0);
                     }
 
-                    Color color = grid.getLineColor();
+                    Color color = grid.getColor();
                     Color newColor = chooseColor(color, TrackerRes.getString("CoordAxes.Dialog.GridColor.Title"));
                     if (newColor != color) {
                         grid.setColor(newColor);
@@ -225,7 +219,7 @@ public class CoordAxes extends TTrack {
                     }
                 });
                 popup.add(colorItem);
-                JMenuItem transparencyItem = new JMenuItem(TrackerRes.getString("CoordAxes.MenuItem.GridOpacity"));
+                JMenuItem transparencyItem = new JMenuItem(TrackerRes.getString("CoordAxes.MenuItem.GridOpacity")); 
                 transparencyItem.addActionListener(e -> {
                     // show the grid if not visible
                     if (!grid.isVisible()) {
@@ -316,6 +310,14 @@ public class CoordAxes extends TTrack {
     }
 
     /**
+     * Overrides TTrack setTrailVisible method to keep trails hidden.
+     *
+     * @param visible ignored
+     */
+    public void setTrailVisible(boolean visible) {
+    }
+
+    /**
      * Mimics step creation by setting the origin position.
      *
      * @param n the frame number
@@ -324,6 +326,7 @@ public class CoordAxes extends TTrack {
      * @return the step
      */
     public Step createStep(int n, double x, double y) {
+//    Step step = steps.getStep(n);
         Step step = getStep(0);
         if (trackerPanel.getSelectedPoint() instanceof CoordAxesStep.Handle) {
             ((CoordAxesStep) step).getHandle().setXY(x, y);
@@ -382,6 +385,7 @@ public class CoordAxes extends TTrack {
      */
     protected boolean isAutoTrackable(int pointIndex) {
         return true;
+//  	return pointIndex==0; // origin only
     }
 
     /**
@@ -392,9 +396,10 @@ public class CoordAxes extends TTrack {
      */
     protected String getTargetDescription(int pointIndex) {
         if (pointIndex == 0) {
-            return TrackerRes.getString("CoordAxes.Origin.Name");
+            return TrackerRes.getString("CoordAxes.Origin.Name"); 
         }
-        return TrackerRes.getString("CoordAxes.Handle.Name");
+        return TrackerRes.getString("CoordAxes.Handle.Name"); 
+//  	return null;
     }
 
     @Override
@@ -428,7 +433,7 @@ public class CoordAxes extends TTrack {
             TPoint handle = ((CoordAxesStep) getStep(0)).getHandle();
             handle.setXY(x, y);
         }
-        firePropertyChange("step", null, n);
+        firePropertyChange("step", null, n); 
         return getMarkedPoint(n, getTargetIndex());
     }
 
@@ -475,16 +480,16 @@ public class CoordAxes extends TTrack {
         // only look at step 0 since getStep(n) returns 0 for every n
         Interactive ia = getStep(0).findInteractive(trackerPanel, xpix, ypix);
         if (ia == null) {
-            partName = TrackerRes.getString("TTrack.Selected.Hint");
-            hint = TrackerRes.getString("CoordAxes.Hint");
+            partName = TrackerRes.getString("TTrack.Selected.Hint"); 
+            hint = TrackerRes.getString("CoordAxes.Hint"); 
             return null;
         }
         if (ia instanceof CoordAxesStep.Handle) {
-            partName = TrackerRes.getString("CoordAxes.Handle.Name");
-            hint = TrackerRes.getString("CoordAxes.Handle.Hint");
+            partName = TrackerRes.getString("CoordAxes.Handle.Name"); 
+            hint = TrackerRes.getString("CoordAxes.Handle.Hint"); 
         } else {
-            partName = TrackerRes.getString("CoordAxes.Origin.Name");
-            hint = TrackerRes.getString("CoordAxes.Origin.Hint");
+            partName = TrackerRes.getString("CoordAxes.Origin.Name"); 
+            hint = TrackerRes.getString("CoordAxes.Origin.Hint"); 
         }
         return ia;
     }
@@ -514,12 +519,12 @@ public class CoordAxes extends TTrack {
         ArrayList<Component> list = super.getToolbarTrackComponents(trackerPanel);
         int n = trackerPanel.getFrameNumber();
         ImageCoordSystem coords = trackerPanel.getCoords();
-        originLabel.setText(TrackerRes.getString("CoordAxes.Origin.Label"));
-        xField.setToolTipText(TrackerRes.getString("CoordAxes.Origin.Field.Tooltip"));
-        yField.setToolTipText(TrackerRes.getString("CoordAxes.Origin.Field.Tooltip"));
-        gridCheckbox.setText(TrackerRes.getString("CoordAxes.Checkbox.Grid"));
-        gridCheckbox.setToolTipText(TrackerRes.getString("CoordAxes.Checkbox.Grid.Tooltip"));
-        gridButton.setToolTipText(TrackerRes.getString("CoordAxes.Button.Grid.Tooltip"));
+        originLabel.setText(TrackerRes.getString("CoordAxes.Origin.Label")); 
+        xField.setToolTipText(TrackerRes.getString("CoordAxes.Origin.Field.Tooltip")); 
+        yField.setToolTipText(TrackerRes.getString("CoordAxes.Origin.Field.Tooltip")); 
+        gridCheckbox.setText(TrackerRes.getString("CoordAxes.Checkbox.Grid")); 
+        gridCheckbox.setToolTipText(TrackerRes.getString("CoordAxes.Checkbox.Grid.Tooltip")); 
+        gridButton.setToolTipText(TrackerRes.getString("CoordAxes.Button.Grid.Tooltip")); 
         list.add(gridSeparator);
         list.add(gridCheckbox);
         list.add(gridButton);
@@ -534,7 +539,7 @@ public class CoordAxes extends TTrack {
         xField.setValue(coords.getOriginX(n));
         yField.setValue(coords.getOriginY(n));
 
-        angleLabel.setText(TrackerRes.getString("CoordAxes.Label.Angle"));
+        angleLabel.setText(TrackerRes.getString("CoordAxes.Label.Angle")); 
         list.add(stepSeparator);
         list.add(angleLabel);
         list.add(angleField);
@@ -555,7 +560,7 @@ public class CoordAxes extends TTrack {
      */
     public void propertyChange(PropertyChangeEvent e) {
         String name = e.getPropertyName();
-        if (name.equals("stepnumber")) {
+        if (name.equals("stepnumber")) { 
             int n = trackerPanel.getFrameNumber();
             ImageCoordSystem coords = trackerPanel.getCoords();
             angleField.setValue(coords.getAngle(n));
@@ -645,11 +650,11 @@ public class CoordAxes extends TTrack {
             XML.getLoader(TTrack.class).saveObject(control, obj);
             CoordAxes axes = (CoordAxes) obj;
             if (axes.gridVisible) {
-                control.setValue("grid_visible", true);
+                control.setValue("grid_visible", true); 
             }
             if (axes.grid.isCustom()) {
-                control.setValue("grid_alpha", axes.grid.getAlpha());
-                control.setValue("grid_RGB", axes.grid.getLineColor().getRGB());
+                control.setValue("grid_alpha", axes.grid.getAlpha()); 
+                control.setValue("grid_RGB", axes.grid.getColor().getRGB()); 
             }
         }
 
@@ -676,17 +681,19 @@ public class CoordAxes extends TTrack {
             CoordAxes axes = (CoordAxes) obj;
             axes.notyetShown = false;
 
-            if (control.getPropertyNames().contains("grid_visible")) {
-                axes.setGridVisible(control.getBoolean("grid_visible"));
+            if (control.getPropertyNames().contains("grid_visible")) { 
+                axes.setGridVisible(control.getBoolean("grid_visible")); 
             }
-            if (control.getPropertyNames().contains("grid_alpha")) {
-                axes.grid.setAlpha(control.getInt("grid_alpha"));
+            if (control.getPropertyNames().contains("grid_alpha")) { 
+                axes.grid.setAlpha(control.getInt("grid_alpha")); 
             }
-            if (control.getPropertyNames().contains("grid_RGB")) {
-                Color color = new Color(control.getInt("grid_RGB"));
+            if (control.getPropertyNames().contains("grid_RGB")) { 
+                Color color = new Color(control.getInt("grid_RGB")); 
                 axes.grid.setColor(color);
             }
             return obj;
         }
     }
+
 }
+

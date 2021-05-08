@@ -32,54 +32,55 @@ import java.io.FilenameFilter;
  * @author Douglas Brown
  */
 public class TrackerJarFilter implements FilenameFilter {
+	
+  public boolean accept(File dir, String name) {
+    String fileName = getName(name).toLowerCase();
+    if (!fileName.endsWith(".jar")) return false; //$NON-NLS-1$
+    if (fileName.equals("tracker.jar")) return true; //$NON-NLS-1$
+    if (fileName.startsWith("tracker-")) { //$NON-NLS-1$
+    	// attempt to get version number
+    	String version = fileName.substring(8);
+    	int len = version.length();
+    	version = version.substring(0, len-4); // strips ".jar"
+  		String snapshot = "-snapshot"; //$NON-NLS-1$
+  		int n = version.toLowerCase().indexOf(snapshot);
+  		if (n>-1) {
+  			version = version.substring(0, n);
+  		}
 
-    public boolean accept(File dir, String name) {
-        String fileName = getName(name).toLowerCase();
-        if (!fileName.endsWith(".jar")) return false; //$NON-NLS-1$
-        if (fileName.equals("tracker.jar")) return true; //$NON-NLS-1$
-        if (fileName.startsWith("tracker-")) { //$NON-NLS-1$
-            // attempt to get version number
-            String version = fileName.substring(8);
-            int len = version.length();
-            version = version.substring(0, len - 4); // strips ".jar"
-            String snapshot = "-snapshot"; //$NON-NLS-1$
-            int n = version.toLowerCase().indexOf(snapshot);
-            if (n > -1) {
-                version = version.substring(0, n);
-            }
-
-            String[] intArray = version.split("\\."); //$NON-NLS-1$
-            if (intArray.length <= 3) {
-                try {
-                    for (String s : intArray) {
-                        Integer.parseInt(s.trim());
-                    }
-                    return true;
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-            try {
-                Double.parseDouble(version);
-                return true;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-        return false;
+      String[] intArray = version.split("\\."); //$NON-NLS-1$
+      if (intArray.length<=3) {
+      	try {
+			for (String s : intArray) {
+				Integer.parseInt(s.trim());
+			}
+      		return true;
+  			} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+      }
+    	try {
+				Double.parseDouble(version);
+      	return true;
+			} catch (Exception ex) {
+			ex.printStackTrace();
+		}
     }
+    return false;
+  }
+  
+  /**
+   * Gets the name from the specified path.
+   *
+   * @param path the full path
+   * @return the name alone
+   */
+  private String getName(String path) {
+    if(path==null) return ""; //$NON-NLS-1$
+    int i = path.lastIndexOf("/"); //$NON-NLS-1$
+    if(i==-1) i = path.lastIndexOf("\\"); //$NON-NLS-1$
+    if(i!=-1) return path.substring(i+1);
+    return path;
+  }
 
-    /**
-     * Gets the name from the specified path.
-     *
-     * @param path the full path
-     * @return the name alone
-     */
-    private String getName(String path) {
-        if (path == null) return ""; //$NON-NLS-1$
-        int i = path.lastIndexOf("/"); //$NON-NLS-1$
-        if (i == -1) i = path.lastIndexOf("\\"); //$NON-NLS-1$
-        if (i != -1) return path.substring(i + 1);
-        return path;
-    }
 }
