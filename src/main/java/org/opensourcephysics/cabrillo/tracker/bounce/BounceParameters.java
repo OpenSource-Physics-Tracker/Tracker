@@ -55,30 +55,20 @@ public class BounceParameters {
     }
 
 
-    /**
-     * The model that was fitted to create these parameters.
-     */
+    // The model that was fitted to create these parameters.
     private final BounceModel model;
 
-    /**
-     * The params matrix has as many rows as model has parameters.
-     * It has as many columns as the dimensionality of the data being fitted.
-     */
+    // The params matrix has as many rows as model has parameters.
+    // It has as many columns as the dimensionality of the data being fitted.
     private final BounceMatrix params;
 
-    /**
-     * The sum of the squares of the residual error of the fitting.
-     */
+    // The sum of the squares of the residual error of the fitting.
     private final double squareError;
 
-    /**
-     * If a step was removed before fitting the model, when was the step?
-     */
+    // If a step was removed before fitting the model, when was the step?
     private final double initialStepAt;
 
-    /**
-     * If a step was removed before fitting the model, how big was it?
-     */
+    // If a step was removed before fitting the model, how big was it?
     private final double[] initialStepSize;
 
 
@@ -141,8 +131,8 @@ public class BounceParameters {
      * @param t time
      * @return derivatives
      */
-    public double[] firstDeriv(double t) {
-        double[] result = model.firstDeriv(params, t);
+    public double[] first_deriv(double t) {
+        double[] result = model.first_deriv(params, t);
         if (initialStepSize != null && initialStepAt < t) {
             for (int i = 0; i < result.length; i++) {
                 result[i] += initialStepSize[i];
@@ -164,8 +154,8 @@ public class BounceParameters {
      * @param t time
      * @return derivatives
      */
-    public double[] secondDeriv(double t) {
-        double[] result = model.secondDeriv(params, t);
+    public double[] second_deriv(double t) {
+        double[] result = model.second_deriv(params, t);
         if (initialStepSize != null && Math.round(initialStepAt - t) == 0) {
             for (int i = 0; i < result.length; i++) {
                 result[i] += initialStepSize[i];

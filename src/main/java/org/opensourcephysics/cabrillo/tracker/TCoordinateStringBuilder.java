@@ -24,64 +24,66 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+
 import org.opensourcephysics.display.DrawingPanel;
 import org.opensourcephysics.display.axes.CoordinateStringBuilder;
 import org.opensourcephysics.media.core.NumberField;
 import org.opensourcephysics.media.core.VideoPanel;
 import org.opensourcephysics.media.core.XYCoordinateStringBuilder;
 
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
-
 /**
  * A CoordinateStringBuilder with format patterns and units.
  *
  * @author Douglas Brown
  */
-public class TCoordinateStringBuilder extends CoordinateStringBuilder implements XYCoordinateStringBuilder {
-
-    NumberField xField;
-    NumberField yField;
-
-    public TCoordinateStringBuilder() {
-        xField = new NumberField(0);
-        yField = new NumberField(0);
+public class TCoordinateStringBuilder 
+		extends CoordinateStringBuilder
+		implements XYCoordinateStringBuilder {
+	
+	NumberField xField, yField;
+	
+	public TCoordinateStringBuilder() {
+		xField = new NumberField(0);
+		yField = new NumberField(0);
+	}
+	
+  @Override
+	public String getCoordinateString(DrawingPanel panel, MouseEvent e) {
+    if (panel instanceof TrackerPanel) {
+    	TrackerPanel trackerPanel = (TrackerPanel) panel;
+	    Point2D pt = trackerPanel.getWorldMousePoint();
+	    return getCoordinateString(trackerPanel, pt.getX(), pt.getY());
     }
+    double x = panel.pixToX(e.getPoint().x);
+    double y = panel.pixToY(e.getPoint().y);
+  	return getCoordinateString(null, x, y);
+  }
+  
+  @Override
+	public String getCoordinateString(VideoPanel vidPanel, double x, double y) {
+    xField.setFormatFor(x);
+    String xStr = xField.getFormat().format(x);
+    if(xField.getUnits()!=null) xStr += xField.getUnits();
+    yField.setFormatFor(y);
+    String yStr = yField.getFormat().format(y);
+    if(yField.getUnits()!=null) yStr += yField.getUnits();
+  	return xLabel+xStr+yLabel+yStr;
+  }
+  
+  public void setUnitsAndPatterns(TTrack track, String xVar, String yVar) {
+  	if (track==null || track.trackerPanel==null) return;
+    xField.setUnits(track.trackerPanel.getUnits(track, xVar));    
+    yField.setUnits(track.trackerPanel.getUnits(track, yVar));
+    xField.setFixedPattern(NumberFormatDialog.getFormatPattern(track, xVar));
+    yField.setFixedPattern(NumberFormatDialog.getFormatPattern(track, yVar));
+  }
 
-    @Override
-    public String getCoordinateString(DrawingPanel panel, MouseEvent e) {
-        if (panel instanceof TrackerPanel) {
-            TrackerPanel trackerPanel = (TrackerPanel) panel;
-            Point2D pt = trackerPanel.getWorldMousePoint();
-            return getCoordinateString(trackerPanel, pt.getX(), pt.getY());
-        }
-        double x = panel.pixToX(e.getPoint().x);
-        double y = panel.pixToY(e.getPoint().y);
-        return getCoordinateString(null, x, y);
-    }
+  @Override
+  public void setCoordinateLabels(String xLabel, String yLabel) {
+    this.xLabel = xLabel;
+    this.yLabel = yLabel;
+  }
 
-    @Override
-    public String getCoordinateString(VideoPanel vidPanel, double x, double y) {
-        xField.setFormatFor(x);
-        String xStr = xField.getFormat().format(x);
-        if (xField.getUnits() != null) xStr += xField.getUnits();
-        yField.setFormatFor(y);
-        String yStr = yField.getFormat().format(y);
-        if (yField.getUnits() != null) yStr += yField.getUnits();
-        return xLabel + xStr + yLabel + yStr;
-    }
-
-    public void setUnitsAndPatterns(TTrack track, String xVar, String yVar) {
-        if (track == null || track.trackerPanel == null) return;
-        xField.setUnits(track.trackerPanel.getUnits(track, xVar));
-        yField.setUnits(track.trackerPanel.getUnits(track, yVar));
-        xField.setFixedPattern(NumberFormatDialog.getFormatPattern(track, xVar));
-        yField.setFixedPattern(NumberFormatDialog.getFormatPattern(track, yVar));
-    }
-
-    @Override
-    public void setCoordinateLabels(String xLabel, String yLabel) {
-        this.xLabel = xLabel;
-        this.yLabel = yLabel;
-    }
 }

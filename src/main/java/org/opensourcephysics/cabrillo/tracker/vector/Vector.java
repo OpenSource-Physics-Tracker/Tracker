@@ -25,27 +25,18 @@
  */
 package org.opensourcephysics.cabrillo.tracker.vector;
 
-import org.opensourcephysics.cabrillo.tracker.*;
-import org.opensourcephysics.controls.XML;
-import org.opensourcephysics.controls.XMLControl;
-import org.opensourcephysics.controls.XMLControlElement;
-import org.opensourcephysics.display.Dataset;
-import org.opensourcephysics.display.DatasetManager;
-import org.opensourcephysics.display.DrawingPanel;
-import org.opensourcephysics.display.Interactive;
-import org.opensourcephysics.media.core.*;
+import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+import java.beans.PropertyChangeEvent;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.geom.Point2D;
-import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.opensourcephysics.cabrillo.tracker.*;
+import org.opensourcephysics.display.*;
+import org.opensourcephysics.media.core.*;
+import org.opensourcephysics.controls.*;
 
 /**
  * A Vector draws a series of VectorSteps that represent a generic
@@ -59,7 +50,6 @@ public class Vector extends TTrack {
     public static String[] dataVariables;
     public static String[] formatVariables;
     public static String[] fieldVariables;
-
     public static Map<String, ArrayList<String>> formatMap;
     public static Map<String, String> formatDescriptionMap;
 
@@ -291,6 +281,17 @@ public class Vector extends TTrack {
         if (panel instanceof TrackerPanel) {
             TrackerPanel trackerPanel = (TrackerPanel) panel;
             if (!isVectorsVisible(trackerPanel)) return;
+//      snap after loading
+//     boolean changed = trackerPanel.changed;
+//      if (!snapVectors.isEmpty() && panel.getClass().equals(TrackerPanel.class)) {
+//      	Iterator it = snapVectors.iterator();
+//      	while (it.hasNext()) {
+//      		VectorStep step = (VectorStep)it.next();
+//      		step.snap(trackerPanel);
+//      	}
+//      	snapVectors.clear();
+//      	trackerPanel.changed = changed;
+//      }
             super.draw(panel, _g);
         }
     }
@@ -796,3 +797,4 @@ public class Vector extends TTrack {
         }
     }
 }
+

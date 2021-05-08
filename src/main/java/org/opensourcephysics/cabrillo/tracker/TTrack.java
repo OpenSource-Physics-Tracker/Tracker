@@ -36,8 +36,6 @@ import javax.swing.Timer;
 import javax.swing.border.*;
 import javax.swing.event.*;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.opensourcephysics.cabrillo.tracker.vector.Vector;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
@@ -54,14 +52,9 @@ import org.opensourcephysics.cabrillo.tracker.AutoTrackerCore.KeyFrame;
  *
  * @author Douglas Brown
  */
-@Getter
-@Setter
-public abstract class TTrack implements Interactive, Trackable, PropertyChangeListener {
-
-    /**
-     * Unique ID number
-     */
-    private final int ID;
+public abstract class TTrack implements Interactive,
+        Trackable,
+        PropertyChangeListener {
 
     protected static String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //$NON-NLS-1$
     protected static JDialog skippedStepWarningDialog;
@@ -72,33 +65,20 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     protected static TrackNameDialog nameDialog;
     protected static int nextID = 1;
     protected static HashMap<Integer, TTrack> activeTracks = new HashMap<>();
-
-    /**
-     * First param : no AffineTransform
-     * Second param : no antialiasing
-     * Thirs param : no fractional metrics
-     */
-    protected static FontRenderContext frc = new FontRenderContext(null, false, false);
+    protected static FontRenderContext frc
+            = new FontRenderContext(null,   // no AffineTransform
+            false,  // no antialiasing
+            false); // no fractional metrics
 
     // instance fields
     protected String name = TrackerRes.getString("TTrack.Name.None"); //$NON-NLS-1$
     protected String description = ""; //$NON-NLS-1$
     protected boolean visible = true;
     protected boolean trailVisible = false;
-
-    /**
-     * Controls trail length
-     */
-    protected int trailLength;
-
+    protected int trailLength; // controls trail length
     protected boolean locked = false;
     protected boolean enabled = true;
-
-    /**
-     * Determines whether Views include this track
-     */
-    protected boolean viewable = true;
-
+    protected boolean viewable = true; // determines whether Views include this track
     protected Footprint[] footprints = new Footprint[0];
     protected Footprint footprint;
     protected Footprint defaultFootprint;
@@ -119,7 +99,8 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     protected NumberField[] positionFields;
     protected Map<String, NumberField[]> numberFields = new TreeMap<>();
     protected Border fieldBorder;
-    protected Component tSeparator, xSeparator, ySeparator, magSeparator, angleSeparator, stepSeparator;
+    protected Component tSeparator, xSeparator, ySeparator, magSeparator,
+            angleSeparator, stepSeparator;
     protected JMenu menu;
     protected boolean autoAdvance;
     protected boolean markByDefault = false, isMarking = false;
@@ -140,53 +121,28 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     protected XMLProperty dataProp;
     protected Object[][] constantsLoadedFromXML;
     protected String[] dataDescriptions;
-
-    /**
-     * True if data is valid
-     */
-    protected boolean dataValid;
-
+    protected boolean dataValid; // true if data is valid
     protected boolean refreshDataLater;
     protected int[] preferredColumnOrder;
     protected ArrayList<Integer> dataFrames = new ArrayList<>();
     protected String partName, hint;
     protected int stepSizeWhenFirstMarked;
     protected TreeSet<Integer> keyFrames = new TreeSet<>();
-
-    /**
-     * For AutoTracking
-     */
+    // for autotracking
     protected boolean autoTrackerMarking;
-
     protected int targetIndex;
-
-    /**
-     * Attached tracks--used by AttachmentDialog with TapeMeasure, Protractor and CircleFitter tracks
-     */
+    // attached tracks--used by AttachmentDialog with TapeMeasure, Protractor and CircleFitter tracks
     protected TTrack[] attachments;
-
-    /**
-     * Used when loading attachments
-     */
-    protected String[] attachmentNames;
-
-    /**
-     * User-editable text columns shown in DataTable view
-     */
+    protected String[] attachmentNames; // used when loading attachments
+    // user-editable text columns shown in DataTable view
     protected Map<String, String[]> textColumnEntries = new TreeMap<>();
-
     protected ArrayList<String> textColumnNames = new ArrayList<>();
-
-    /**
-     * Mouse listener for number fields
-     */
+    // mouse listener for number fields
     protected MouseAdapter formatMouseListener, formatAngleMouseListener;
-
     protected String[] customNumberFormats;
+    private final int ID; // unique ID number
 
-    /**
-     * For AutoSkipping while AutoTracking
-     */
+    // For autoskipping while autotracking
     public boolean skippedStepWarningSuppress = false;
 
 
@@ -568,6 +524,53 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     }
 
     /**
+     * Gets the locked property.
+     *
+     * @return <code>true</code> if this is locked
+     */
+    public boolean isLocked() {
+        return locked;
+    }
+
+    /**
+     * Sets the autoAdvance property.
+     *
+     * @param auto <code>true</code> to request that the video autoadvance while marking.
+     */
+    public void setAutoAdvance(boolean auto) {
+        autoAdvance = auto;
+    }
+
+    /**
+     * Gets the autoAdvance property.
+     *
+     * @return <code>true</code> if this is autoadvance
+     */
+    public boolean isAutoAdvance() {
+        return autoAdvance;
+    }
+
+    /**
+     * Sets the markByDefault property. When true, the mouse handler should mark
+     * a point whenever the active track reports itself incomplete.
+     *
+     * @param mark <code>true</code> to mark by default
+     */
+    public void setMarkByDefault(boolean mark) {
+        markByDefault = mark;
+    }
+
+    /**
+     * Gets the markByDefault property. When true, the mouse handler should mark
+     * a point whenever the active track reports itself incomplete.
+     *
+     * @return <code>true</code> if this marks by default
+     */
+    public boolean isMarkByDefault() {
+        return markByDefault;
+    }
+
+    /**
      * Gets the color.
      *
      * @return the current color
@@ -647,6 +650,24 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     }
 
     /**
+     * Gets the ID number of this track.
+     *
+     * @return the ID number
+     */
+    public int getID() {
+        return ID;
+    }
+
+    /**
+     * Gets the name of this track.
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
      * Gets the name of this track.
      *
      * @param context ignored by default
@@ -679,6 +700,14 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
         }
     }
 
+    /**
+     * Gets the description of this track.
+     *
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
 
     /**
      * Sets the description of this track.
@@ -722,6 +751,24 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     }
 
     /**
+     * Determines whether views and track menu include this track.
+     *
+     * @param viewable <code>true</code> to include this track in views
+     */
+    public void setViewable(boolean viewable) {
+        this.viewable = viewable;
+    }
+
+    /**
+     * Reports whether or not this is viewable.
+     *
+     * @return <code>true</code> if this track is viewable
+     */
+    public boolean isViewable() {
+        return viewable;
+    }
+
+    /**
      * Reports whether or not this is dependent. A dependent track gets some
      * or all of its data from other tracks. Dependent tracks should override
      * this method to return true.
@@ -761,6 +808,26 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
      */
     public void setFootprints(Footprint[] choices, Step step) {
         setFootprints(choices);
+    }
+
+    /**
+     * Gets the footprint choices.
+     *
+     * @return the array of Footprints available to this track
+     */
+    public Footprint[] getFootprints() {
+        return footprints;
+    }
+
+    /**
+     * Gets the footprint choices. The step parameter may be
+     * used to get the footprints of secondary step arrays (veloc, accel, etc).
+     *
+     * @param step the step that identifies the step array
+     * @return the array of Footprints available to this track
+     */
+    public Footprint[] getFootprints(Step step) {
+        return footprints;
     }
 
     /**
@@ -822,6 +889,15 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     }
 
     /**
+     * Gets the current footprint.
+     *
+     * @return the footprint
+     */
+    public Footprint getFootprint() {
+        return footprint;
+    }
+
+    /**
      * Sets the footprint to the specified choice. The step parameter may be
      * used to set the footprints of secondary step arrays (veloc, accel, etc).
      *
@@ -846,8 +922,8 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     /**
      * Gets this track's current icon.
      *
-     * @param w the icon width
-     * @param h the icon height
+     * @param w       the icon width
+     * @param h       the icon height
      * @return the icon
      */
     public Icon getIcon(int w, int h, String context) {
@@ -2910,4 +2986,6 @@ public abstract class TTrack implements Interactive, Trackable, PropertyChangeLi
     protected static TTrack getTrack(int ID) {
         return activeTracks.get(ID);
     }
+
 }
+

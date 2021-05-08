@@ -24,8 +24,6 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.opensourcephysics.cabrillo.tracker.deploy.TrackerStarter;
 import org.opensourcephysics.controls.*;
 import org.opensourcephysics.display.*;
@@ -59,29 +57,26 @@ import java.util.logging.Level;
  *
  * @author Douglas Brown
  */
-@Getter
-@Setter
 public class Tracker {
 
     static {
         XML.setLoader(Preferences.class, new Preferences.Loader());
     }
 
+    // define static constants
     /**
-     * Tracker version
+     * tracker version and copyright
      */
     public static final String VERSION = "5.2.0.0";
-
-    /**
-     * Tracker copyright
-     */
     public static final String COPYRIGHT = "Copyright (c) 2018 Douglas Brown, Nikolai Avdeev";
-
     /**
-     * The tracker icon
+     * the tracker icon
      */
-    public static final ImageIcon TRACKER_ICON =
-            new ImageIcon(Tracker.class.getResource("/images/tracker_icon_32.png"));
+    public static final ImageIcon TRACKER_ICON = new ImageIcon(Tracker.class.getResource("/images/tracker_icon_32.png"));
+    /**
+     * a larger tracker icon
+     */
+    public static final ImageIcon TRACKER_ICON_256 = new ImageIcon(Tracker.class.getResource("/images/tracker_icon_256.png"));
 
     public static final String THETA = TeXParser.parseTeX("$\\theta");
     static final String OMEGA = TeXParser.parseTeX("$\\omega");
@@ -485,6 +480,15 @@ public class Tracker {
     }
 
     /**
+     * Gets the frame.
+     *
+     * @return the frame
+     */
+    public TFrame getFrame() {
+        return frame;
+    }
+
+    /**
      * Creates the TFrame.
      */
     private void createFrame() {
@@ -571,6 +575,8 @@ public class Tracker {
             });
         }
     }
+
+//________________________________  static methods ____________________________
 
     /**
      * Compares version strings.
@@ -724,6 +730,7 @@ public class Tracker {
                     // add entry to the results map
                     results.put(file.getName(), expandedFunctions);
                 }
+
             }
         }
         return results;

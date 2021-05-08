@@ -37,7 +37,6 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import lombok.Getter;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.tools.FontSizer;
@@ -50,59 +49,14 @@ import org.opensourcephysics.controls.*;
  *
  * @author Douglas Brown
  */
-@Getter
 public class CircleFitter extends TTrack {
 
     protected static int maxDataPointCount = 50;
-
     protected static String[] dataVariables;
-
-    /**
-     * Associated with number fields
-     */
-    protected static String[] fieldVariables;
-
-    /**
-     * Used by NumberFormatSetter
-     */
-    protected static String[] formatVariables;
-
+    protected static String[] fieldVariables; // associated with number fields
+    protected static String[] formatVariables; // used by NumberFormatSetter
     protected static Map<String, ArrayList<String>> formatMap;
     protected static Map<String, String> formatDescriptionMap;
-
-    protected boolean fixedPosition = true;
-    protected boolean attachToSteps = false;
-    protected boolean isRelativeFrameNumbers = false;
-
-    private boolean refreshingAttachments;
-    private boolean abortRefreshAttachments;
-    private boolean loadingAttachments;
-
-    protected JCheckBoxMenuItem fixedItem;
-
-    protected JLabel clickToMarkLabel;
-    protected JLabel xDataPointLabel;
-    protected JLabel yDataPointLabel;
-
-    protected NumberField xDataField;
-    protected NumberField yDataField;
-
-    protected Component xDataPointSeparator;
-    protected Component yDataPointSeparator;
-
-    protected JMenuItem originToCenterItem;
-    protected JMenuItem clearPointsItem;
-    protected JMenuItem attachmentItem;
-
-    protected JButton pointCountButton;
-
-    protected int absoluteStart = 0;
-    protected int relativeStart = -2;
-    protected int attachmentFrameCount = 5;
-
-    protected TTrack[] attachmentForSteps;
-
-    protected String stepAttachmentName;
 
     static {
         String center = TrackerRes.getString("CircleFitter.Data.Center") + "}"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -155,6 +109,22 @@ public class CircleFitter extends TTrack {
         formatDescriptionMap.put(formatVariables[2], TrackerRes.getString("CircleFitter.Label.Radius")); //$NON-NLS-1$
 
     }
+
+    // instance fields
+    protected boolean fixedPosition = true;
+    protected JCheckBoxMenuItem fixedItem;
+    protected JLabel clickToMarkLabel;
+    protected JLabel xDataPointLabel, yDataPointLabel;
+    protected NumberField xDataField, yDataField;
+    protected Component xDataPointSeparator, yDataPointSeparator;
+    protected JMenuItem originToCenterItem, clearPointsItem;
+    protected JMenuItem attachmentItem;
+    protected JButton pointCountButton;
+    protected boolean attachToSteps = false, isRelativeFrameNumbers = false;
+    protected int absoluteStart = 0, relativeStart = -2, attachmentFrameCount = 5;
+    protected TTrack[] attachmentForSteps;
+    protected String stepAttachmentName;
+    private boolean refreshingAttachments, abortRefreshAttachments, loadingAttachments;
 
     /**
      * Constructs a CircleFitter.
@@ -675,6 +645,15 @@ public class CircleFitter extends TTrack {
     }
 
     /**
+     * Gets the attachment frame count.
+     *
+     * @return the frame count
+     */
+    public int getAttachmentFrameCount() {
+        return attachmentFrameCount;
+    }
+
+    /**
      * Gets the end frame for single track attachments.
      *
      * @param frameNumber the current frame number
@@ -1142,6 +1121,7 @@ public class CircleFitter extends TTrack {
         return numberFields;
     }
 
+//__________________________ protected methods ________________________
 
     @Override
     protected void setTrackerPanel(TrackerPanel panel) {
@@ -1343,7 +1323,7 @@ public class CircleFitter extends TTrack {
         int key = 0;
         if (!this.isFixed()) {
             for (int i : keyFrames) {
-                if (i <= step.frameNumber)
+                if (i <= step.n)
                     key = i;
             }
         }
@@ -1414,7 +1394,7 @@ public class CircleFitter extends TTrack {
             for (Step step : stepArray) {
                 if (step == null) continue;
                 CircleFitterStep circleStep = (CircleFitterStep) step;
-                trackerPanel.getCoords().setOriginXY(step.frameNumber, circleStep.center.x, circleStep.center.y);
+                trackerPanel.getCoords().setOriginXY(step.n, circleStep.center.x, circleStep.center.y);
             }
         }
         trackerPanel.getAxes().setVisible(true);
@@ -1422,6 +1402,7 @@ public class CircleFitter extends TTrack {
         Undo.postCoordsEdit(trackerPanel, control);
     }
 
+//__________________________ static methods ___________________________
 
     /**
      * Returns an ObjectLoader to save and load data for this class.
@@ -1585,4 +1566,6 @@ public class CircleFitter extends TTrack {
             return obj;
         }
     }
+
 }
+

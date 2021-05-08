@@ -26,8 +26,7 @@ package org.opensourcephysics.cabrillo.tracker.vector;
 
 import org.opensourcephysics.cabrillo.tracker.TTrack;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * This is an ArrayList that represents a chain of vectors linked tip-to-tail.
@@ -36,222 +35,224 @@ import java.util.Collection;
  */
 public class VectorChain extends ArrayList<VectorStep> {
 
-    /**
-     * Constructs a chain.
-     *
-     * @param start the start vector
-     */
-    protected VectorChain(VectorStep start) {
-        if (isAllowed(start)) {
-            start.chain = this;
-            super.add(start);
-        }
+  /**
+   * Constructs a chain.
+   *
+   * @param start the start vector
+   */
+  protected VectorChain(VectorStep start) {
+    if (isAllowed(start)) {
+      start.chain = this;
+      super.add(start);
     }
+  }
 
-    /**
-     * Gets the end of the chain.
-     *
-     * @return the end vector
-     */
-    public VectorStep getEnd() {
-        return get(size() - 1);
-    }
+  /**
+   * Gets the end of the chain.
+   *
+   * @return the end vector
+   */
+  public VectorStep getEnd() {
+    return get(size() - 1);
+  }
 
-    /**
-     * Gets the start of the chain.
-     *
-     * @return the start vector
-     */
-    public VectorStep getStart() {
-        return get(0);
-    }
+  /**
+   * Gets the start of the chain.
+   *
+   * @return the start vector
+   */
+  public VectorStep getStart() {
+    return get(0);
+  }
 
-    /**
-     * Removes the end of the chain.
-     *
-     * @return the removed end
-     */
-    public VectorStep removeEnd() {
-        if (size() == 0) return null;
-        VectorStep end = getEnd();
-        end.chain = null;
-        end.attach(null);
-        super.remove(size() - 1);
-        return end;
-    }
+  /**
+   * Removes the end of the chain.
+   *
+   * @return the removed end
+   */
+  public VectorStep removeEnd() {
+    if (size() == 0) return null;
+    VectorStep end = getEnd();
+    end.chain = null;
+    end.attach(null);
+    super.remove(size() - 1);
+    return end;
+  }
 
-    /**
-     * /**
-     * Attempts to break this chain in two. If successful, the specified vector
-     * becomes the tail vector of a new chain.
-     *
-     * @param vector the vector
-     */
-    public void breakAt(VectorStep vector) {
-        if (vector == getEnd()) {
-            removeEnd();
-        }
+  /**
+  /**
+   * Attempts to break this chain in two. If successful, the specified vector
+   * becomes the tail vector of a new chain.
+   *
+   * @param vector the vector
+   */
+  public void breakAt(VectorStep vector) {
+    if (vector == getEnd()) {
+      removeEnd();
     }
+  }
 
-    /**
-     * Overrides ArrayList method.
-     */
-    public void clear() {
-        for (VectorStep link : this) {
-            // detach link and remove reference to this chain
-            link.chain = null;
-            link.attach(null);
-        }
-        super.clear();
+  /**
+   * Overrides ArrayList method.
+   */
+  public void clear() {
+    for (VectorStep link : this) {
+      // detach link and remove reference to this chain
+      link.chain = null;
+      link.attach(null);
     }
+    super.clear();
+  }
 
-    /**
-     * Ads a vector to this chain.
-     *
-     * @param vector the vector to add
-     * @return true if the vector is successfully added
-     */
-    public boolean add(VectorStep vector) {
-        // add a chain of vectors
-        if (vector.getChain() != null) {
-            return add(vector.getChain());
-        }
-        // link to the end hinge if allowed
-        if (isAllowed(vector)) {
-            VectorStep end = getEnd();
-            vector.attach(end.getVisibleTip());
-            vector.chain = this;
-            super.add(vector);
-            return true;
-        }
-        return false;
+  /**
+   * Ads a vector to this chain.
+   *
+   * @param vector the vector to add
+   * @return true if the vector is successfully added
+   */
+  public boolean add(VectorStep vector) {
+    // add a chain of vectors
+    if (vector.getChain() != null) {
+      return add(vector.getChain());
     }
+    // link to the end hinge if allowed
+    if (isAllowed(vector)) {
+      VectorStep end = getEnd();
+      vector.attach(end.getVisibleTip());
+      vector.chain = this;
+      super.add(vector);
+      return true;
+    }
+    return false;
+  }
 
-    /**
-     * Adds a VectorChain to this chain.
-     *
-     * @param chain the chain to add
-     * @return true if successfully added
-     */
-    public boolean add(VectorChain chain) {
-        if (chain == this) return false;
-        // remove all vectors from the chain and add them to this
-        ArrayList<VectorStep> vectors = chain.remove(chain.getStart());
-        addAll(vectors);
-        return true;
-    }
+  /**
+   * Adds a VectorChain to this chain.
+   *
+   * @param chain the chain to add
+   * @return true if successfully added
+   */
+  public boolean add(VectorChain chain) {
+    if (chain == this) return false;
+    // remove all vectors from the chain and add them to this
+    ArrayList<VectorStep> vectors = chain.remove(chain.getStart());
+    addAll(vectors);
+    return true;
+  }
 
-    /**
-     * Overrides ArrayList method.
-     *
-     * @param c the collection to add
-     * @return true if at least one item in the collection is successfully added
-     */
-    public boolean addAll(Collection<? extends VectorStep> c) {
-        boolean added = false;
-        for (VectorStep vectorStep : c) {
-            added = add(vectorStep) || added;
-        }
-        return added;
+  /**
+   * Overrides ArrayList method.
+   *
+   * @param c the collection to add
+   * @return true if at least one item in the collection is successfully added
+   */
+  public boolean addAll(Collection<? extends VectorStep> c) {
+    boolean added = false;
+    for (VectorStep vectorStep : c) {
+      added = add(vectorStep) || added;
     }
+    return added;
+  }
 
-    /**
-     * Overrides ArrayList method.
-     *
-     * @param index the index
-     * @param v     the vector to add
-     */
-    public void add(int index, VectorStep v) {
-    }
+  /**
+   * Overrides ArrayList method.
+   *
+   * @param index the index
+   * @param v the vector to add
+   */
+  public void add(int index, VectorStep v) {
+  }
 
-    /**
-     * Overrides ArrayList method.
-     *
-     * @param index the index
-     * @return the object removed
-     */
-    public VectorStep remove(int index) {
-        return null;
-    }
+  /**
+   * Overrides ArrayList method.
+   *
+   * @param index the index
+   * @return the object removed
+   */
+  public VectorStep remove(int index) {
+    return null;
+  }
 
-    /**
-     * Overrides ArrayList method.
-     *
-     * @param obj the object to remove
-     * @return false
-     */
-    public boolean remove(Object obj) {
-        return false;
-    }
+  /**
+   * Overrides ArrayList method.
+   *
+   * @param obj the object to remove
+   * @return false
+   */
+  public boolean remove(Object obj) {
+    return false;
+  }
 
-    /**
-     * Overrides ArrayList method.
-     *
-     * @param from index
-     * @param to   index
-     */
-    public void removeRange(int from, int to) {
-    }
+  /**
+   * Overrides ArrayList method.
+   *
+   * @param from index
+   * @param to index
+   */
+  public void removeRange(int from, int to) {
+  }
 
-    /**
-     * Overrides ArrayList method.
-     *
-     * @param c a collection
-     * @return false
-     */
-    public boolean retainAll(Collection<?> c) {
-        return false;
-    }
+  /**
+   * Overrides ArrayList method.
+   *
+   * @param c a collection
+   * @return false
+   */
+  public boolean retainAll(Collection<?> c) {
+    return false;
+  }
 
-    /**
-     * Overrides ArrayList method.
-     *
-     * @param index the index
-     * @param c     the collection to add
-     * @return true if the collection is successfully added
-     */
-    public boolean addAll(int index, Collection<? extends VectorStep> c) {
-        return false;
-    }
+  /**
+   * Overrides ArrayList method.
+   *
+   * @param index the index
+   * @param c the collection to add
+   * @return true if the collection is successfully added
+   */
+  public boolean addAll(int index, Collection<? extends VectorStep> c) {
+    return false;
+  }
 
-    /**
-     * Overrides ArrayList method.
-     *
-     * @param index the index
-     * @param obj   the object
-     * @return the element previously at index
-     */
-    public VectorStep set(int index, VectorStep obj) {
-        return null;
-    }
+  /**
+   * Overrides ArrayList method.
+   *
+   * @param index the index
+   * @param obj the object
+   * @return the element previously at index
+   */
+  public VectorStep set(int index, VectorStep obj) {
+    return null;
+  }
 
 //_____________________________ protected methods _____________________________
 
-    /**
-     * Determines whether the specified vector is allowed to be added to the end hinge.
-     *
-     * @param vector the vector
-     * @return true if allowed
-     */
-    protected boolean isAllowed(VectorStep vector) {
-        if (vector.getChain() != null) return false;
-        if (size() == 0) return true;
-        Class<? extends TTrack> endClass = getEnd().getTrack().getClass();
-        return endClass.equals(vector.getTrack().getClass());
-    }
+  /**
+   * Determines whether the specified vector is allowed to be added to the end hinge.
+   *
+   * @param vector the vector
+   * @return true if allowed
+   */
+  protected boolean isAllowed(VectorStep vector) {
+    if (vector.getChain() != null) return false;
+    if (size() == 0) return true;
+    Class<? extends TTrack> endClass = getEnd().getTrack().getClass();
+    return endClass.equals(vector.getTrack().getClass());
+  }
 
-    /**
-     * Removes vectors downstream of and including the specified vector.
-     *
-     * @param vector the vector
-     * @return the list of vectors removed
-     */
-    protected ArrayList<VectorStep> remove(VectorStep vector) {
-        ArrayList<VectorStep> list = new ArrayList<>();
-        int length = size();
-        for (int i = indexOf(vector); i < length; i++) {
-            list.add(0, removeEnd());
-        }
-        return list;
+  /**
+   * Removes vectors downstream of and including the specified vector.
+   *
+   * @param vector the vector
+   * @return the list of vectors removed
+   */
+  protected ArrayList<VectorStep> remove(VectorStep vector) {
+    ArrayList<VectorStep> list = new ArrayList<>();
+    int length = size();
+    for (int i = indexOf(vector); i < length; i++) {
+      list.add(0, removeEnd());
     }
+    return list;
+  }
+
 }
+

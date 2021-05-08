@@ -24,67 +24,83 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
+import java.awt.geom.*;
+
+import javax.swing.Icon;
 
 /**
  * A PositionVectorFootprint returns a vector shape for a Point[] of length 2,
  * but creates a hit shape only at the tip of the vector.
  */
-@Getter
-@Setter
 public class PositionVectorFootprint extends PointShapeFootprint {
 
-    LineFootprint arrow;
+  // instance fields
+	LineFootprint arrow;
 
-    /**
-     * Constructs a PositionVectorFootprint.
-     *
-     * @param name the name of the footprint
-     * @param w    the stroke line width
-     */
-    public PositionVectorFootprint(String name, int w) {
-        super(name, new Ellipse2D.Double(-2, -2, 4, 4));
-        arrow = (LineFootprint) LineFootprint.getFootprint("Footprint.Arrow"); //$NON-NLS-1$
-        if (arrow != null) {
-            arrow.setLineWidth(w);
-        }
-        baseStroke = null;
+  /**
+   * Constructs a PositionVectorFootprint.
+   *
+   * @param name the name of the footprint
+   * @param w the stroke line width
+   */
+  public PositionVectorFootprint(String name, int w) {
+    super(name, new Ellipse2D.Double(-2, -2, 4, 4));
+    arrow = (LineFootprint)LineFootprint.getFootprint("Footprint.Arrow"); //$NON-NLS-1$
+    if (arrow != null) {
+      arrow.setLineWidth(w);
     }
+    baseStroke = null;
+  }
+  
+  /**
+   * Gets the fill shape for a specified point.
+   *
+   * @param points an array of points
+   * @return the fill shape
+   */
+  public Shape getShape(Point[] points) {
+  	super.getShape(points); // this sets up hitShapes[] at vector tip
+    return arrow.getShape(points);
+  }
 
-    /**
-     * Gets the fill shape for a specified point.
-     *
-     * @param points an array of points
-     * @return the fill shape
-     */
-    public Shape getShape(Point[] points) {
-        super.getShape(points); // this sets up hitShapes[] at vector tip
-        return arrow.getShape(points);
-    }
+  /**
+   * Gets the icon.
+   *
+   * @param w width of the icon
+   * @param h height of the icon
+   * @return the icon
+   */
+  public Icon getIcon(int w, int h) {
+  	arrow.setColor(color);
+    return arrow.getIcon(w, h);
+  }
 
-    /**
-     * Gets the icon.
-     *
-     * @param w width of the icon
-     * @param h height of the icon
-     * @return the icon
-     */
-    public Icon getIcon(int w, int h) {
-        arrow.setColor(color);
-        return arrow.getIcon(w, h);
-    }
+  /**
+   * Sets the stroke. May be set to null.
+   *
+   * @param stroke the desired stroke
+   */
+  public void setStroke(BasicStroke stroke) {
+    arrow.setStroke(stroke);
+  }
 
-    /**
-     * Sets the line width.
-     *
-     * @param w the desired line width
-     */
-    public void setLineWidth(double w) {
-        arrow.setLineWidth(w);
-    }
+  /**
+   * Gets the stroke. May return null;
+   *
+   * @return the stroke
+   */
+  public BasicStroke getStroke() {
+    return arrow.getStroke();
+  }
+
+  /**
+   * Sets the line width.
+   *
+   * @param w the desired line width
+   */
+  public void setLineWidth(double w) {
+    arrow.setLineWidth(w);
+  }
+
 }
