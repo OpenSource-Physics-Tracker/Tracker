@@ -37,7 +37,7 @@ import org.opensourcephysics.tools.FontSizer;
  *
  * @author Douglas Brown
  */
-public class DoubleCrosshairFootprint extends LineFootprint {
+class DoubleCrosshairFootprint extends LineFootprint {
 
   // instance fields
 	protected Shape targetShape;
