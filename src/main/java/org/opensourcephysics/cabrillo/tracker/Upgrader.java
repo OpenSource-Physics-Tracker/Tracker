@@ -46,7 +46,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.opensourcephysics.cabrillo.tracker.component.TActions;
+import org.opensourcephysics.cabrillo.tracker.component.TFrame;
 import org.opensourcephysics.cabrillo.tracker.deploy.TrackerStarter;
+import org.opensourcephysics.cabrillo.tracker.tracker.Tracker;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.controls.OSPLog;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.desktop.OSPDesktop;

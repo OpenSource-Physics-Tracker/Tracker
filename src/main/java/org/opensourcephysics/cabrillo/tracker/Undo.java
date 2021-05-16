@@ -31,6 +31,17 @@ import java.awt.Point;
 import java.io.IOException;
 import java.util.*;
 
+import org.opensourcephysics.cabrillo.tracker.component.TActions;
+import org.opensourcephysics.cabrillo.tracker.component.TMenuBar;
+import org.opensourcephysics.cabrillo.tracker.component.TTrack;
+import org.opensourcephysics.cabrillo.tracker.component.TTrackBar;
+import org.opensourcephysics.cabrillo.tracker.particle.ParticleDataTrack;
+import org.opensourcephysics.cabrillo.tracker.perspective.PerspectiveTrack;
+import org.opensourcephysics.cabrillo.tracker.step.Step;
+import org.opensourcephysics.cabrillo.tracker.step.StepSet;
+import org.opensourcephysics.cabrillo.tracker.track.TrackProperties;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.controls.*;
 import org.opensourcephysics.media.core.*;
 
@@ -42,7 +53,7 @@ import org.opensourcephysics.media.core.*;
 public class Undo {
 
     // static fields
-    protected static Map<TrackerPanel, Undo> undomap = new HashMap<>();
+    public static Map<TrackerPanel, Undo> undomap = new HashMap<>();
 
     // instance fields
     protected UndoableEditSupport undoSupport;
@@ -54,7 +65,6 @@ public class Undo {
     private Undo() {
         // set up the undo system
         undoManager = new MyUndoManager();
-//    undoManager.setLimit(20);
         undoSupport = new UndoableEditSupport();
         undoSupport.addUndoableEditListener(undoManager);
         XML.setLoader(TrackProperties.class, TrackProperties.getLoader());
@@ -151,7 +161,7 @@ public class Undo {
      *
      * @param track the track
      */
-    protected static void postTrackDelete(TTrack track) {
+    public static void postTrackDelete(TTrack track) {
         TrackerPanel panel = track.trackerPanel;
         if (panel == null) return;
         UndoableEdit edit = new TrackDelete(panel, track);
@@ -165,7 +175,7 @@ public class Undo {
      * @param panel the TrackerPanel that has been cleared
      * @param xml   a list of XML strings describing the cleared tracks
      */
-    protected static void postTrackClear(TrackerPanel panel, List<String> xml) {
+    public static void postTrackClear(TrackerPanel panel, List<String> xml) {
         UndoableEdit edit = new TrackClear(panel, xml);
         getUndo(panel).undoSupport.postEdit(edit);
         refreshMenus(panel);
@@ -177,7 +187,7 @@ public class Undo {
      * @param track   the changed track
      * @param control an XMLControl with the previous state of the track
      */
-    protected static void postTrackEdit(TTrack track, XMLControl control) {
+    public static void postTrackEdit(TTrack track, XMLControl control) {
         TrackerPanel panel = track.trackerPanel;
         if (panel == null) return;
         UndoableEdit edit = new TrackEdit(track, control);
@@ -190,7 +200,7 @@ public class Undo {
      *
      * @param tracksAndXMLControls list of array elements, each element = {track, track's previous state}
      */
-    protected static void postMultiTrackEdit(ArrayList<Object[]> tracksAndXMLControls) {
+    public static void postMultiTrackEdit(ArrayList<Object[]> tracksAndXMLControls) {
         if (tracksAndXMLControls == null || tracksAndXMLControls.size() == 0) return;
         TTrack track = (TTrack) tracksAndXMLControls.get(0)[0];
         TrackerPanel panel = track.trackerPanel;
@@ -231,7 +241,7 @@ public class Undo {
      * @param steps   the changed StepSet
      * @param control an XMLControl with the previous state of the StepSet
      */
-    protected static void postStepSetEdit(StepSet steps, XMLControl control) {
+    public static void postStepSetEdit(StepSet steps, XMLControl control) {
         TrackerPanel panel = steps.trackerPanel;
         TTrack track = null;
         boolean singleTrack = true;
@@ -264,7 +274,7 @@ public class Undo {
      * @param panel   the TrackerPanel with the changed coords
      * @param control an XMLControl with the previous state of the coords
      */
-    protected static void postCoordsEdit(TrackerPanel panel, XMLControl control) {
+    public static void postCoordsEdit(TrackerPanel panel, XMLControl control) {
         UndoableEdit edit = new CoordsEdit(panel, control);
         getUndo(panel).undoSupport.postEdit(edit);
         refreshMenus(panel);
@@ -277,7 +287,7 @@ public class Undo {
      * @param trackControl  an XMLControl with the previous state of the track
      * @param coordsControl an XMLControl with the previous state of the coords
      */
-    protected static void postTrackAndCoordsEdit(TTrack track, XMLControl trackControl, XMLControl coordsControl) {
+    public static void postTrackAndCoordsEdit(TTrack track, XMLControl trackControl, XMLControl coordsControl) {
         TrackerPanel panel = track.trackerPanel;
         if (panel == null) return;
         // coords edit first!
@@ -297,7 +307,7 @@ public class Undo {
      * @param step  step number after edit occured
      * @param added true if a frame was added
      */
-    protected static void postImageVideoEdit(TrackerPanel panel,
+    public static void postImageVideoEdit(TrackerPanel panel,
                                              String[] paths, int index, int step, boolean added) {
         UndoableEdit edit = new ImageVideoEdit(
                 panel, paths, index, step, added);
@@ -311,7 +321,7 @@ public class Undo {
      * @param panel   the TrackerPanel with the new video clip
      * @param control an XMLControl describing the previous video clip
      */
-    protected static void postVideoReplace(TrackerPanel panel, XMLControl control) {
+    public static void postVideoReplace(TrackerPanel panel, XMLControl control) {
         UndoableEdit edit = new VideoReplace(panel, control);
         getUndo(panel).undoSupport.postEdit(edit);
         refreshMenus(panel);
@@ -323,7 +333,7 @@ public class Undo {
      * @param panel  the TrackerPanel with the new video clip
      * @param filter the deleted filter
      */
-    protected static void postFilterDelete(TrackerPanel panel, Filter filter) {
+    public static void postFilterDelete(TrackerPanel panel, Filter filter) {
         UndoableEdit edit = new FilterDelete(panel, filter);
         getUndo(panel).undoSupport.postEdit(edit);
         refreshMenus(panel);
@@ -336,7 +346,7 @@ public class Undo {
      * @param filter  the  filter
      * @param control an XMLControl with the previous state of the filter
      */
-    protected static void postFilterEdit(TrackerPanel panel, Filter filter, XMLControl control) {
+    public static void postFilterEdit(TrackerPanel panel, Filter filter, XMLControl control) {
         UndoableEdit edit = new FilterEdit(panel, filter, control);
         getUndo(panel).undoSupport.postEdit(edit);
         refreshMenus(panel);
@@ -348,7 +358,7 @@ public class Undo {
      * @param panel the TrackerPanel that has been cleared
      * @param xml   a list of XML strings describing the cleared tracks
      */
-    protected static void postFilterClear(TrackerPanel panel, List<String> xml) {
+    public static void postFilterClear(TrackerPanel panel, List<String> xml) {
         UndoableEdit edit = new FilterClear(panel, xml);
         getUndo(panel).undoSupport.postEdit(edit);
         refreshMenus(panel);
@@ -360,7 +370,7 @@ public class Undo {
      * @param track   the track with the changed property
      * @param control an XMLControl with the previous state of the footprint
      */
-    protected static void postTrackDisplayEdit(TTrack track, XMLControl control) {
+    public static void postTrackDisplayEdit(TTrack track, XMLControl control) {
         TrackerPanel panel = track.trackerPanel;
         if (panel == null) return;
         UndoableEdit edit = new TrackDisplayEdit(track, control);

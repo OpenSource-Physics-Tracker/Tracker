@@ -43,7 +43,7 @@ import java.nio.charset.Charset;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import org.opensourcephysics.cabrillo.tracker.Tracker;
+import org.opensourcephysics.cabrillo.tracker.tracker.Tracker;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.controls.XMLControlElement;

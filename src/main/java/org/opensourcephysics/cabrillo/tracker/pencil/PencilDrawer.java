@@ -36,9 +36,9 @@ import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 
-import org.opensourcephysics.cabrillo.tracker.Tracker;
-import org.opensourcephysics.cabrillo.tracker.TrackerPanel;
-import org.opensourcephysics.cabrillo.tracker.TrackerRes;
+import org.opensourcephysics.cabrillo.tracker.tracker.Tracker;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.display.GUIUtils;
 import org.opensourcephysics.display.Interactive;
 import org.opensourcephysics.display.InteractivePanel;

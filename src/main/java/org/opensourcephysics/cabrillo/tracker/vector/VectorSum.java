@@ -24,7 +24,13 @@
  */
 package org.opensourcephysics.cabrillo.tracker.vector;
 
-import org.opensourcephysics.cabrillo.tracker.*;
+import org.opensourcephysics.cabrillo.tracker.component.TTrack;
+import org.opensourcephysics.cabrillo.tracker.footprint.ArrowFootprint;
+import org.opensourcephysics.cabrillo.tracker.footprint.Footprint;
+import org.opensourcephysics.cabrillo.tracker.line.LineFootprint;
+import org.opensourcephysics.cabrillo.tracker.step.Step;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.display.DrawingPanel;
@@ -281,7 +287,7 @@ public class VectorSum extends Vector {
     /**
      * Cleans up associated resources when this track is deleted or cleared.
      */
-    protected void dispose() {
+    public void dispose() {
         super.dispose();
         for (Vector v : vectors) {
             if (v != null) {

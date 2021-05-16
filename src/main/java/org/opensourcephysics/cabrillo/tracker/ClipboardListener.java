@@ -30,6 +30,11 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 
+import org.opensourcephysics.cabrillo.tracker.component.TFrame;
+import org.opensourcephysics.cabrillo.tracker.particle.ParticleDataTrack;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerIO;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.display.DatasetManager;
 import org.opensourcephysics.media.core.DataTrack;
 import org.opensourcephysics.tools.DataTool;
@@ -41,7 +46,7 @@ import org.opensourcephysics.tools.DataTool;
  *
  * @author Douglas Brown
  */
-class ClipboardListener extends Thread implements ClipboardOwner {
+public class ClipboardListener extends Thread implements ClipboardOwner {
 
     private final Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
     private final TFrame frame;
@@ -193,5 +198,4 @@ class ClipboardListener extends Thread implements ClipboardOwner {
     public void end() {
         running = false;
     }
-
 }

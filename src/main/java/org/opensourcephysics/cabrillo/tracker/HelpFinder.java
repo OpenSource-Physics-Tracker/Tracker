@@ -47,6 +47,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.text.Document;
 
+import org.opensourcephysics.cabrillo.tracker.component.TToolBar;
+import org.opensourcephysics.cabrillo.tracker.tracker.Tracker;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.controls.XMLControlElement;
@@ -239,7 +242,7 @@ public class HelpFinder {
         return context.toString().trim();
     }
 
-    protected static Component[] getNavComponentsFor(Launcher launcher) {
+    public static Component[] getNavComponentsFor(Launcher launcher) {
         helpLauncher = launcher;
         searchLabel.setText(TrackerRes.getString("HelpFinder.Label.SearchFor.Text") + ":"); //$NON-NLS-1$ //$NON-NLS-2$
         searchLabel.setToolTipText(TrackerRes.getString("HelpFinder.Label.SearchFor.Tooltip")); //$NON-NLS-1$

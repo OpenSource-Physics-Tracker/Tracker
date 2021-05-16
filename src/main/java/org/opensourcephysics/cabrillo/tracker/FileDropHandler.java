@@ -43,6 +43,10 @@ import javax.swing.JOptionPane;
 import javax.swing.TransferHandler;
 import javax.swing.filechooser.FileFilter;
 
+import org.opensourcephysics.cabrillo.tracker.component.TFrame;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerIO;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.controls.OSPLog;
 import org.opensourcephysics.display.OSPRuntime;
 import org.opensourcephysics.media.core.ImageVideo;

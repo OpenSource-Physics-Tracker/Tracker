@@ -25,7 +25,7 @@
 
 package org.opensourcephysics.cabrillo.tracker.bounce;
 
-import org.opensourcephysics.cabrillo.tracker.Derivative;
+import org.opensourcephysics.cabrillo.tracker.derivative.Derivative;
 
 import java.util.Arrays;
 

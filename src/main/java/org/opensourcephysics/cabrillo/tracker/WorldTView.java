@@ -31,7 +31,12 @@
 
  import javax.swing.*;
 
+ import org.opensourcephysics.cabrillo.tracker.component.*;
+ import org.opensourcephysics.cabrillo.tracker.coord.CoordAxes;
  import org.opensourcephysics.cabrillo.tracker.pencil.PencilScene;
+ import org.opensourcephysics.cabrillo.tracker.tracker.TrackerIO;
+ import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+ import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
  import org.opensourcephysics.display.*;
  import org.opensourcephysics.media.core.*;
  import org.opensourcephysics.tools.*;
@@ -415,7 +420,7 @@
       *
       * @return true if selected
       */
-     protected boolean isSelectedView() {
+     public boolean isSelectedView() {
          Container c = getParent();
          while (c != null) {
              if (c instanceof TViewChooser) {

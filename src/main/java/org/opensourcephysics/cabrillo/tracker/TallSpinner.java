@@ -7,11 +7,11 @@ import java.awt.event.MouseAdapter;
 /**
  * Spinner with same preferred height as another component.
  */
-class TallSpinner extends JSpinner {
+public class TallSpinner extends JSpinner {
 
     Component comp;
 
-    TallSpinner(SpinnerModel model, Component heightComponent) {
+    public TallSpinner(SpinnerModel model, Component heightComponent) {
         super(model);
         comp = heightComponent;
         JFormattedTextField tf = getTextField();

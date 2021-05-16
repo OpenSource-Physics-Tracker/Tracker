@@ -24,7 +24,12 @@
  */
 package org.opensourcephysics.cabrillo.tracker.pencil;
 
-import org.opensourcephysics.cabrillo.tracker.*;
+import org.opensourcephysics.cabrillo.tracker.component.MainTView;
+import org.opensourcephysics.cabrillo.tracker.component.TFrame;
+import org.opensourcephysics.cabrillo.tracker.component.TToolBar;
+import org.opensourcephysics.cabrillo.tracker.tracker.Tracker;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.display.ColorIcon;
 import org.opensourcephysics.display.DrawingPanel;
 import org.opensourcephysics.display.ResizableIcon;

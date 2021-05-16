@@ -31,6 +31,16 @@ import java.awt.font.*;
 import java.awt.geom.*;
 
 import org.opensourcephysics.cabrillo.tracker.*;
+import org.opensourcephysics.cabrillo.tracker.component.TToolBar;
+import org.opensourcephysics.cabrillo.tracker.component.TTrack;
+import org.opensourcephysics.cabrillo.tracker.coord.CoordAxes;
+import org.opensourcephysics.cabrillo.tracker.footprint.ArrowFootprint;
+import org.opensourcephysics.cabrillo.tracker.footprint.Footprint;
+import org.opensourcephysics.cabrillo.tracker.point.PointMass;
+import org.opensourcephysics.cabrillo.tracker.step.PositionStep;
+import org.opensourcephysics.cabrillo.tracker.step.Step;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.display.*;

@@ -34,6 +34,13 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.*;
 
 import org.opensourcephysics.cabrillo.tracker.*;
+import org.opensourcephysics.cabrillo.tracker.component.TTrack;
+import org.opensourcephysics.cabrillo.tracker.footprint.Footprint;
+import org.opensourcephysics.cabrillo.tracker.line.LineFootprint;
+import org.opensourcephysics.cabrillo.tracker.step.Step;
+import org.opensourcephysics.cabrillo.tracker.tracker.Tracker;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.display.*;
 import org.opensourcephysics.media.core.*;
 import org.opensourcephysics.controls.*;
@@ -330,7 +337,7 @@ public class Vector extends TTrack {
     }
 
     @Override
-    protected void setMarking(boolean marking) {
+    public void setMarking(boolean marking) {
         super.setMarking(marking);
         repaint(trackerPanel);
     }
