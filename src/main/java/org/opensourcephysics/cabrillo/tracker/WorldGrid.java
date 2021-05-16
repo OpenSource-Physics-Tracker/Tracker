@@ -24,6 +24,7 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
 import org.opensourcephysics.display.DrawingPanel;
 import org.opensourcephysics.media.core.TPoint;
 import org.opensourcephysics.media.core.Trackable;

@@ -32,9 +32,9 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-import org.opensourcephysics.cabrillo.tracker.TFrame;
-import org.opensourcephysics.cabrillo.tracker.TrackerPanel;
-import org.opensourcephysics.cabrillo.tracker.TrackerRes;
+import org.opensourcephysics.cabrillo.tracker.component.TFrame;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.tools.FontSizer;
 
 /**

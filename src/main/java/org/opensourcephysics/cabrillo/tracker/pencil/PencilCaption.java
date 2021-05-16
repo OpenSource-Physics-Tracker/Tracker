@@ -24,8 +24,8 @@
  */
 package org.opensourcephysics.cabrillo.tracker.pencil;
 
-import org.opensourcephysics.cabrillo.tracker.Tracker;
-import org.opensourcephysics.cabrillo.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.Tracker;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.controls.XMLLoader;

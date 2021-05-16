@@ -87,7 +87,7 @@ Folder `libs` path: `yourProjectFolder -> build -> libs`<br>
 <b>Seventh step:</b><br>
 Assign path to FFMpeg and Tracker. To do this, we need to execute the command, and assign our paths in the command itself:<br>
 
-`java -cp build/libs/yourTrackerJarFile.jar:$FFMPEG_HOME/ffmpeg.jar:$FFMPEG_HOME/bridj.jar org.opensourcephysics.cabrillo.tracker.Tracker $*`
+`java -cp build/libs/yourTrackerJarFile.jar:$FFMPEG_HOME/ffmpeg.jar:$FFMPEG_HOME/bridj.jar org.opensourcephysics.cabrillo.tracker.tracker.Tracker $*`
 
 <b>Eighth step:</b><br>
 Run Tracker application with jar file:

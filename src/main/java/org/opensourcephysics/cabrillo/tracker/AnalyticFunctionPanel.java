@@ -7,6 +7,8 @@
 
 package org.opensourcephysics.cabrillo.tracker;
 
+import org.opensourcephysics.cabrillo.tracker.model.ModelFunctionPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.tools.UserFunctionEditor;
 
 /**

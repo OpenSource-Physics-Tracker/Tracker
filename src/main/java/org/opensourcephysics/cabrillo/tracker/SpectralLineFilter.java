@@ -33,6 +33,8 @@ import java.awt.geom.*;
 import java.awt.image.*;
 import javax.swing.*;
 
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.controls.*;
 import org.opensourcephysics.media.core.*;
 

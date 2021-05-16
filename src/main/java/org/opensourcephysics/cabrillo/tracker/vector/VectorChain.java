@@ -24,7 +24,7 @@
  */
 package org.opensourcephysics.cabrillo.tracker.vector;
 
-import org.opensourcephysics.cabrillo.tracker.TTrack;
+import org.opensourcephysics.cabrillo.tracker.component.TTrack;
 
 import java.util.ArrayList;
 import java.util.Collection;

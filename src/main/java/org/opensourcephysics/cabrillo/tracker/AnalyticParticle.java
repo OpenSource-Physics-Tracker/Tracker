@@ -24,6 +24,11 @@
  */
 package org.opensourcephysics.cabrillo.tracker;
 
+import org.opensourcephysics.cabrillo.tracker.component.ReferenceFrame;
+import org.opensourcephysics.cabrillo.tracker.particle.ParticleModel;
+import org.opensourcephysics.cabrillo.tracker.step.PositionStep;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerPanel;
+import org.opensourcephysics.cabrillo.tracker.tracker.TrackerRes;
 import org.opensourcephysics.controls.XML;
 import org.opensourcephysics.controls.XMLControl;
 import org.opensourcephysics.media.core.ImageCoordSystem;
@@ -39,8 +44,7 @@ import java.awt.geom.Point2D;
  *
  * @author W. Christian, D. Brown
  */
-public class AnalyticParticle
-        extends ParticleModel {
+public class AnalyticParticle extends ParticleModel {
 
     UserFunction[] functions;
 
@@ -77,7 +81,7 @@ public class AnalyticParticle
      * Gets the next trace position. Subclasses override to get positions based
      * on model.
      */
-    protected Point2D[] getNextTracePositions() {
+    public Point2D[] getNextTracePositions() {
         double x = functions[0].evaluate(time);
         double y = functions[1].evaluate(time);
         point.setLocation(x, y);
@@ -87,7 +91,7 @@ public class AnalyticParticle
     /**
      * Resets model parameters and sets position(s) for start frame.
      */
-    protected void reset() {
+    public void reset() {
         super.reset();
         t0 = getInitialValues()[0]; // time at start frame
         functions = getFunctionEditor().getMainFunctions();
