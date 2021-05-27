@@ -5,7 +5,7 @@ plugins {
 jar {
     manifest {
         // This is where the Main class is specified for launching applications (otherwise the jar will not start)
-        attributes 'Main-Class': 'org.opensourcephysics.cabrillo.tracker.Tracker'
+        attributes 'Main-Class': 'org.opensourcephysics.cabrillo.tracker.tracker.Tracker'
     }
 
     // Create fat-jar file
